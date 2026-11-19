@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="App do Projeto Hold BTC 100: registre seus aportes mensais em bitcoin, acompanhe preço médio e resultado, gerencie UTXOs e aprenda autocustódia.">
 <title>Hold BTC 100</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-uOk3Bakr124cNEcdKMOVi+Dt8wkbmnKu+GDcpeSNIO8='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Pfw0I2GetxmxSw3muz+tfnDngCZQCyASSb1kuj31Ago='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -412,6 +412,8 @@ button.io:active{background:var(--surface-2)}
 .xi-warn ul{margin:6px 0 0;padding-left:18px}
 .xi-warn li{margin:6px 0}
 .xi-wait{font-size:13.5px;color:var(--warn);background:var(--warn-bg);border-radius:10px;padding:8px 10px;margin:2px 0 10px}
+.xi-alt{margin:0 0 4px}.xi-alt .hint{margin:6px 2px 0}
+.xi-rs{margin:0 0 14px}.xi-rs p{margin:0}.xi-rs .btn{background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}.xi-rs .xi-rs-p+.btn{margin-top:10px}.xi-rs .hint{margin:6px 0 0}
 .xi-bar{height:6px;border-radius:999px;background:var(--line);overflow:hidden;margin:6px 0 10px}
 .xi-bar span{display:block;height:100%;width:35%;border-radius:999px;background:var(--orange);animation:xiMove 1.3s ease-in-out infinite}
 @keyframes xiMove{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
@@ -814,7 +816,7 @@ const KS_CARDS = {
    Claude, também espelha num documento privado do usuário.
    ========================================================= */
 
-const APP_VERSION = '1.8.13';
+const APP_VERSION = '1.8.14';
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const HIST = {"start":"2015-01","usd":[269,236,249,240,233,247,274,257,233,275,346,404,400,404,427,433,490,602,649,600,593,655,724,855,967,1075,1126,1210,1817,2384,2684,3787,4520,5404,8338,12178,12166,10318,8680,8122,8372,6952,7096,7394,6818,6489,5192,3887,3595,3654,3979,4704,6942,9680,10459,9914,9056,8766,8345,7372,8268,8948,7481,7512,9050,9296,10232,11509,11218,12286,16730,24328,31072,39024,51906,58338,47486,36155,38354,44318,45439,52582,59166,51586,42365,40791,44360,41879,35044,25823,21591,21674,19744,19962,18841,16851,19838,23126,25804,28897,28234,28846,29858,27587,26456,30805,36179,39982,42444,51946,66244,65986,64146,65194,63729,61864,61188,66861,83364,95022,97976,93433,83444,88373,99394,105848,111410,111996,111124,111840,99685,88638,83198,72854,67640,72356,75048,66150,60768,70714,81095,80570],"brl":[708,663,783,731,714,768,883,904,911,1067,1307,1564,1620,1603,1583,1542,1734,2062,2125,1926,1930,2088,2418,2866,3091,3338,3522,3795,5832,7858,8605,11932,14171,17247,27175,40087,39062,33444,28462,27676,30443,26233,27169,29059,28068,24388,19662,15101,13451,13608,15305,18328,27776,37353,39528,39856,37326,35825,34676,30296,34306,38845,36536,40003,51073,48305,54030,62853,60569,69121,90640,125185,166425,211371,293069,324482,251253,181928,197777,232745,239904,291307,328780,291530,234452,211975,220398,199260,173644,130385,115903,111476,103397,104809,99381,88340,103169,119603,134475,145054,140682,139952,143345,135273,130613,156021,177216,195797,208587,257883,329902,338449,329261,351333,353186,343509,339079,376033,484100,579349,589992,538697,479536,511123,563308,587149,615933,610031,596450,602314,532408,483352,444108,378882,353863,364172,374017,339193,310759,364403,417209,413273]}; // médias mensais estimadas: {start:'2015-01', usd:[…], brl:[…]}
 const REF_PRICE = { BRL: 416900, USD: 75800, EUR: 68000, at: Date.UTC(2026, 10, 7, 18, 0), src: 'ref' }; // US$ do CoinLore × PTAX de 06/11/2026 (R$ 5,50; € 6,13)
@@ -3688,22 +3690,24 @@ function xiHTML() {
   if (f.step === 'aviso') return `<h2>Importar pela chave pública mestra</h2><p class="sub">Traga todos os endereços de uma carteira de uma vez, já com o saldo, e dê nome a cada um antes de importar.</p>
     <div class="note warn xi-warn"><b>Aviso de privacidade</b><ul>
       <li>A chave pública mestra (xpub, ypub ou zpub) <b>não move</b> seus bitcoins, mas mostra <b>todos</b> os endereços da carteira, o histórico e o saldo. Trate como informação sensível e não compartilhe.</li>
-      <li>Para descobrir quais endereços já foram usados, o app consulta um servidor da rede bitcoin. <b>Quem opera o servidor fica sabendo que esses endereços são da mesma pessoa</b> e vê o seu IP. O padrão é o mempool.space; o ideal é usar o seu próprio nó (mempool ou Esplora).</li>
+      <li>Para descobrir quais endereços já foram usados, o app consulta um servidor da rede bitcoin. <b>Quem opera o servidor fica sabendo que esses endereços são da mesma pessoa</b> e vê o seu IP. O padrão é o mempool.space; o ideal é usar o seu próprio nó (mempool ou Esplora). Se o servidor não responder, o app oferece continuar no blockstream.info, só se você tocar.</li>
       <li>O app <b>não guarda a chave</b>: só os endereços e os UTXOs que você confirmar, neste aparelho.</li>
       <li>Nunca digite aqui uma chave privada (xprv) nem as 12 ou 24 palavras. Nenhum app de acompanhamento precisa delas.</li></ul></div>
     <button class="btn btn-p block" data-act="xi-ok">Entendi, continuar</button>`;
   if (f.step === 'scan') return `<h2>Buscando endereços…</h2><p class="sub" id="xi-prog">${esc(f.prog || 'Preparando…')}</p><div class="xi-bar" aria-hidden="true"><span></span></div>
     <p class="xi-wait" id="xi-wait"${f.wait ? '' : ' hidden'}>${esc(f.wait || '')}</p>
+    <div class="xi-alt" id="xi-altbox"${f.alt ? '' : ' hidden'}><button class="btn btn-q block" data-act="xi-alt">Continuar agora com ${esc(xiHost(xiAltOf(f.server)))}</button><p class="hint">Sem perder o que já foi consultado. O ${esc(xiHost(xiAltOf(f.server)))} passa a ver os endereços consultados daqui em diante.</p></div>
     <p class="hint">O app para depois de ${f.gap} endereços seguidos sem uso, em recebimento e em troco. As consultas saem com um pequeno intervalo, para o servidor não recusar. Se ele demorar ou pedir uma pausa, o app avisa acima e continua sozinho.</p><button class="btn btn-q block" style="margin-top:14px" data-act="xi-cancel">Cancelar</button>`;
   if (f.step === 'review') return xiReviewHTML();
   const q = xiCanQuery();
   return `<h2>Chave pública mestra</h2><p class="sub">Cole a xpub, ypub ou zpub da conta, ou o descritor exportado pela carteira (Sparrow, Trezor Suite, Electrum).</p>
     <div class="field"><label for="xi-k">Chave ou descritor</label><textarea class="inp mono" id="xi-k" name="xkey" rows="3" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="zpub6r… ou wpkh([…]xpub…/<0;1>/*)" data-inp="xi-key">${esc(f.key)}</textarea><p class="hint" id="xi-kh">${esc(f.keyHint || '')}</p></div>
     <div class="field"><label for="xi-t">Tipo de endereço</label><select class="inp" id="xi-t" name="xtype">${XI_TYPES.map(([v, l]) => `<option value="${v}" ${f.type === v ? 'selected' : ''}>${l}</option>`).join('')}</select><p class="hint">A zpub e a ypub já dizem o tipo. Com xpub, o app ${q ? 'testa cada tipo e usa o que tiver movimento' : 'precisa que você escolha o tipo'}.</p></div>
-    ${q ? `<div class="field"><label for="xi-s">Servidor (API Esplora ou mempool)</label><input class="inp mono" id="xi-s" name="xserver" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(f.server)}"><p class="hint">Para mais privacidade, use a API do seu próprio nó, por exemplo https://meunode.local/api.</p></div>
+    ${q ? `<div class="field"><label for="xi-s">Servidor (API Esplora ou mempool)</label><input class="inp mono" id="xi-s" name="xserver" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(f.server)}"><p class="hint">Servidores públicos: mempool.space (o padrão) e blockstream.info. Para mais privacidade, use a API do seu próprio nó, por exemplo https://meunode.local/api.</p></div>
     <div class="field"><label for="xi-g">Parar depois de quantos endereços seguidos sem uso</label><select class="inp" id="xi-g" name="xgap">${[20, 50, 100].map(n => `<option ${f.gap === n ? 'selected' : ''}>${n}</option>`).join('')}</select><p class="hint">20 é o padrão das carteiras. Aumente se a carteira for antiga ou se você gerou muitos endereços sem usar.</p></div>
     <p class="err form" hidden>${esc(f.err || '')}</p>
-    <button class="btn btn-p block" data-act="xi-scan">Buscar endereços e saldos</button>
+    ${xiResumeHTML(f)}
+    <button class="btn btn-p block" data-act="xi-scan">${f.scan && f.scan.n ? 'Continuar a busca' : 'Buscar endereços e saldos'}</button>
     <p style="text-align:center;margin:12px 0 0"><button class="link-btn small" data-act="xi-derive">Ou só gerar os endereços, sem consultar</button></p>`
     : `<p class="note" style="margin:0 0 14px">${IN_CLAUDE ? 'Nesta prévia o app não acessa a internet, então não dá para buscar os saldos.' : 'No modo 100% offline o app não consulta a rede, então não dá para buscar os saldos.'} Você ainda pode gerar os endereços aqui mesmo, sem consulta, e dar nome a eles. Os saldos entram depois, como UTXOs.</p>
     <div class="field"><label for="xi-c">Quantos endereços de recebimento e de troco</label><select class="inp" id="xi-c" name="xcount">${[10, 20, 50].map(n => `<option ${f.count === n ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
@@ -3716,6 +3720,11 @@ async function xiKeyInfo(s) {
 }
 async function xiKeyHint(el) {
   const s = (el.value || '').trim(), h = $('#xi-kh'); if (!h) return;
+  const f = ui.form;   // chave diferente: a busca interrompida não vale mais (1.8.14)
+  if (f && f.scan && f.scan.key !== s) {
+    f.scan = null; const p = $('#xi-rs .xi-rs-p'), b = $('#sheet-body [data-act="xi-scan"]'); if (p) p.remove(); if (b) b.textContent = 'Buscar endereços e saldos';
+    const bx = $('#xi-rs'); if (bx && !bx.querySelector('button')) bx.remove();
+  }
   if (/^[xyztuv]prv/i.test(s)) { el.value = ''; h.innerHTML = '<span class="neg">Isso é uma chave PRIVADA e foi apagada do campo. Ela dá acesso aos seus bitcoins: não digite em nenhum app.</span>'; return; }
   if (s.length < 100) { h.textContent = ''; return; }
   try {
@@ -3724,67 +3733,99 @@ async function xiKeyHint(el) {
     h.innerHTML = `<span class="pos">${esc(k.prefix)} válida</span> · ${type ? esc(typeLabel(type)) : 'tipo a definir'}${origin ? ` · impressão digital ${esc(origin.slice(0, 8))}` : ''}${k.depth !== 3 ? `<br><span class="warn">Esta chave está no nível ${k.depth}; o comum é a chave da conta (nível 3). Confira na sua carteira.</span>` : ''}`;
   } catch (e) { if ((el.value || '').trim() === s) h.innerHTML = `<span class="neg">${esc(e.message)}</span>`; }
 }
-/* Consultas ao servidor (1.8.11). Até a 1.8.10, uma resposta que nunca chegava deixava a tela "Buscando endereços…" parada
-   para sempre, e as rajadas de 5 consultas faziam o servidor recusar parte delas. Agora:
-   - cada tentativa tem tempo-limite (XI_TIMEOUT); sem resposta ou sem conexão, tenta de novo e, na 3ª falha, para com uma mensagem;
-   - as consultas saem espaçadas (xiPace.gap, de 200 ms a 2 s): o intervalo dobra quando o servidor recusa e volta a diminuir
-     com as respostas boas. Recusa é 429, 5xx ou falha de rede logo depois de respostas boas (um 429 sem CORS chega assim ao app);
-   - recusa pausa todas as consultas e tenta de novo até 7 vezes, em cerca de 1 minuto;
+/* Consultas ao servidor (1.8.11, revistas na 1.8.14). Até a 1.8.10, uma resposta que nunca chegava deixava a tela
+   "Buscando endereços…" parada para sempre. Na 1.8.13, no celular, o mempool.space parou de responder no meio da busca e o
+   app desistiu depois de 3 tentativas de 15 s: o limite de consultas do servidor (não divulgado, por IP; nos dados móveis
+   o IP é dividido com outras pessoas) às vezes deixa de responder em vez de recusar. Agora:
+   - no máximo xiPace.par consultas ao mesmo tempo (XI_PAR), uma a cada xiPace.gap (de 250 ms a 4 s);
+   - resposta lenta (mais de XI_SLOW) ou recusa (429, 5xx, falha de rede depois de respostas boas) deixa a busca mais
+     devagar até o fim: uma consulta por vez e, na recusa, o dobro do intervalo;
+   - sem resposta depois de respostas boas é o servidor pedindo calma ("lento"): pausas de 5 a 30 s e até XI_SLOW_TRIES
+     tentativas seguidas sem resposta (cerca de 2 minutos) antes de parar; sem nenhuma resposta desde o início, para na 3ª.
+     A contagem (xiPace.miss) vale para a busca toda e zera na primeira resposta boa: consultas paradas ao mesmo tempo
+     não multiplicam a espera;
+   - na espera longa, a tela oferece continuar em outro servidor (xiAltOf), com um toque, sem perder o que já foi
+     consultado (f.scan, em xiScanRun); os erros do servidor levam srv, para o formulário oferecer o mesmo;
    - a tela mostra a pausa com contagem e o tempo sem resposta (xiTick), e o Cancelar interrompe na hora. */
-const XI_TIMEOUT = 15000, XI_GAP = 200, XI_GAP_MAX = 2000, XI_NET_TRIES = 3, XI_BUSY_TRIES = 7;
-const XI_NET_WAIT = [1500, 3000], XI_BUSY_WAIT = [2000, 4000, 8000, 15000, 15000, 15000];
+const XI_TIMEOUT = 15000, XI_GAP = 250, XI_GAP_MAX = 4000, XI_PAR = 2, XI_SLOW = 4000;
+const XI_NET_TRIES = 3, XI_BUSY_TRIES = 7, XI_SLOW_TRIES = 5;
+const XI_NET_WAIT = [1500, 3000], XI_BUSY_WAIT = [2000, 4000, 8000, 15000, 15000, 15000], XI_SLOW_WAIT = [5000, 10000, 20000, 30000];
+const XI_ALT = 'https://blockstream.info/api';
+const xiHost = s => { try { return new URL(s).host; } catch (e) { return String(s); } };
+/* outro servidor: o blockstream.info para quem usa o mempool.space; o mempool.space para os demais (inclusive o nó próprio) */
+const xiAltOf = s => xiHost(s) === 'mempool.space' ? XI_ALT : XI_SERVER;
 const XI_WHY = {
   cheio: 'O servidor pediu uma pausa por excesso de consultas.',
   erro: 'O servidor está com problema agora.',
   recusa: 'O servidor recusou a consulta ou a conexão caiu.',
+  lento: 'O servidor parou de responder por um tempo, provavelmente pelo limite de consultas.',
   timeout: `O servidor não respondeu em ${XI_TIMEOUT / 1000} segundos.`,
   rede: 'A conexão com o servidor falhou.'
 };
-const xiPace = { gap: XI_GAP, next: 0, why: '', try: 0, max: 0, ok: 0, n: 0, pend: new Map() };
-function xiPaceReset() { Object.assign(xiPace, { gap: XI_GAP, next: 0, why: '', try: 0, max: 0, ok: 0, n: 0 }); xiPace.pend.clear(); }
-/* vez de cada consulta: uma a cada xiPace.gap, depois de qualquer pausa pedida */
-async function xiSlot(signal) { const now = Date.now(), at = Math.max(now, xiPace.next); xiPace.next = at + xiPace.gap; if (at > now) await xiWait(at - now, signal); }
-function xiPause(ms, why, n, max) { xiPace.next = Math.max(xiPace.next, Date.now() + ms); Object.assign(xiPace, { why, try: n, max }); xiTick(); }
-async function xiGet(base, path, signal) {
-  let net = 0, busy = 0;
+const xiPace = { gap: XI_GAP, par: XI_PAR, live: 0, gen: 0, next: 0, why: '', try: 0, max: 0, ok: 0, miss: 0, n: 0, pend: new Map() };
+/* gen separa as buscas: consulta abandonada de uma busca anterior não mexe na contagem da atual */
+function xiPaceReset() { Object.assign(xiPace, { gap: XI_GAP, par: XI_PAR, live: 0, gen: xiPace.gen + 1, next: 0, why: '', try: 0, max: 0, ok: 0, miss: 0 }); xiPace.pend.clear(); }
+/* vez de cada consulta: no máximo xiPace.par ao mesmo tempo, uma a cada xiPace.gap, depois de qualquer pausa pedida */
+async function xiSlot(signal) {
   for (;;) {
-    await xiSlot(signal);
-    const ctl = new AbortController(), stop = () => ctl.abort(), id = ++xiPace.n;
+    const now = Date.now();
+    if (xiPace.live < xiPace.par && xiPace.next <= now) { xiPace.live++; xiPace.next = now + xiPace.gap; return xiPace.gen; }
+    await xiWait(Math.min(250, Math.max(20, xiPace.next - now)), signal);
+  }
+}
+function xiPause(ms, why, n, max) { xiPace.next = Math.max(xiPace.next, Date.now() + ms); Object.assign(xiPace, { why, try: n, max }); xiTick(); }
+/* mais devagar até o fim da busca: uma consulta por vez e o dobro do intervalo (uma vez por pausa) */
+function xiSlower() { xiPace.par = 1; if (!xiPace.why) xiPace.gap = Math.min(XI_GAP_MAX, xiPace.gap * 2); }
+const xiErr = msg => Object.assign(new Error(msg), { srv: true });
+const XI_KEEP = 'O que já foi consultado ficou guardado: continue em outro servidor ou espere alguns minutos e toque em Continuar a busca.';
+async function xiGet(base, path, signal) {
+  let busy = 0; const host = xiHost(base);
+  for (;;) {
+    const gen = await xiSlot(signal);
+    const ctl = new AbortController(), stop = () => ctl.abort(), id = ++xiPace.n, t0 = Date.now();
     let late = false, r = null, data, fail = '';
     signal.addEventListener('abort', stop, { once: true });
     const timer = setTimeout(() => { late = true; ctl.abort(); }, XI_TIMEOUT);
-    xiPace.pend.set(id, Date.now());
+    xiPace.pend.set(id, t0);
     try {
       r = await fetch(base + path, { signal: ctl.signal, cache: 'no-store' });
       if (r.ok) { const txt = await r.text(); try { data = JSON.parse(txt); } catch (e) { fail = 'json'; } }
     } catch (e) { fail = signal.aborted ? 'cancel' : late ? 'timeout' : 'rede'; }
-    finally { clearTimeout(timer); signal.removeEventListener('abort', stop); xiPace.pend.delete(id); }
+    finally { clearTimeout(timer); signal.removeEventListener('abort', stop); xiPace.pend.delete(id); if (gen === xiPace.gen) xiPace.live--; }
     if (fail === 'cancel') throw new DOMException('Busca cancelada.', 'AbortError');
-    if (fail === 'json') throw new Error('O servidor respondeu algo que não é da API Esplora (mempool ou Blockstream). Confira o endereço do servidor.');
+    if (fail === 'json') throw xiErr(`O servidor ${host} respondeu algo que não é da API Esplora (mempool ou Blockstream). Confira o endereço do servidor.`);
     if (!fail && r.ok) {
-      xiPace.ok++; xiPace.gap = Math.max(XI_GAP, Math.round(xiPace.gap * 0.9));
+      xiPace.ok++; xiPace.miss = 0;
+      if (Date.now() - t0 > XI_SLOW) xiPace.par = 1; else xiPace.gap = Math.max(XI_GAP, Math.round(xiPace.gap * 0.9));
       if (xiPace.next <= Date.now()) xiPace.why = '';
       return data;
     }
-    if (!fail && r.status !== 429 && r.status < 500) throw new Error(r.status === 400 || r.status === 404 ? 'O servidor não reconheceu a consulta. Ele precisa ser compatível com a API Esplora (mempool ou Blockstream).' : `O servidor respondeu com erro ${r.status}.`);
+    if (!fail && r.status !== 429 && r.status < 500) throw xiErr(r.status === 400 || r.status === 404 ? `O servidor ${host} não reconheceu a consulta. Ele precisa ser compatível com a API Esplora (mempool ou Blockstream).` : `O servidor ${host} respondeu com erro ${r.status}.`);
     if (fail === 'rede' && navigator.onLine === false) throw new Error('O aparelho está sem internet. Conecte-se e tente de novo.');
-    const why = !fail ? (r.status === 429 ? 'cheio' : 'erro') : fail === 'rede' && xiPace.ok ? 'recusa' : fail;
+    const why = !fail ? (r.status === 429 ? 'cheio' : 'erro') : !xiPace.ok ? fail : fail === 'rede' ? 'recusa' : 'lento';
     if (why === 'cheio' || why === 'erro' || why === 'recusa') {
-      if (++busy >= XI_BUSY_TRIES) throw new Error(why === 'recusa' ? 'O servidor deixou de responder: recusou várias consultas seguidas ou a internet caiu. Espere alguns minutos e tente de novo.' : 'O servidor está recusando por excesso de consultas. Espere alguns minutos e tente de novo, ou use o seu próprio nó.');
-      if (!xiPace.why) xiPace.gap = Math.min(XI_GAP_MAX, xiPace.gap * 2);
-      xiPause(XI_BUSY_WAIT[busy - 1], why, busy + 1, XI_BUSY_TRIES); continue;
+      if (++busy >= XI_BUSY_TRIES) throw xiErr(why === 'recusa' ? `O servidor ${host} deixou de responder: recusou várias consultas seguidas ou a internet caiu. ${XI_KEEP}` : `O servidor ${host} está recusando por excesso de consultas. ${XI_KEEP}`);
+      xiSlower(); xiPause(XI_BUSY_WAIT[busy - 1], why, busy + 1, XI_BUSY_TRIES); continue;
     }
-    if (++net >= XI_NET_TRIES) throw new Error(why === 'timeout' ? `O servidor não respondeu (esperei ${XI_TIMEOUT / 1000} segundos em cada uma das ${XI_NET_TRIES} tentativas). Confira a internet e tente de novo; se continuar, use outro servidor.` : 'Não consegui falar com o servidor. Confira a internet e o endereço. Se for o seu nó, ele precisa aceitar consultas vindas do app (CORS).');
-    xiPause(XI_NET_WAIT[net - 1], why, net + 1, XI_NET_TRIES);
+    const k = ++xiPace.miss;   // sem resposta ou sem conexão: tentativas seguidas, na busca toda
+    if (why === 'lento') {
+      if (k >= XI_SLOW_TRIES) throw xiErr(`O servidor ${host} parou de responder no meio da busca (esperei ${XI_TIMEOUT / 1000} segundos em cada uma das ${XI_SLOW_TRIES} tentativas, com pausas entre elas). Costuma ser o limite de consultas do servidor. ${XI_KEEP}`);
+      xiSlower(); xiPause(XI_SLOW_WAIT[k - 1], why, k + 1, XI_SLOW_TRIES); continue;
+    }
+    if (k >= XI_NET_TRIES) throw xiErr(why === 'timeout' ? `O servidor ${host} não respondeu a nenhuma consulta (esperei ${XI_TIMEOUT / 1000} segundos em cada uma das ${XI_NET_TRIES} tentativas). Pode ser a internet do aparelho ou um bloqueio desse servidor na sua rede: tente outro servidor ou outra conexão (Wi-Fi ou dados móveis).` : `Não consegui falar com o servidor ${host}. Confira a internet e o endereço. Se for o seu nó, ele precisa aceitar consultas vindas do app (CORS).`);
+    xiPause(XI_NET_WAIT[k - 1], why, k + 1, XI_NET_TRIES);
   }
 }
-/* aviso de espera na tela da busca: pausa com contagem regressiva ou consulta sem resposta há alguns segundos */
+/* aviso de espera na tela da busca: pausa com contagem regressiva ou consulta sem resposta há alguns segundos. Com a espera
+   longa (pausa ou 8 s sem resposta), aparece o botão de continuar em outro servidor (1.8.14). */
 function xiTick() {
   const f = ui.form; if (!f || f.kind !== 'xpub' || f.step !== 'scan') return;
   const now = Date.now(), left = Math.ceil((xiPace.next - now) / 1000), started = [...xiPace.pend.values()];
-  const age = started.length ? Math.floor((now - Math.min(...started)) / 1000) : 0;
-  const t = xiPace.why && left >= 1 ? `${XI_WHY[xiPace.why]} Tento de novo em ${left} s (tentativa ${xiPace.try} de ${xiPace.max}).` : age >= 3 ? `Esperando a resposta do servidor… ${age} s` : '';
-  f.wait = t; const el = $('#xi-wait'); if (el) { el.textContent = t; el.hidden = !t; }
+  const age = started.length ? Math.floor((now - Math.min(...started)) / 1000) : 0, paused = !!xiPace.why && left >= 1;
+  const t = paused ? `${XI_WHY[xiPace.why]} Tento de novo em ${left} s (tentativa ${xiPace.try} de ${xiPace.max}).` : age >= 3 ? `Esperando a resposta do servidor ${xiHost(f.server)}… ${age} s` : '';
+  f.wait = t; f.alt = paused || age >= 8;
+  const el = $('#xi-wait'); if (el) { el.textContent = t; el.hidden = !t; }
+  const ab = $('#xi-altbox'); if (ab) ab.hidden = !f.alt;
 }
 /* respostas do servidor conferidas (1.8.9): números de verdade, txid em hexadecimal e vout e valor inteiros.
    Um servidor próprio pode ser qualquer um; UTXO fora do formato não entra na revisão. */
@@ -3793,56 +3834,84 @@ const xiTxs = s => { s = s && typeof s === 'object' ? s : {}; return xn((s.chain
 const xiBal = s => { s = s && typeof s === 'object' ? s : {}; const c = s.chain_stats || {}, m = s.mempool_stats || {}; return xn(c.funded_txo_sum) - xn(c.spent_txo_sum) + xn(m.funded_txo_sum) - xn(m.spent_txo_sum); };
 const xiUtxoOk = u => !!u && typeof u === 'object' && typeof u.txid === 'string' && /^[0-9a-fA-F]{64}$/.test(u.txid) && Number.isInteger(u.vout) && u.vout >= 0 && Number.isInteger(u.value) && u.value > 0 && (!u.status || u.status.block_time == null || Number.isFinite(u.status.block_time));
 function xiProg(t) { ui.form.prog = t; const el = $('#xi-prog'); if (el) el.textContent = t; }
-/* um toque só: tocar em Buscar de novo enquanto uma busca está em andamento não começa outra (1.8.11) */
+/* um toque só: tocar em Buscar de novo enquanto uma busca está em andamento não começa outra (1.8.11).
+   Troca de servidor durante a busca (1.8.14): xi-alt marca f.relaunch e cancela a busca atual; ao terminar, ela dá lugar
+   à nova, que segue do ponto em que a anterior parou. */
 async function xiScan(deriveOnly) {
   if (xiBusy) return; xiBusy = true;
   try { await xiScanRun(deriveOnly); } finally { xiBusy = false; }
+  const f = ui.form;
+  if (f && f.kind === 'xpub' && f.relaunch) { f.relaunch = false; if (ui.sheet && ui.sheet.kind === 'xpub') await xiScan(false); }
 }
+/* Busca que continua de onde parou (1.8.14). O progresso fica em f.scan (tipo, ramo, posição, endereços com movimento e
+   UTXOs já buscados) e só avança quando um lote inteiro de 5 endereços foi respondido. Erro, Cancelar e troca de servidor
+   não jogam fora o que já foi consultado: Buscar (que vira Continuar a busca) com a mesma chave, o mesmo tipo e o mesmo
+   limite segue do lote em que parou, no servidor que estiver no campo. Chave, tipo ou limite diferentes: busca do zero. */
 async function xiScanRun(deriveOnly) {
-  const f = ui.form; f.key = (fv('xkey') || '').trim(); f.type = fv('xtype') || f.type; f.err = '';
-  if (!deriveOnly) { f.server = (fv('xserver') || XI_SERVER).trim().replace(/\/+$/, ''); f.gap = +fv('xgap') || 20; } else f.count = +fv('xcount') || f.count;
+  const f = ui.form, form = !!$('#xi-k');   // sem o formulário na tela (troca de servidor durante a busca), vale o que está em f
+  if (form) { f.key = (fv('xkey') || '').trim(); f.type = fv('xtype') || f.type; }
+  f.err = ''; f.fail = false;
+  if (form && !deriveOnly) { f.server = (fv('xserver') || XI_SERVER).trim().replace(/\/+$/, ''); f.gap = +fv('xgap') || 20; } else if (form) f.count = +fv('xcount') || f.count;
   if (!f.key) return formErr('Cole a chave pública ou o descritor.');
   let info; try { info = await xiKeyInfo(f.key); } catch (e) { return formErr(e.message); }
   if (!deriveOnly && !/^https:\/\//i.test(f.server) && !/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//i.test(f.server + '/')) return formErr('Use um endereço https:// para o servidor.');
-  let type = info.type || (f.type !== 'auto' ? f.type : null);
-  if (!type && deriveOnly) return formErr('Com xpub, escolha o tipo de endereço.');
-  f.step = 'scan'; f.prog = 'Preparando…'; f.wait = ''; xiRender();
-  const ctl = xiCtl = new AbortController(), sig = ctl.signal, node = info.k.node;
-  xiPaceReset();
+  const type0 = info.type || (f.type !== 'auto' ? f.type : null), node = info.k.node;
+  if (!type0 && deriveOnly) return formErr('Com xpub, escolha o tipo de endereço.');
+  const base = { fp: info.origin ? info.origin.slice(0, 8) : '', tag: info.origin ? info.origin.slice(0, 8) : f.key.replace(/^.*?([xyz]pub[1-9A-HJ-NP-Za-km-z]{4}).*$/s, '$1'), prefix: info.k.prefix };
+  if (deriveOnly) {
+    const res = { ...base, type: type0, derived: true, rows: [], note: '' };
+    for (const c of [0, 1]) { const gen = XK.chain(node, c, type0); for (let i = 0; i < f.count; i++) res.rows.push({ c, i, addr: await gen(i), bal: 0, txs: 0, utxos: [] }); }
+    f.res = res; xiPrepare(); f.step = 'review'; xiRender(); return;
+  }
+  let s = f.scan;
+  if (!s || s.key !== f.key || s.gap !== f.gap || s.pick !== f.type) s = f.scan = { key: f.key, gap: f.gap, pick: f.type, type: type0, note: '', t: 0, c: 0, i: 0, miss: 0, n: 0, u: 0, rows: [], hosts: [] };
+  f.step = 'scan'; f.prog = s.n ? `Continuando de onde parou · ${s.rows.length} com movimento até agora` : 'Preparando…'; f.wait = ''; f.alt = false; xiRender();
+  const ctl = xiCtl = new AbortController(), sig = ctl.signal, host = xiHost(f.server);
+  xiPaceReset(); if (!s.hosts.includes(host)) s.hosts.push(host);
   // a cada segundo: atualiza o aviso de espera e encerra a busca se a tela da importação foi fechada
   const tick = setInterval(() => { if (ui.sheet && ui.sheet.kind === 'xpub' && ui.form === f) xiTick(); else ctl.abort(); }, 1000);
   try {
-    let note = '';
-    if (!type) {
-      for (const t of ['p2wpkh', 'p2tr', 'p2sh-p2wpkh', 'p2pkh']) {
-        xiProg(`Testando ${typeLabel(t)}…`);
-        if (xiTxs(await xiGet(f.server, `/address/${await XK.chain(node, 0, t)(0)}`, sig))) { type = t; break; }
+    if (!s.type) {
+      const T = ['p2wpkh', 'p2tr', 'p2sh-p2wpkh', 'p2pkh'];
+      for (; s.t < T.length && !s.type; s.t++) {
+        xiProg(`Testando ${typeLabel(T[s.t])}…`);
+        if (xiTxs(await xiGet(f.server, `/address/${await XK.chain(node, 0, T[s.t])(0)}`, sig))) s.type = T[s.t];
       }
-      if (!type) { type = 'p2wpkh'; note = 'Nenhum tipo teve movimento no primeiro endereço. Usei SegWit nativo; se não for o seu, volte e escolha o tipo.'; }
+      if (!s.type) { s.type = 'p2wpkh'; s.note = 'Nenhum tipo teve movimento no primeiro endereço. Usei SegWit nativo; se não for o seu, volte e escolha o tipo.'; }
     }
-    const res = { type, fp: info.origin ? info.origin.slice(0, 8) : '', tag: info.origin ? info.origin.slice(0, 8) : f.key.replace(/^.*?([xyz]pub[1-9A-HJ-NP-Za-km-z]{4}).*$/s, '$1'), prefix: info.k.prefix, derived: deriveOnly, rows: [], note };
-    for (const c of [0, 1]) {
-      const gen = XK.chain(node, c, type);
-      if (deriveOnly) { for (let i = 0; i < f.count; i++) res.rows.push({ c, i, addr: await gen(i), bal: 0, txs: 0, utxos: [] }); continue; }
-      let i = 0, miss = 0;
-      while (miss < f.gap) {
-        xiProg(`${c ? 'Troco' : 'Recebimento'}: consultando os endereços ${i + 1} a ${i + 5} · ${res.rows.length} com movimento até agora`);
-        const idx = [i, i + 1, i + 2, i + 3, i + 4], addrs = []; for (const j of idx) addrs.push(await gen(j));
+    for (; s.c < 2; s.c++, s.i = 0, s.miss = 0) {
+      const c = s.c, gen = XK.chain(node, c, s.type);
+      while (s.miss < f.gap) {
+        xiProg(`${c ? 'Troco' : 'Recebimento'}: consultando os endereços ${s.i + 1} a ${s.i + 5} · ${s.rows.length} com movimento até agora`);
+        const idx = [s.i, s.i + 1, s.i + 2, s.i + 3, s.i + 4], addrs = []; for (const j of idx) addrs.push(await gen(j));
         const st = await Promise.all(addrs.map(a => xiGet(f.server, `/address/${a}`, sig)));
-        for (let k = 0; k < 5 && miss < f.gap; k++) { const txs = xiTxs(st[k]); if (!txs) { miss++; continue; } miss = 0; res.rows.push({ c, i: idx[k], addr: addrs[k], bal: xiBal(st[k]), txs, utxos: [] }); }
-        i += 5;
+        let miss = s.miss; const add = [];
+        for (let k = 0; k < 5 && miss < f.gap; k++) { const txs = xiTxs(st[k]); if (!txs) { miss++; continue; } miss = 0; add.push({ c, i: idx[k], addr: addrs[k], bal: xiBal(st[k]), txs, utxos: [] }); }
+        s.rows.push(...add); s.miss = miss; s.i += 5; s.n += 5;   // o lote só entra quando chegou inteiro
       }
     }
-    const withBal = res.rows.filter(r => r.bal > 0);
-    for (const [n, r] of withBal.entries()) {
-      xiProg(`Buscando UTXOs: ${n + 1} de ${withBal.length}`);
+    const withBal = s.rows.filter(r => r.bal > 0);
+    for (; s.u < withBal.length; s.u++) {
+      const r = withBal[s.u];
+      xiProg(`Buscando UTXOs: ${s.u + 1} de ${withBal.length}`);
       const lst = await xiGet(f.server, `/address/${r.addr}/utxo`, sig);
       r.utxos = (Array.isArray(lst) ? lst : []).filter(xiUtxoOk).map(u => ({ txid: u.txid, vout: u.vout, sats: u.value, date: u.status && u.status.block_time ? xiDate(u.status.block_time) : todayISO(), conf: !!(u.status && u.status.confirmed) }));
     }
-    if (!deriveOnly) S().xiServer = f.server === XI_SERVER ? undefined : f.server;
-    f.res = res; xiPrepare(); f.step = 'review'; xiRender();
-  } catch (e) { f.step = 'form'; f.wait = ''; f.err = sig.aborted ? '' : e.message; xiRender(); if (f.err) { const el = $('#sheet-body .err.form'); if (el) el.hidden = false; } }
+    S().xiServer = f.server === XI_SERVER ? undefined : f.server;
+    f.res = { ...base, type: s.type, derived: false, rows: s.rows, note: s.note, hosts: s.hosts }; f.scan = null; xiPrepare(); f.step = 'review'; xiRender();
+  } catch (e) {
+    if (sig.aborted && f.relaunch) return;   // troca de servidor: a nova busca começa em seguida, sem passar pelo formulário
+    f.step = 'form'; f.wait = ''; f.err = sig.aborted ? '' : e.message; f.fail = !sig.aborted && !!e.srv; xiRender();
+    if (f.err) { const el = $('#sheet-body .err.form'); if (el) el.hidden = false; }
+  }
   finally { clearInterval(tick); ctl.abort(); if (xiCtl === ctl) xiCtl = null; }   // abort: nenhuma consulta do lote continua depois do fim
+}
+/* caixa de retomada (1.8.14): depois de um erro do servidor ou do Cancelar, mostra o que já foi consultado; depois de erro
+   do servidor, oferece continuar em outro servidor. Tocar em Continuar a busca segue de onde parou. */
+function xiResumeHTML(f) {
+  const s = f.scan, part = !!(s && s.n), alt = xiHost(xiAltOf(f.server));
+  if (!part && !f.fail) return '';
+  return `<div class="note xi-rs" id="xi-rs">${part ? `<p class="xi-rs-p">Busca interrompida: ${s.n} endereços consultados, ${s.rows.length} com movimento. Ela continua de onde parou.</p>` : ''}${f.fail ? `<button class="btn btn-q block" data-act="xi-alt">Continuar com ${esc(alt)}</button><p class="hint">O ${esc(alt)} passa a ver os endereços consultados daqui em diante.</p>` : ''}</div>`;
 }
 /* nomes sugeridos, endereços já cadastrados e UTXOs já registrados */
 function xiPrepare() {
@@ -3864,6 +3933,7 @@ function xiReviewHTML() {
   const grp = (c, title) => { const list = rows.filter(x => x.c === c); return list.length ? `<h3 class="mini">${title} · ${list.length}</h3>${list.map(x => `<div class="xi-row"><div class="xi-a"><span class="xi-i">${x.c}/${x.i}</span><span class="mono">${esc(shortAddr(x.addr))}</span>${r.derived ? '' : `<span class="xi-v">${AMT(x.bal)} · ${x.txs} ${x.txs === 1 ? 'transação' : 'transações'}</span>`}${x.exId ? '<span class="tag">já cadastrado</span>' : ''}</div><input class="inp" name="xn_${x.c}_${x.i}" value="${esc(x.name)}" autocomplete="off" aria-label="Nome do endereço ${x.c}/${x.i}"></div>`).join('')}` : ''; };
   return `<h2>Revise antes de importar</h2>
     <p class="sub">${esc(r.prefix)} · ${esc(typeLabel(r.type))}${r.fp ? ` · impressão digital ${esc(r.fp)}` : ''}. ${r.derived ? `${rows.length} endereços gerados, sem consulta de saldo.` : rows.length ? `${rows.length} ${rows.length === 1 ? 'endereço' : 'endereços'} com movimento · ${AMT(tot)} em ${utx.length} ${utx.length === 1 ? 'UTXO' : 'UTXOs'}.` : 'Nenhum endereço com movimento foi encontrado.'}${known ? ` ${known} já estavam cadastrados.` : ''}</p>
+    ${r.hosts && r.hosts.length > 1 ? `<p class="hint" style="margin:-6px 0 12px">Consultado em ${r.hosts.map(esc).join(' e ')}.</p>` : ''}
     ${r.note ? `<p class="note warn" style="margin-bottom:12px">${esc(r.note)}</p>` : ''}
     ${rows.length ? `<div class="field"><label for="xi-w">Importar para a carteira</label><select class="inp" id="xi-w" name="xwallet" data-inp="xi-wallet">${state.wallets.map(w => `<option value="${w.id}">${esc(w.name)}</option>`).join('')}<option value="__new" selected>+ Nova carteira…</option></select></div>
     <div class="field" id="xi-nwf"><label for="xi-wn">Nome da nova carteira</label><input class="inp" id="xi-wn" name="xwname" value="Carteira ${esc(r.tag)}" autocomplete="off"></div>
@@ -3920,6 +3990,11 @@ Object.assign(ACT, {
   'xi-scan': () => xiScan(false),
   'xi-derive': () => xiScan(true),
   'xi-cancel': () => { if (xiCtl) xiCtl.abort(); },
+  'xi-alt': () => {   // continuar em outro servidor, sem perder o que já foi consultado (1.8.14)
+    const f = ui.form; if (!f || f.kind !== 'xpub' || f.relaunch) return;
+    f.server = xiAltOf(f.server); const el = $('#xi-s'); if (el) el.value = f.server;
+    if (xiCtl) { f.relaunch = true; xiCtl.abort(); } else xiScan(false);
+  },
   'xi-back': () => { ui.form.step = 'form'; ui.form.res = null; xiRender(); },
   'xi-apply': () => xiApply()
 });

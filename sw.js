@@ -7,11 +7,11 @@
    site (a política de privacidade) gravava essa página no lugar do app, e o app aberto sem internet mostrava a política.
    A política fica guardada também, para abrir sem internet (1.8.12).
    Troque CACHE a cada versão publicada para os aparelhos baixarem a nova. */
-const CACHE = 'holdbtc100-v1.8.13';
+const CACHE = 'holdbtc100-v1.8.14';
 const FLAGS = 'holdbtc100-flags';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 const EXTRA = ['./privacidade.html'];   // se faltar no site, a instalação segue sem ela
-const isAPI = h => /coingecko|binance|mempool\.space|bcb\.gov\.br|frankfurter/.test(h);
+const isAPI = h => /coingecko|binance|mempool\.space|blockstream\.info|bcb\.gov\.br|frankfurter/.test(h);   // blockstream.info: outro servidor da importação (1.8.14)
 const isApp = u => /\/(index\.html)?$/.test(u.pathname);
 
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL).then(() => c.addAll(EXTRA).catch(() => { }))).then(() => self.skipWaiting())); });
