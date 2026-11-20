@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="App do Projeto Hold BTC 100: registre seus aportes mensais em bitcoin, acompanhe preço médio e resultado, gerencie UTXOs e aprenda autocustódia.">
 <title>Hold BTC 100</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-gRlW2XDn/aMnZoliZtchkhcaeKpm0Dtjf5BfWnpkeZI='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-onqPyFQJM4mSOSdc/chMTNNV4tAmqogBbyp7HulNVyQ='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -524,6 +524,13 @@ a.set-row{color:inherit;text-decoration:none}
 /* aviso na confirmação de backup (1.8.9): campos corrigidos e servidor da importação */
 .restore-warn{background:var(--warn-bg);color:var(--ink);margin:0 0 14px;overflow-wrap:anywhere}
 .restore-warn b{color:var(--warn)}
+/* backup com conferência SHA-256 e PIN opcional (1.8.18) */
+.restore-ok{background:var(--pos-bg);color:var(--ink);margin:0 0 14px;overflow-wrap:anywhere}
+.restore-ok b{color:var(--pos)}
+.restore-info{margin:0 0 14px}
+.bk-sw{margin:2px 0 8px}
+#bk-pin-f{margin:0 0 10px}
+#bk-pin-f .hint{margin:0 0 4px}
 
 .ic{display:block;width:24px;height:24px}
 </style>
@@ -820,7 +827,7 @@ const KS_CARDS = {
    Claude, também espelha num documento privado do usuário.
    ========================================================= */
 
-const APP_VERSION = '1.8.17';
+const APP_VERSION = '1.8.18';
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const HIST = {"start":"2015-01","usd":[269,236,249,240,233,247,274,257,233,275,346,404,400,404,427,433,490,602,649,600,593,655,724,855,967,1075,1126,1210,1817,2384,2684,3787,4520,5404,8338,12178,12166,10318,8680,8122,8372,6952,7096,7394,6818,6489,5192,3887,3595,3654,3979,4704,6942,9680,10459,9914,9056,8766,8345,7372,8268,8948,7481,7512,9050,9296,10232,11509,11218,12286,16730,24328,31072,39024,51906,58338,47486,36155,38354,44318,45439,52582,59166,51586,42365,40791,44360,41879,35044,25823,21591,21674,19744,19962,18841,16851,19838,23126,25804,28897,28234,28846,29858,27587,26456,30805,36179,39982,42444,51946,66244,65986,64146,65194,63729,61864,61188,66861,83364,95022,97976,93433,83444,88373,99394,105848,111410,111996,111124,111840,99685,88638,83198,72854,67640,72356,75048,66150,60768,70714,81095,80570],"brl":[708,663,783,731,714,768,883,904,911,1067,1307,1564,1620,1603,1583,1542,1734,2062,2125,1926,1930,2088,2418,2866,3091,3338,3522,3795,5832,7858,8605,11932,14171,17247,27175,40087,39062,33444,28462,27676,30443,26233,27169,29059,28068,24388,19662,15101,13451,13608,15305,18328,27776,37353,39528,39856,37326,35825,34676,30296,34306,38845,36536,40003,51073,48305,54030,62853,60569,69121,90640,125185,166425,211371,293069,324482,251253,181928,197777,232745,239904,291307,328780,291530,234452,211975,220398,199260,173644,130385,115903,111476,103397,104809,99381,88340,103169,119603,134475,145054,140682,139952,143345,135273,130613,156021,177216,195797,208587,257883,329902,338449,329261,351333,353186,343509,339079,376033,484100,579349,589992,538697,479536,511123,563308,587149,615933,610031,596450,602314,532408,483352,444108,378882,353863,364172,374017,339193,310759,364403,417209,413273]}; // médias mensais estimadas: {start:'2015-01', usd:[…], brl:[…]}
 const REF_PRICE = { BRL: 416900, USD: 75800, EUR: 68000, at: Date.UTC(2026, 10, 7, 18, 0), src: 'ref' }; // US$ do CoinLore × PTAX de 06/11/2026 (R$ 5,50; € 6,13)
@@ -2069,10 +2076,10 @@ async function saveFile(filename, data, mime) {
   try { const blob = new Blob([data], { type: mime }), url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = filename; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 5000); toast('Download iniciado'); return true; }
   catch (e) { toast('Não foi possível baixar o arquivo.'); return false; }
 }
-async function copyText(t) {
-  try { await navigator.clipboard.writeText(t); toast('Copiado'); return; } catch (e) { }
-  try { const ta = document.createElement('textarea'); ta.value = t; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;opacity:0;top:0'; document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); if (ok) { toast('Copiado'); return; } } catch (e) { }
-  toast('Não deu para copiar. Selecione o texto e copie manualmente.');
+async function copyText(t) {   // devolve se copiou (1.8.18: o backup com PIN avisa só depois de copiar)
+  try { await navigator.clipboard.writeText(t); toast('Copiado'); return true; } catch (e) { }
+  try { const ta = document.createElement('textarea'); ta.value = t; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;opacity:0;top:0'; document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); if (ok) { toast('Copiado'); return true; } } catch (e) { }
+  toast('Não deu para copiar. Selecione o texto e copie manualmente.'); return false;
 }
 const csvCell = v => { const s = String(v ?? ''); return /[;"\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
 function aportesCSV() {
@@ -2117,12 +2124,71 @@ function movimentosCSV() {
   const rows = movimentos().map(m => { const a = m.a, g = m.tipo === 'venda' ? -1 : 1; return [fmtDate(m.date), m.tipo, a ? n2(g * a.fiat) : '', a ? cur() : '', a ? n2(a.price) : '', m.sats, btc(m.sats), m.ex, m.local, m.note, a ? n2(a.fee || 0) : '', m.fee == null ? '' : m.fee, m.wallet, m.txid].map(csvCell).join(';'); });
   return String.fromCharCode(0xFEFF) + ['data', 'tipo', 'valor', 'moeda', 'cotacao', 'sats', 'btc', 'corretora', 'local', 'observacao', 'taxa', 'taxa_sats', 'carteira', 'txid'].join(';') + '\r\n' + rows.join('\r\n') + '\r\n';
 }
-function backupJSON() { return JSON.stringify({ app: 'holdbtc100', format: 1, version: APP_VERSION, exportedAt: new Date().toISOString(), state: cloudPayload() }, null, 1); }
+/* Backup assinado, com PIN opcional (1.8.18). Formato 2: o envelope leva assinatura = SHA-256 (hexadecimal) da forma
+   canônica do JSON (chaves em ordem, sem espaços) do envelope inteiro menos a própria assinatura. Sem PIN, o estado vai
+   aberto em state e a assinatura confere só a integridade: pega arquivo cortado, corrompido ou editado, mas quem editar
+   de propósito pode refazer a conta. Com PIN (escolha da pessoa, na exportação), o estado vai em dados, cifrado com
+   AES-256-GCM; a chave sai do PIN por PBKDF2-SHA256 com 600.000 rodadas (o mínimo da OWASP desde 2023; o número vai no
+   arquivo, para subir no futuro) e o resto do envelope entra como dado autenticado: sem o PIN, ninguém lê o backup nem o
+   altera sem ser notado. O PIN do backup não é guardado e não tem relação com o PIN de bloqueio do app.
+   Backups de antes da 1.8.18 (formato 1, sem assinatura) continuam entrando, com um aviso. */
+const BK_FORMAT = 2, BK_ITER = 600000, BK_PIN_MIN = 6;
+const subtleOk = () => !!(window.crypto && crypto.subtle);
+const enc8 = s => new TextEncoder().encode(s);
+function canonJSON(v) {
+  if (Array.isArray(v)) return '[' + v.map(x => x === undefined || typeof x === 'function' ? 'null' : canonJSON(x)).join(',') + ']';
+  if (v && typeof v === 'object') return '{' + Object.keys(v).filter(k => v[k] !== undefined && typeof v[k] !== 'function').sort().map(k => JSON.stringify(k) + ':' + canonJSON(v[k])).join(',') + '}';
+  return JSON.stringify(v) ?? 'null';
+}
+async function sha256hex(s) { const h = new Uint8Array(await crypto.subtle.digest('SHA-256', enc8(s))); return Array.from(h, b => b.toString(16).padStart(2, '0')).join(''); }
+function b64big(u8) { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); }
+const bkSem = (o, ...ks) => { const r = { ...o }; for (const k of ks) delete r[k]; return r; };
+async function bkKey(pin, salt, iter) {
+  const base = await crypto.subtle.importKey('raw', enc8(pin.normalize('NFC')), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations: iter }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+async function backupJSON(pin = '') {
+  const env = { app: 'holdbtc100', format: BK_FORMAT, version: APP_VERSION, exportedAt: new Date().toISOString() };
+  if (!subtleOk()) { if (pin) throw new Error('sem-cripto'); return JSON.stringify({ ...env, format: 1, state: cloudPayload() }, null, 1); }   // página fora de https: formato antigo, sem assinatura
+  if (pin) {
+    const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+    env.cifrado = { alg: 'AES-256-GCM', kdf: 'PBKDF2-SHA256', iter: BK_ITER, sal: b64e(salt), iv: b64e(iv) };
+    const key = await bkKey(pin, salt, BK_ITER), aad = enc8(canonJSON(env));   // dado autenticado: o envelope sem dados e sem assinatura
+    const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: aad }, key, enc8(JSON.stringify(cloudPayload())));
+    env.dados = b64big(new Uint8Array(ct));
+  } else env.state = cloudPayload();
+  env.assinatura = { alg: 'SHA-256', valor: await sha256hex(canonJSON(env)) };
+  return JSON.stringify(env, null, 1);
+}
+let bkBusy = false;
+async function exportBackup(copy) {
+  const f = ui.form || {}, comPin = f.kind === 'export' && !!f.bkPin;
+  let pin = '';
+  if (comPin) {
+    pin = fv('bkpin'); const p2 = fv('bkpin2');
+    if (pin.length < BK_PIN_MIN) return formErr(`O PIN do backup precisa ter pelo menos ${BK_PIN_MIN} caracteres.`);
+    if (pin !== p2) return formErr('Os dois PINs não são iguais.');
+  }
+  if (bkBusy) return; bkBusy = true;
+  const er = $('#sheet-body .err.form'); if (er) er.hidden = true;
+  if (comPin) toast('Criptografando o backup…');
+  let txt;
+  try { txt = await backupJSON(pin); } catch (e) { console.error(e); return formErr('Não deu para gerar o backup neste navegador.'); } finally { bkBusy = false; }
+  const aviso = 'Guarde o PIN: sem ele, o backup não abre.';
+  if (copy) { if (await copyText(txt) && comPin) toast(`Backup com PIN copiado. ${aviso}`); return; }
+  if (await saveFile(`holdbtc100-backup-${todayISO()}${comPin ? '-pin' : ''}.json`, txt, 'application/json') && comPin) toast(`Backup com PIN baixado. ${aviso}`);
+}
 function sheetExport() {
+  ui.form = { kind: 'export', bkPin: false };   // PIN do backup (1.8.18): desligado por padrão, só a pessoa liga
   openSheet('export', () => `<h2>Exportar</h2><p class="sub">Os arquivos têm só os seus registros: nada de chaves ou seed.</p>
     <button class="tool" data-act="exp-csv"><b>Planilha das movimentações (.csv)</b><span>${movimentos().length ? 'Para ver e filtrar no Excel e no Google Planilhas: aportes, vendas, saques e transações, com a coluna tipo. Não restaura a carteira' : 'Ainda sem movimentações. A planilha traz o que está registrado no app (aportes, vendas, saques, entradas e transações). Endereços importados sem saldo só viram movimentação se você importar também o histórico, opção da revisão na importação pela chave pública'}</span><span class="chev" aria-hidden="true">›</span></button>
-    <button class="tool" data-act="exp-json"><b>Backup completo (.json)</b><span>Tudo o que está no app, menos o PIN: aportes, carteiras, UTXOs, transações, lições e ajustes. É ele que traz tudo de volta, aqui ou em outro aparelho</span><span class="chev" aria-hidden="true">›</span></button>
+    <div class="switch bk-sw"><span><span class="t">Proteger o backup com PIN</span><br><span class="d">${subtleOk() ? 'Criptografa o backup: sem o PIN, ninguém lê nem altera o arquivo. Se você esquecer o PIN, o backup não abre.' : 'Este navegador não permite criptografar o backup.'}</span></span><button class="tog${ui.form.bkPin ? ' on' : ''}" data-act="bk-pin-tog" aria-pressed="${!!ui.form.bkPin}" aria-label="Proteger o backup com PIN"${subtleOk() ? '' : ' disabled'}></button></div>
+    <div id="bk-pin-f"${ui.form.bkPin ? '' : ' hidden'}><div class="two"><div class="field"><label for="bk-p1">PIN do backup</label><input class="inp" id="bk-p1" name="bkpin" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"></div><div class="field"><label for="bk-p2">Repita o PIN</label><input class="inp" id="bk-p2" name="bkpin2" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"></div></div>
+      <p class="hint">Pelo menos ${BK_PIN_MIN} caracteres, números ou letras. Só números afastam curiosos; para guardar na nuvem ou no e-mail, use 10 ou mais, com letras. O PIN não fica guardado no app.</p></div>
+    <p class="err form" hidden></p>
+    <button class="tool" data-act="exp-json"><b>Backup completo (.json)</b><span>Tudo o que está no app, menos o PIN de bloqueio: aportes, carteiras, UTXOs, transações, lições e ajustes. É ele que traz tudo de volta, aqui ou em outro aparelho</span><span class="chev" aria-hidden="true">›</span></button>
     <button class="tool" data-act="exp-copy"><b>Copiar backup</b><span>Para colar num e-mail ou nota, se o download não funcionar</span><span class="chev" aria-hidden="true">›</span></button>
+    <p class="hint">Todo backup sai com a conferência SHA-256: ao importar, o app avisa se o arquivo foi cortado ou editado.</p>
     <p class="hint">${cloud.on && !S().offline ? 'Nesta prévia, os registros ficam neste aparelho e na sua conta do Claude.' : 'Os registros ficam só neste aparelho, no armazenamento do navegador.'} Limpar só o histórico de navegação não apaga nada. Limpar os dados dos sites no navegador ou desinstalar o app pode apagar tudo: guarde um backup fora do celular.</p>`, { label: 'Exportar' });
 }
 function sheetImport() {
@@ -2180,20 +2246,84 @@ function applyImport() {
   for (const a of p.list) state.aportes.push({ id: uid(), date: a.date, fiat: a.fiat, price: a.price, sats: a.sats, fee: a.fee || 0, ex: a.ex || DEF_EX(a.type), note: a.note || '', type: a.type || 'compra', ...(isSale(a) ? { src: 'ex' } : { dest: 'ex' }) });
   S().onboarded = true; save(); closeSheet(false, false); ui.tab = 'aportes'; ui.page = null; render(); toast(`${p.list.length} ${p.list.length === 1 ? 'registro importado' : 'registros importados'}`); fxSync();
 }
-function importBackupText(text) {
-  let obj; try { obj = JSON.parse(text); } catch (e) { return formErr('O texto não é um backup válido do app.'); }
-  if (!obj || obj.app !== 'holdbtc100' || !obj.state || typeof obj.state !== 'object' || Array.isArray(obj.state)) return formErr('Este arquivo não é um backup do Hold BTC 100.');
+/* Importação do backup (1.8.18): confere a assinatura antes de tudo. Formato 2 sem PIN: a conferência SHA-256 tem de
+   bater; se não bater (ou faltar), o app avisa que o arquivo mudou e só segue com a confirmação da pessoa. Com PIN: pede
+   o PIN e abre com AES-GCM, que recusa PIN errado e qualquer alteração. Depois, o caminho de sempre: validação dos
+   campos (1.8.9) e confirmação com o resumo. Formato 1 (até a 1.8.17): entra como antes, com um aviso. */
+async function importBackupText(text) {
+  try {
+    let obj; try { obj = JSON.parse(text); } catch (e) { return formErr('O texto não é um backup válido do app. Se ele veio de um e-mail ou de uma nota, confira se foi copiado inteiro.'); }
+    if (!obj || typeof obj !== 'object' || Array.isArray(obj) || obj.app !== 'holdbtc100') return formErr('Este arquivo não é um backup do Hold BTC 100.');
+    const fmt = obj.format == null ? 1 : obj.format;
+    if (!Number.isInteger(fmt) || fmt < 1) return formErr('Este arquivo não é um backup do Hold BTC 100.');
+    if (fmt > BK_FORMAT) return formErr('Este backup foi feito por uma versão mais nova do app. Atualize o app e tente de novo.');
+    const at = typeof obj.exportedAt === 'string' && !isNaN(Date.parse(obj.exportedAt)) ? new Date(obj.exportedAt) : null;
+    const info = { fmt, at, ver: typeof obj.version === 'string' && /^\d{1,3}(\.\d{1,3}){2}$/.test(obj.version) ? obj.version : '', sig: fmt >= 2 ? await bkCheck(obj) : 'antigo' };
+    if (fmt >= 2 && obj.cifrado != null) return bkAskPin(obj, info);
+    if (!obj.state || typeof obj.state !== 'object' || Array.isArray(obj.state)) return formErr('Este arquivo não é um backup do Hold BTC 100.');
+    if (info.sig === 'falhou' || info.sig === 'ausente') return bkAltered(obj.state, info);
+    restoreBackupState(obj.state, info);
+  } catch (e) { console.error(e); formErr('Não consegui conferir este backup. Tente de novo.'); }
+}
+async function bkCheck(obj) {
+  const a = obj.assinatura;
+  if (!a || typeof a !== 'object' || a.alg !== 'SHA-256' || typeof a.valor !== 'string' || !/^[0-9a-f]{64}$/.test(a.valor)) return 'ausente';
+  if (!subtleOk()) return 'sem-cripto';
+  return (await sha256hex(canonJSON(bkSem(obj, 'assinatura')))) === a.valor ? 'ok' : 'falhou';
+}
+async function bkDecrypt(obj, pin) {
+  const c = obj.cifrado, falha = code => Object.assign(new Error(code), { code });
+  if (!subtleOk()) throw falha('sem-cripto');
+  if (!c || typeof c !== 'object' || c.alg !== 'AES-256-GCM' || c.kdf !== 'PBKDF2-SHA256' || !Number.isInteger(c.iter) || c.iter < 100000 || c.iter > 5000000 || typeof c.sal !== 'string' || typeof c.iv !== 'string' || typeof obj.dados !== 'string') throw falha('formato');
+  let salt, iv, ct; try { salt = b64d(c.sal); iv = b64d(c.iv); ct = b64d(obj.dados); } catch (e) { throw falha('formato'); }
+  if (salt.length < 16 || iv.length !== 12 || ct.length < 17) throw falha('formato');
+  const key = await bkKey(pin, salt, c.iter);
+  let pt; try { pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv, additionalData: enc8(canonJSON(bkSem(obj, 'dados', 'assinatura'))) }, key, ct); } catch (e) { throw falha('pin'); }
+  try { return JSON.parse(new TextDecoder().decode(pt)); } catch (e) { throw falha('formato'); }
+}
+const bkOrigem = i => i.at ? `Exportado em ${pad2(i.at.getDate())}/${pad2(i.at.getMonth() + 1)}/${i.at.getFullYear()} às ${pad2(i.at.getHours())}:${pad2(i.at.getMinutes())}${i.ver ? `, na versão ${i.ver}` : ''}. ` : '';
+function bkAskPin(obj, info) {
+  if (!subtleOk()) return formErr('Este navegador não abre backups com PIN.');
+  ui.form = { kind: 'import', bk: { obj, info } };
+  $('#sheet-body').innerHTML = `<h2>Backup protegido por PIN</h2><p class="sub">${bkOrigem(info)}Digite o PIN escolhido na exportação.</p>
+    ${info.sig === 'ok' ? '' : `<p class="note restore-warn"><b>${info.sig === 'falhou' ? 'A conferência SHA-256 não bateu.' : 'A assinatura do arquivo foi apagada ou está incompleta.'}</b> O arquivo mudou depois de exportado. O PIN ainda mostra se o conteúdo é o original.</p>`}
+    <div class="field"><label for="bk-pin">PIN do backup</label><input class="inp" id="bk-pin" name="bkpin" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+    <p class="err form" hidden></p><button class="btn btn-p block" data-act="bk-open" data-enter="1">Abrir backup</button>`;
+  setTimeout(() => { const i = $('#bk-pin'); if (i) i.focus(); }, 30);
+}
+async function bkOpen() {
+  const f = ui.form, b = f && f.bk; if (!b || f.busy) return;
+  const pin = fv('bkpin'); if (!pin) return formErr('Digite o PIN do backup.');
+  const btn = $('#sheet-body [data-act="bk-open"]'); f.busy = true; if (btn) { btn.disabled = true; btn.textContent = 'Abrindo…'; }
+  let st = null, erro = '';
+  try { st = await bkDecrypt(b.obj, pin); }
+  catch (e) { erro = e.code === 'pin' ? (b.info.sig === 'ok' ? 'PIN incorreto.' : 'PIN incorreto ou arquivo alterado.') : e.code === 'sem-cripto' ? 'Este navegador não abre backups com PIN.' : 'O backup está fora do formato do app e não pode ser aberto.'; }
+  f.busy = false; if (ui.form !== f) return;   // a folha foi fechada enquanto abria
+  if (btn) { btn.disabled = false; btn.textContent = 'Abrir backup'; }
+  if (!erro && (!st || typeof st !== 'object' || Array.isArray(st))) erro = 'O backup está fora do formato do app e não pode ser aberto.';
+  if (erro) { const i = $('#bk-pin'); if (i) { i.value = ''; i.focus(); } return formErr(erro); }
+  restoreBackupState(st, { ...b.info, sig: 'pin' });
+}
+function bkAltered(st, info) {
+  ui.form = { kind: 'import', bkForce: { st, info } };
+  $('#sheet-body').innerHTML = `<h2>Backup alterado</h2><p class="sub">${bkOrigem(info)}${info.sig === 'ausente' ? 'A assinatura do arquivo foi apagada ou está incompleta.' : 'A conferência SHA-256 não bateu: o arquivo mudou depois de exportado.'} Ele pode ter sido cortado ao copiar, editado ou montado por outra pessoa.</p>
+    <p class="note restore-warn">Restaure só se foi você quem editou o arquivo. Mesmo assim, cada campo passa pela validação do app antes de entrar.</p>
+    <p class="err form" hidden></p><button class="btn btn-d block" data-act="bk-force">Restaurar mesmo assim</button><button class="btn btn-q block" style="margin-top:10px" data-act="close-sheet">Cancelar</button>`;
+}
+function restoreBackupState(st, info) {
   // 1.8.9: o backup passa pela validação antes da confirmação; a pessoa vê o que foi corrigido e o servidor da importação
-  let m; try { m = migrate(JSON.parse(JSON.stringify(obj.state))); } catch (e) { return formErr('Este backup tem dados fora do formato do app e não pode ser restaurado.'); }
+  let m; try { m = migrate(JSON.parse(JSON.stringify(st))); } catch (e) { return formErr('Este backup tem dados fora do formato do app e não pode ser restaurado.'); }
   const fixes = migrateFixes, n = m.aportes.length, srv = m.settings.xiServer;
+  const sig = info.forced ? null : { pin: ['ok', '<b>Backup aberto com o PIN.</b> A assinatura confere: o conteúdo é o mesmo da exportação.'], ok: ['ok', '<b>Conferência SHA-256 ok.</b> O arquivo chegou inteiro, sem cortes nem edições. Sem PIN, ela não prova quem gerou o backup.'], antigo: ['info', 'Backup de antes da versão 1.8.18, sem a conferência SHA-256.'], 'sem-cripto': ['info', 'Este navegador não conseguiu conferir a assinatura do backup.'] }[info.sig];
   const avisos = [
+    info.forced ? '<b>A conferência SHA-256 falhou.</b> O arquivo mudou depois de exportado: restaure só se foi você quem o editou.' : '',
     fixes ? `<b>${fixes} ${fixes === 1 ? 'campo estava fora do formato do app e foi corrigido' : 'campos estavam fora do formato do app e foram corrigidos'}.</b> Restaure só backups feitos por você.` : '',
     srv ? `Este backup usa o servidor <b>${esc(srv)}</b> na importação pela chave pública. Confira se ele é seu.` : ''
   ].filter(Boolean);
-  confirmSheet('Restaurar backup?', `O backup tem ${n} ${n === 1 ? 'aporte' : 'aportes'} e ${m.utxos.length} UTXOs. Ele substitui tudo o que está no app agora.`, 'Restaurar backup', () => {
+  confirmSheet('Restaurar backup?', `${bkOrigem(info)}O backup tem ${n} ${n === 1 ? 'aporte' : 'aportes'} e ${m.utxos.length} UTXOs. Ele substitui tudo o que está no app agora.`, 'Restaurar backup', () => {
     const keep = { pin: S().pin, bio: S().bio }; state = m; state.settings.pin = keep.pin; state.settings.bio = keep.bio; state.settings.onboarded = true; state.demo = false;
     save(); closeSheet(false, false); ui.page = null; ui.tab = 'home'; render(); toast('Backup restaurado');
-  }, true, avisos.map(t => `<p class="note restore-warn">${t}</p>`).join(''));
+  }, true, (sig ? `<p class="note restore-${sig[0]}">${sig[1]}</p>` : '') + avisos.map(t => `<p class="note restore-warn">${t}</p>`).join(''));
 }
 /* --- CSV --- */
 function parseCSV(text) {
@@ -2435,8 +2565,11 @@ const ACT = {
   'import-apply': applyImport,
   'import-paste': () => { const t = fv('paste').trim(); if (!t) return formErr('Cole o texto do backup ou de um CSV.'); if (t.startsWith('{')) importBackupText(t); else previewList(parseCSVAportes(t), cur(), 'texto colado'); },
   'exp-csv': () => { if (!movimentos().length) return toast('Nenhuma movimentação para exportar.'); saveFile(`holdbtc100-movimentacoes-${todayISO()}.csv`, movimentosCSV(), 'text/csv'); },
-  'exp-json': () => saveFile(`holdbtc100-backup-${todayISO()}.json`, backupJSON(), 'application/json'),
-  'exp-copy': () => copyText(backupJSON()),
+  'exp-json': () => exportBackup(false),
+  'exp-copy': () => exportBackup(true),
+  'bk-pin-tog': el => { const f = ui.form; if (!f || f.kind !== 'export') return; f.bkPin = !f.bkPin; el.classList.toggle('on', f.bkPin); el.setAttribute('aria-pressed', f.bkPin); const box = $('#bk-pin-f'); if (box) box.hidden = !f.bkPin; const er = $('#sheet-body .err.form'); if (er) er.hidden = true; if (f.bkPin) { const i = $('#bk-p1'); if (i) i.focus(); } },
+  'bk-open': () => bkOpen(),
+  'bk-force': () => { const b = ui.form && ui.form.bkForce; if (b) restoreBackupState(b.st, { ...b.info, forced: true }); },
   'copy-ir': () => copyText(ui.irText || ''),
   'wipe': () => confirmSheet('Apagar todos os dados?', 'Aportes, carteira, lições e ajustes deste aparelho serão apagados. Exporte um backup antes se quiser guardar.', 'Apagar tudo', () => { state = defaultState(); state.updatedAt = Date.now(); persist(); cloudPush(); closeSheet(true); ui.tab = 'home'; ui.page = null; render(); sheetOnboarding(); }, true),
   'utxo-on': () => { S().utxo = true; addDemoUtxos(); save(); render(); toast('Gestão de UTXOs ativada'); },
@@ -2518,7 +2651,7 @@ document.addEventListener('change', e => {
 });
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && ui.sheet && !ui.sheet.opts.noClose) closeSheet();
-  if (e.key === 'Enter' && ui.sheet && e.target.matches && e.target.matches('input.inp:not([type="search"])')) { const b = $('#sheet-body .btn-p[data-act^="save"]'); if (b) { e.preventDefault(); b.click(); } }
+  if (e.key === 'Enter' && ui.sheet && e.target.matches && e.target.matches('input.inp:not([type="search"])')) { const b = $('#sheet-body .btn-p[data-act^="save"], #sheet-body .btn-p[data-enter]'); if (b) { e.preventDefault(); b.click(); } }
   if (ui.locked && /^\d$/.test(e.key)) pinKey(e.key);
   if (ui.locked && e.key === 'Backspace') ACT['pin-del']();
 });
