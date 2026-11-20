@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="App do Projeto Hold BTC 100: registre seus aportes mensais em bitcoin, acompanhe preço médio e resultado, gerencie UTXOs e aprenda autocustódia.">
 <title>Hold BTC 100</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-DW/EqRiJ11/VKN6hGIp6YS/rphgIw5qfyJKkGzxZB08='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-gRlW2XDn/aMnZoliZtchkhcaeKpm0Dtjf5BfWnpkeZI='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -414,6 +414,10 @@ button.io:active{background:var(--surface-2)}
 .xi-wait{font-size:13.5px;color:var(--warn);background:var(--warn-bg);border-radius:10px;padding:8px 10px;margin:2px 0 10px}
 .xi-alt{margin:0 0 4px}.xi-alt .hint{margin:6px 2px 0}
 .xi-rs{margin:0 0 14px}.xi-rs p{margin:0}.xi-rs .btn{background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}.xi-rs .xi-rs-p+.btn{margin-top:10px}.xi-rs .hint{margin:6px 0 0}
+.switch.xi-only,.switch.xi-hist{padding:6px 0 12px;margin:0 0 8px}.xi-only .tog[disabled],.xi-hist .tog[disabled]{opacity:.4}
+.xi-herr{margin:0 0 12px}.xi-herr p{margin:0}.xi-herr .btn{margin-top:10px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}.xi-herr .hint{margin:6px 0 0}
+.xi-all{margin:-2px 0 4px;font-size:14px;color:var(--muted)}.xi-all .link-btn{font-size:14px;margin:0;padding:2px 0}
+.xi-more summary{cursor:pointer;font-weight:600;padding:10px 0;border-bottom:1px solid var(--line)}
 .xi-bar{height:6px;border-radius:999px;background:var(--line);overflow:hidden;margin:6px 0 10px}
 .xi-bar span{display:block;height:100%;width:35%;border-radius:999px;background:var(--orange);animation:xiMove 1.3s ease-in-out infinite}
 @keyframes xiMove{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
@@ -816,7 +820,7 @@ const KS_CARDS = {
    Claude, também espelha num documento privado do usuário.
    ========================================================= */
 
-const APP_VERSION = '1.8.15';
+const APP_VERSION = '1.8.17';
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const HIST = {"start":"2015-01","usd":[269,236,249,240,233,247,274,257,233,275,346,404,400,404,427,433,490,602,649,600,593,655,724,855,967,1075,1126,1210,1817,2384,2684,3787,4520,5404,8338,12178,12166,10318,8680,8122,8372,6952,7096,7394,6818,6489,5192,3887,3595,3654,3979,4704,6942,9680,10459,9914,9056,8766,8345,7372,8268,8948,7481,7512,9050,9296,10232,11509,11218,12286,16730,24328,31072,39024,51906,58338,47486,36155,38354,44318,45439,52582,59166,51586,42365,40791,44360,41879,35044,25823,21591,21674,19744,19962,18841,16851,19838,23126,25804,28897,28234,28846,29858,27587,26456,30805,36179,39982,42444,51946,66244,65986,64146,65194,63729,61864,61188,66861,83364,95022,97976,93433,83444,88373,99394,105848,111410,111996,111124,111840,99685,88638,83198,72854,67640,72356,75048,66150,60768,70714,81095,80570],"brl":[708,663,783,731,714,768,883,904,911,1067,1307,1564,1620,1603,1583,1542,1734,2062,2125,1926,1930,2088,2418,2866,3091,3338,3522,3795,5832,7858,8605,11932,14171,17247,27175,40087,39062,33444,28462,27676,30443,26233,27169,29059,28068,24388,19662,15101,13451,13608,15305,18328,27776,37353,39528,39856,37326,35825,34676,30296,34306,38845,36536,40003,51073,48305,54030,62853,60569,69121,90640,125185,166425,211371,293069,324482,251253,181928,197777,232745,239904,291307,328780,291530,234452,211975,220398,199260,173644,130385,115903,111476,103397,104809,99381,88340,103169,119603,134475,145054,140682,139952,143345,135273,130613,156021,177216,195797,208587,257883,329902,338449,329261,351333,353186,343509,339079,376033,484100,579349,589992,538697,479536,511123,563308,587149,615933,610031,596450,602314,532408,483352,444108,378882,353863,364172,374017,339193,310759,364403,417209,413273]}; // médias mensais estimadas: {start:'2015-01', usd:[…], brl:[…]}
 const REF_PRICE = { BRL: 416900, USD: 75800, EUR: 68000, at: Date.UTC(2026, 10, 7, 18, 0), src: 'ref' }; // US$ do CoinLore × PTAX de 06/11/2026 (R$ 5,50; € 6,13)
@@ -2116,7 +2120,7 @@ function movimentosCSV() {
 function backupJSON() { return JSON.stringify({ app: 'holdbtc100', format: 1, version: APP_VERSION, exportedAt: new Date().toISOString(), state: cloudPayload() }, null, 1); }
 function sheetExport() {
   openSheet('export', () => `<h2>Exportar</h2><p class="sub">Os arquivos têm só os seus registros: nada de chaves ou seed.</p>
-    <button class="tool" data-act="exp-csv"><b>Planilha das movimentações (.csv)</b><span>Para ver e filtrar no Excel e no Google Planilhas: aportes, vendas, saques e transações, com a coluna tipo. Não restaura a carteira</span><span class="chev" aria-hidden="true">›</span></button>
+    <button class="tool" data-act="exp-csv"><b>Planilha das movimentações (.csv)</b><span>${movimentos().length ? 'Para ver e filtrar no Excel e no Google Planilhas: aportes, vendas, saques e transações, com a coluna tipo. Não restaura a carteira' : 'Ainda sem movimentações. A planilha traz o que está registrado no app (aportes, vendas, saques, entradas e transações). Endereços importados sem saldo só viram movimentação se você importar também o histórico, opção da revisão na importação pela chave pública'}</span><span class="chev" aria-hidden="true">›</span></button>
     <button class="tool" data-act="exp-json"><b>Backup completo (.json)</b><span>Tudo o que está no app, menos o PIN: aportes, carteiras, UTXOs, transações, lições e ajustes. É ele que traz tudo de volta, aqui ou em outro aparelho</span><span class="chev" aria-hidden="true">›</span></button>
     <button class="tool" data-act="exp-copy"><b>Copiar backup</b><span>Para colar num e-mail ou nota, se o download não funcionar</span><span class="chev" aria-hidden="true">›</span></button>
     <p class="hint">${cloud.on && !S().offline ? 'Nesta prévia, os registros ficam neste aparelho e na sua conta do Claude.' : 'Os registros ficam só neste aparelho, no armazenamento do navegador.'} Limpar só o histórico de navegação não apaga nada. Limpar os dados dos sites no navegador ou desinstalar o app pode apagar tudo: guarde um backup fora do celular.</p>`, { label: 'Exportar' });
@@ -3691,13 +3695,13 @@ function xiHTML() {
     <div class="note warn xi-warn"><b>Aviso de privacidade</b><ul>
       <li>A chave pública mestra (xpub, ypub ou zpub) <b>não move</b> seus bitcoins, mas mostra <b>todos</b> os endereços da carteira, o histórico e o saldo. Trate como informação sensível e não compartilhe.</li>
       <li>Para descobrir quais endereços já foram usados, o app consulta um servidor da rede bitcoin. <b>Quem opera o servidor fica sabendo que esses endereços são da mesma pessoa</b> e vê o seu IP. O padrão é o blockstream.info, da Blockstream; o ideal é usar o seu próprio nó (Esplora ou mempool). Se o servidor não responder, o app oferece continuar no mempool.space, só se você tocar.</li>
-      <li>O app <b>não guarda a chave</b>: só os endereços e os UTXOs que você confirmar, neste aparelho.</li>
+      <li>O app <b>não guarda a chave</b>: só os endereços, os UTXOs e, se você escolher, o histórico de transações que você confirmar, neste aparelho.</li>
       <li>Nunca digite aqui uma chave privada (xprv) nem as 12 ou 24 palavras. Nenhum app de acompanhamento precisa delas.</li></ul></div>
     <button class="btn btn-p block" data-act="xi-ok">Entendi, continuar</button>`;
-  if (f.step === 'scan') return `<h2>Buscando endereços…</h2><p class="sub" id="xi-prog">${esc(f.prog || 'Preparando…')}</p><div class="xi-bar" aria-hidden="true"><span></span></div>
+  if (f.step === 'scan') return `<h2>${f.phase === 'hist' ? 'Buscando o histórico…' : 'Buscando endereços…'}</h2><p class="sub" id="xi-prog">${esc(f.prog || 'Preparando…')}</p><div class="xi-bar" aria-hidden="true"><span></span></div>
     <p class="xi-wait" id="xi-wait"${f.wait ? '' : ' hidden'}>${esc(f.wait || '')}</p>
     <div class="xi-alt" id="xi-altbox"${f.alt ? '' : ' hidden'}><button class="btn btn-q block" data-act="xi-alt">Continuar agora com ${esc(xiHost(xiAltOf(f.server)))}</button><p class="hint">Sem perder o que já foi consultado. O ${esc(xiHost(xiAltOf(f.server)))} passa a ver os endereços consultados daqui em diante.</p></div>
-    <p class="hint">A busca só para depois de ${f.gap} endereços seguidos sem uso, em recebimento e em troco: carteiras muito usadas passam bem desse número. As consultas saem com um pequeno intervalo, para o servidor não recusar. Se ele demorar ou pedir uma pausa, o app avisa acima e continua sozinho.</p><button class="btn btn-q block" style="margin-top:14px" data-act="xi-cancel">Cancelar</button>`;
+    <p class="hint">${f.phase === 'hist' ? 'Uma consulta para cada endereço com movimento e mais uma a cada 25 transações dele. Cancelar volta à revisão sem o histórico; ligar de novo continua de onde parou.' : `A busca só para depois de ${f.gap} endereços seguidos sem uso, em recebimento e em troco: carteiras muito usadas passam bem desse número.`} As consultas saem com um pequeno intervalo, para o servidor não recusar. Se ele demorar ou pedir uma pausa, o app avisa acima e continua sozinho.</p><button class="btn btn-q block" style="margin-top:14px" data-act="xi-cancel">Cancelar</button>`;
   if (f.step === 'review') return xiReviewHTML();
   const q = xiCanQuery();
   return `<h2>Chave pública mestra</h2><p class="sub">Cole a xpub, ypub ou zpub da conta, ou o descritor exportado pela carteira (Sparrow, Trezor Suite, Electrum).</p>
@@ -3842,7 +3846,7 @@ function xiProg(t) { ui.form.prog = t; const el = $('#xi-prog'); if (el) el.text
    à nova, que segue do ponto em que a anterior parou. */
 async function xiScan(deriveOnly) {
   if (xiBusy) return; xiBusy = true;
-  try { await xiScanRun(deriveOnly); } finally { xiBusy = false; }
+  try { await (ui.form && ui.form.phase === 'hist' ? xiHistRun() : xiScanRun(deriveOnly)); } finally { xiBusy = false; }   // histórico: 1.8.17
   const f = ui.form;
   if (f && f.kind === 'xpub' && f.relaunch) { f.relaunch = false; if (ui.sheet && ui.sheet.kind === 'xpub') await xiScan(false); }
 }
@@ -3890,7 +3894,7 @@ async function xiScanRun(deriveOnly) {
         const idx = [s.i, s.i + 1, s.i + 2, s.i + 3, s.i + 4], addrs = []; for (const j of idx) addrs.push(await gen(j));
         const st = await Promise.all(addrs.map(a => xiGet(f.server, `/address/${a}`, sig)));
         let miss = s.miss; const add = [];
-        for (let k = 0; k < 5 && miss < f.gap; k++) { const txs = xiTxs(st[k]); if (!txs) { miss++; continue; } miss = 0; add.push({ c, i: idx[k], addr: addrs[k], bal: xiBal(st[k]), txs, utxos: [] }); }
+        for (let k = 0; k < 5 && miss < f.gap; k++) { const txs = xiTxs(st[k]); if (!txs) { miss++; continue; } miss = 0; add.push({ c, i: idx[k], addr: addrs[k], bal: xiBal(st[k]), txs, cn: xn(((st[k] || {}).chain_stats || {}).tx_count), utxos: [] }); }
         s.rows.push(...add); s.miss = miss; s.i += 5; s.n += 5;   // o lote só entra quando chegou inteiro
       }
     }
@@ -3902,7 +3906,7 @@ async function xiScanRun(deriveOnly) {
       r.utxos = (Array.isArray(lst) ? lst : []).filter(xiUtxoOk).map(u => ({ txid: u.txid, vout: u.vout, sats: u.value, date: u.status && u.status.block_time ? xiDate(u.status.block_time) : todayISO(), conf: !!(u.status && u.status.confirmed) }));
     }
     S().xiServer = f.server === XI_SERVER ? undefined : f.server;
-    f.res = { ...base, type: s.type, derived: false, rows: s.rows, note: s.note, hosts: s.hosts, gap: s.gap }; f.scan = null; xiPrepare(); f.step = 'review'; xiRender();
+    f.res = { ...base, type: s.type, derived: false, rows: s.rows, note: s.note, hosts: s.hosts, gap: s.gap, calm: s.calm }; f.scan = null; xiPrepare(); f.step = 'review'; xiRender();
   } catch (e) {
     if (sig.aborted && f.relaunch) return;   // troca de servidor: a nova busca começa em seguida, sem passar pelo formulário
     f.step = 'form'; f.wait = ''; f.err = sig.aborted ? '' : e.message; f.fail = !sig.aborted && !!e.srv; xiRender();
@@ -3913,6 +3917,143 @@ async function xiScanRun(deriveOnly) {
     if (xiPace.calm && !s.calm.includes(host)) s.calm.push(host);
   }
 }
+/* Histórico de movimentações (1.8.17): opcional, desligado por padrão e ligado só pela pessoa, na revisão (decisão do
+   Nicolas). Ligado, o app busca as transações de cada endereço com movimento (/address/:a/txs e, a cada 25 confirmadas,
+   /address/:a/txs/chain/:última vista), com o mesmo ritmo, as mesmas pausas e a mesma troca de servidor da busca de
+   endereços, e monta: as entradas de fora (saque ou entrada externa, como os UTXOs), as transações (envio, consolidação,
+   movimentação entre endereços, com taxa, tamanho e TXID reais) e os UTXOs que elas criaram, gastos ou não.
+   Transação com entradas de terceiros (coinjoin, payjoin) entra só com a sua parte: a taxa na proporção do que as suas
+   entradas puseram e o resto como envio resumido; se voltou mais do que saiu, o que voltou entra como entrada.
+   A busca continua de onde parou (r.hs) depois de erro, Cancelar ou troca de servidor. O histórico só entra se fechar com
+   a busca de saldos (o que sobra sem gastar tem de ser exatamente os UTXOs de agora) e só numa importação do zero: com UTXOs
+   já registrados nesses endereços, a opção fica travada, para nada ser contado duas vezes. */
+const XI_HMAX = 3000;   // transações; acima disso, a carteira entra sem o histórico
+const xiHex = s => typeof s === 'string' && /^[0-9a-fA-F]{64}$/.test(s);
+const xiNat = v => Number.isInteger(v) && v >= 0;
+function xiTxOk(t) {
+  if (!t || typeof t !== 'object' || !xiHex(t.txid) || !Array.isArray(t.vin) || !Array.isArray(t.vout) || !t.vin.length || !t.vout.length || !xiNat(t.fee) || !(Number.isInteger(t.weight) && t.weight > 0)) return false;
+  const st = t.status; if (!st || typeof st !== 'object' || (st.confirmed && !(Number.isInteger(st.block_height) && Number.isFinite(st.block_time)))) return false;
+  return t.vin.every(v => !!v && typeof v === 'object' && (v.is_coinbase === true || (xiHex(v.txid) && xiNat(v.vout) && !!v.prevout && typeof v.prevout === 'object' && xiNat(v.prevout.value))))
+    && t.vout.every(o => !!o && typeof o === 'object' && xiNat(o.value));
+}
+/* a transação vista pela carteira (W, os endereços com movimento): entradas e saídas dela; o resto, resumido */
+function xiTxPack(t, W) {
+  const conf = !!t.status.confirmed, ins = [], outs = [], ext = []; let fin = 0, fs = 0, xs = 0;
+  for (const v of t.vin) { const a = v.is_coinbase !== true && v.prevout.scriptpubkey_address; if (a && W.has(a)) ins.push({ t: v.txid.toLowerCase(), v: v.vout, s: v.prevout.value }); else { fin++; if (v.is_coinbase !== true) fs += v.prevout.value; } }
+  t.vout.forEach((o, n) => { const a = o.scriptpubkey_address; if (a && W.has(a) && o.value > 0) outs.push({ n, a, s: o.value }); else { xs += o.value; if (o.value > 0) ext.push({ n, a: typeof a === 'string' ? a.slice(0, 100) : '', s: o.value }); } });
+  return { id: t.txid.toLowerCase(), conf, h: conf ? t.status.block_height : 0, t: conf ? t.status.block_time : 0, fee: t.fee, vs: Math.ceil(t.weight / 4), ins, outs, ext: ins.length && !fin ? ext : [], fin, fs, xs };
+}
+const xiHistWhy = r => r.hbig ? `Indisponível: a carteira tem mais de ${XI_HMAX.toLocaleString('pt-BR')} transações, acima do limite do app para o histórico. Os endereços e os UTXOs de agora entram do mesmo jeito.`
+  : r.rows.some(x => x.utxos.some(u => u.match) || (x.exId && state.utxos.some(u => u.address === x.exId))) ? 'Indisponível: já há UTXOs registrados em endereços desta carteira. O histórico só entra numa importação do zero, para nada ser contado duas vezes.' : '';
+function xiHistOn() { const f = ui.form, r = f && f.res; return !!(f && f.kind === 'xpub' && f.hist && r && !r.derived && r.hist && r.hist.ok && !xiHistWhy(r)); }
+async function xiHistRun() {
+  const f = ui.form, r = f && f.res; if (!r || r.derived || !r.rows.length) return;
+  const rows = r.rows, W = new Set(rows.map(x => x.addr)), h = r.hs || (r.hs = { st: rows.map(() => ({ last: '', got: 0, done: false })), tx: {} });
+  const nt = () => Object.keys(h.tx).length, nd = () => h.st.filter(s => s.done).length;
+  const pr = () => xiProg(`Histórico: ${nd()} de ${rows.length} ${rows.length === 1 ? 'endereço' : 'endereços'} · ${nt()} ${nt() === 1 ? 'transação' : 'transações'} até agora`);
+  Object.assign(f, { step: 'scan', wait: '', alt: false, herr: '', hfail: false, prog: 'Preparando…' }); xiRender(); pr();
+  const ctl = xiCtl = new AbortController(), sig = ctl.signal, host = xiHost(f.server), calm = r.calm || (r.calm = []);
+  xiPaceReset(); if (r.hosts && !r.hosts.includes(host)) r.hosts.push(host);
+  if (calm.includes(host)) xiSlower();   // este servidor já pediu calma: continua devagar
+  const tick = setInterval(() => { if (ui.sheet && ui.sheet.kind === 'xpub' && ui.form === f) xiTick(); else ctl.abort(); }, 1000);
+  let next = 0;
+  const worker = async () => {
+    for (;;) {
+      while (next < rows.length && h.st[next].done) next++;
+      if (next >= rows.length) return;
+      const j = next++, x = rows[j], s = h.st[j];
+      while (!s.done) {   // uma página por vez; ela só conta quando chegou inteira
+        const lst = await xiGet(f.server, `/address/${x.addr}/txs${s.last ? `/chain/${s.last}` : ''}`, sig);
+        if (!Array.isArray(lst) || !lst.every(xiTxOk)) throw xiErr(`O servidor ${host} respondeu o histórico fora do formato da API Esplora (mempool ou Blockstream).`);
+        let conf = 0, last = '';
+        for (const t of lst) { const p = xiTxPack(t, W), o = h.tx[p.id]; if (p.conf) { conf++; last = p.id; } if (!o || (!o.conf && p.conf)) h.tx[p.id] = p; }
+        if (nt() > XI_HMAX) throw Object.assign(new Error('limite'), { big: true });
+        s.got += conf;
+        if (!conf || last === s.last || (x.cn ? s.got >= x.cn : conf < 25)) s.done = true; else s.last = last;
+        pr();
+      }
+    }
+  };
+  try {
+    await Promise.all([worker(), worker()]);
+    const hs = xiHistBuild(r);
+    if (hs.err) { r.hs = null; Object.assign(f, { hist: false, herr: hs.err }); }
+    else { r.hist = hs; S().xiServer = f.server === XI_SERVER ? undefined : f.server; }
+    f.step = 'review'; xiRender();
+  } catch (e) {
+    if (sig.aborted && f.relaunch) return;   // troca de servidor: o histórico segue no outro, de onde parou
+    if (e && e.big) { r.hbig = true; r.hs = null; }
+    Object.assign(f, { hist: false, step: 'review', wait: '', herr: sig.aborted || (e && e.big) ? '' : e.message, hfail: !sig.aborted && !!(e && e.srv) }); xiRender();
+  }
+  finally { clearInterval(tick); ctl.abort(); if (xiCtl === ctl) xiCtl = null; if (xiPace.calm && !calm.includes(host)) calm.push(host); }
+}
+/* monta o histórico: quem criou um UTXO vem antes de quem o gastou; no mais, a ordem dos blocos (sem confirmação no fim) */
+function xiHistBuild(r) {
+  const fail = m => ({ err: `${m} Importe sem o histórico ou volte e busque de novo.` });
+  const all = Object.values(r.hs.tx), byTx = new Map(all.map(x => [x.id, x])), row = new Map(r.rows.map(x => [x.addr, x]));
+  const list = [], seen = new Set(), pos = x => x.conf ? x.h : 1e12;
+  const visit = x => { if (seen.has(x.id)) return; seen.add(x.id); for (const i of x.ins) { const p = byTx.get(i.t); if (p) visit(p); } list.push(x); };
+  all.sort((a, b) => pos(a) - pos(b) || a.t - b.t || (a.id < b.id ? -1 : 1)).forEach(visit);
+  const outs = new Map(), plan = [], recv = [], today = todayISO();
+  const made = (x, o, date, kind) => { const u = { key: `${x.id}:${o.n}`, txid: x.id, vout: o.n, sats: o.s, row: row.get(o.a), date, conf: x.conf, kind }; outs.set(u.key, u); return u; };
+  let nIn = 0, nOut = 0, nMove = 0, fees = 0, sent = 0;
+  for (const x of list) {
+    const d0 = x.conf ? xiDate(x.t) : today, ins = [];
+    for (const i of x.ins) { const u = outs.get(`${i.t}:${i.v}`); if (!u || u.by || u.sats !== i.s) return fail('Uma transação gasta um UTXO que não aparece certo no histórico.'); ins.push(u); }
+    if (!ins.length) {   // só entrada: veio de fora
+      if (!x.outs.length) continue;
+      const p = { txid: x.id, date: d0, ins, made: x.outs.map(o => made(x, o, d0, 'in')), ext: [] };
+      recv.push(...p.made); plan.push(p); nIn++; continue;
+    }
+    const date = ins.reduce((m, u) => u.date > m ? u.date : m, d0), I = ins.reduce((t, u) => t + u.sats, 0), O = x.outs.reduce((t, o) => t + o.s, 0);
+    const p = { txid: x.id, date, ins, made: [], ext: [], fee: x.fee, vs: x.vs, note: '' };
+    if (!x.fin) {
+      if (I !== O + x.xs + x.fee) return fail('Os valores de uma transação não fecham.');
+      p.ext = x.ext.map(o => ({ n: o.n, addr: o.a, sats: o.s })); p.made = x.outs.map(o => made(x, o, date, 'tx'));
+    } else {   // com entradas de terceiros (coinjoin, payjoin): só a sua parte
+      const fee = Math.min(I - 1, Math.max(1, Math.round(x.fee * I / (I + x.fs))));
+      Object.assign(p, { fee, vs: x.fee > 0 ? Math.max(1, Math.round(x.vs * fee / x.fee)) : x.vs, note: 'Coinjoin ou payjoin: só a sua parte entrou' });   // tamanho na mesma proporção da taxa: o sat/vB fica o da transação
+      if (I - fee >= O) { p.made = x.outs.map(o => made(x, o, date, 'tx')); if (I - fee > O) p.ext = [{ n: 1e9, addr: '', sats: I - fee - O }]; }
+      else { p.ext = [{ n: 1e9, addr: '', sats: I - fee }]; p.made = x.outs.map(o => Object.assign(made(x, o, date, 'in'), { mix: true })); recv.push(...p.made); }
+    }
+    const tx = p.made.filter(u => u.kind === 'tx'), ch = tx.find(u => u.row && u.row.c === 1);
+    for (const u of tx) { u.rem = u === ch && tx.length + p.ext.length > 1; u.role = u.rem ? 'troco' : 'destino'; }
+    for (const u of ins) u.by = x.id;
+    const ext = p.ext.reduce((t, o) => t + o.sats, 0); fees += p.fee; sent += ext; if (ext) nOut++; else nMove++;
+    plan.push(p);
+  }
+  const left = [...outs.values()].filter(u => !u.by), cur = new Map();
+  for (const x of r.rows) for (const u of x.utxos) cur.set(`${String(u.txid).toLowerCase()}:${u.vout}`, u.sats);
+  if (left.length !== cur.size || left.some(u => cur.get(u.key) !== u.sats)) return fail('O histórico não fecha com os UTXOs de agora: alguma transação pode ter entrado durante a busca.');
+  let room = Math.max(0, calc().ex);   // de onde veio cada entrada: como nos UTXOs, saque enquanto couber no saldo da corretora
+  recv.forEach((u, j) => { u.j = j; u.origin = !u.mix && room >= u.sats ? 'saque' : 'externo'; if (u.origin === 'saque') room -= u.sats; });
+  return { ok: true, plan, recv, n: plan.length, nIn, nOut, nMove, fees, sent, cur: left.reduce((t, u) => t + u.sats, 0) };
+}
+/* grava o histórico (dentro do attempt de xiApply): entradas com a origem escolhida, transações com as saídas na ordem
+   da blockchain e os UTXOs criados por elas, gastos ou não */
+function xiHistApply(hs, addrOf, og, exName) {
+  const put = (u, extra) => { const a = addrOf.get(u.row.addr), nu = { id: uid(), sats: u.sats, address: a.id, wallet: a.wallet, type: a.type, label: '', date: u.date, txid: u.txid, vout: String(u.vout), frozen: false, spent: false, ...extra }; state.utxos.push(nu); u.id = nu.id; return nu; };
+  const entrada = u => {
+    const origin = og(u), nu = put(u, { origin, kyc: origin === 'saque', label: origin === 'saque' ? `Saque ${fmtYM(u.date.slice(0, 7))}` : 'Entrada externa' });
+    if (origin === 'saque') { const w = { id: uid(), date: u.date, sats: u.sats, fee: 0, ex: exName, utxoId: nu.id }; state.saques.push(w); nu.saqueId = w.id; }
+  };
+  let n = 0;
+  for (const p of hs.plan) {
+    n++;
+    if (!p.ins.length) { p.made.forEach(entrada); continue; }
+    const ins = p.ins.map(u => byId(state.utxos, u.id)); if (ins.some(u => !u)) throw new Error('O histórico ficou incompleto. Importe sem o histórico.');
+    const sid = uid(), kyc = ins.some(u => u.kyc), src = ins[0].wallet, outs = [];
+    for (const u of p.made) {
+      if (u.kind === 'in') { entrada(u); continue; }   // transação conjunta em que voltou mais do que saiu
+      const rem = !!u.rem && addrOf.get(u.row.addr).wallet === src, nu = put(u, { origin: 'tx', txId: sid, role: rem ? 'troco' : 'destino', kyc });
+      outs.push([u.vout, { key: uid(), kind: 'own', utxo: nu.id, sats: u.sats, rem }]);
+    }
+    for (const o of p.ext) outs.push([o.n, { key: uid(), kind: 'ext', addr: o.addr, sats: o.sats, rem: false, sale: false }]);
+    state.spends.push({ id: sid, date: p.date, inputs: ins.map(u => u.id), outputs: outs.sort((a, b) => a[0] - b[0]).map(o => o[1]), fee: p.fee, vsize: p.vs, vsizeReal: true, txid: p.txid, note: p.note });
+    for (const u of ins) Object.assign(u, { spent: true, spentAt: p.date, spendId: sid });
+  }
+  return n;
+}
 /* caixa de retomada (1.8.14): depois de um erro do servidor ou do Cancelar, mostra o que já foi consultado; depois de erro
    do servidor, oferece continuar em outro servidor. Tocar em Continuar a busca segue de onde parou. */
 function xiResumeHTML(f) {
@@ -3922,6 +4063,7 @@ function xiResumeHTML(f) {
 }
 /* nomes sugeridos, endereços já cadastrados e UTXOs já registrados */
 function xiPrepare() {
+  Object.assign(ui.form, { hist: false, herr: '', hfail: false });   // resultado novo: histórico desligado (1.8.17)
   const r = ui.form.res, c0 = calc(); let room = Math.max(0, c0.ex), k = 0;
   for (const x of r.rows) {
     const ex = findAddrByString(x.addr); x.exId = ex ? ex.id : null;
@@ -3939,60 +4081,95 @@ function xiGapLine(rows, gap) {
   const last = c => rows.reduce((m, x) => x.c === c ? Math.max(m, x.i + 1) : m, 0), t = (n, ramo) => n ? `o nº ${n} em ${ramo}` : `nenhum em ${ramo}`;
   return `Último endereço usado: ${t(last(0), 'recebimento')} e ${t(last(1), 'troco')}. Depois dele, em cada ramo, a busca conferiu mais ${gap} sem uso e parou, como fazem as carteiras.`;
 }
+/* chave do histórico na revisão (1.8.17): desligada por padrão; a descrição diz quantas consultas a mais ela custa e, depois
+   da busca, o que veio. Erro do servidor no histórico: aviso com a oferta de continuar no outro servidor, de onde parou. */
+function xiHistHTML(f, r, on) {
+  const why = xiHistWhy(r), hs = r.hist && r.hist.ok ? r.hist : null, alt = xiHost(xiAltOf(f.server)), pl = (n, a, b) => `${n} ${n === 1 ? a : b}`;
+  const q = r.rows.reduce((t, x) => t + Math.max(1, Math.ceil((x.cn || 0) / 25)), 0);
+  const d = why || (hs ? `${pl(hs.n, 'transação', 'transações')} no histórico: ${pl(hs.recv.length, 'entrada', 'entradas')} de fora, ${pl(hs.nOut, 'envio', 'envios')} e ${pl(hs.nMove, 'movimentação', 'movimentações')} entre os seus endereços. Taxas pagas: ${AMT(hs.fees)}.${on ? '' : ' Ligue para importar junto.'}`
+    : `Entradas, envios e movimentações entre os seus endereços, com data, taxa e TXID. ${r.hs ? 'A busca do histórico parou no meio: ligue de novo para continuar de onde parou.' : `Ligada, o app busca as transações de cada endereço: cerca de ${pl(q, 'consulta', 'consultas')} a mais ao servidor.`}`);
+  return `<div class="switch xi-hist"><span><span class="t">Importar também o histórico de movimentações</span><br><span class="d">${d}</span></span><button class="tog${on ? ' on' : ''}" data-act="xi-hist" aria-pressed="${on}" aria-label="Importar também o histórico de movimentações"${why ? ' disabled' : ''}></button></div>${f.herr ? `<div class="note warn xi-herr"><p>${esc(f.herr)}</p>${f.hfail ? `<button class="btn btn-q block" data-act="xi-alt">Continuar com ${esc(alt)}</button><p class="hint">O ${esc(alt)} passa a ver os endereços consultados daqui em diante.</p>` : ''}</div>` : ''}`;
+}
 function xiReviewHTML() {
   const f = ui.form, r = f.res, rows = r.rows, utx = rows.flatMap(x => x.utxos.map(u => ({ ...u, x }))), fresh = utx.filter(u => !u.match);
   const tot = rows.reduce((t, x) => t + x.bal, 0), known = rows.filter(x => x.exId).length, last = exNames().slice(-1)[0];
-  const grp = (c, title) => { const list = rows.filter(x => x.c === c); return list.length ? `<h3 class="mini">${title} · ${list.length}</h3>${list.map(x => `<div class="xi-row"><div class="xi-a"><span class="xi-i">${x.c}/${x.i}</span><span class="mono">${esc(shortAddr(x.addr))}</span>${r.derived ? '' : `<span class="xi-v">${AMT(x.bal)} · ${x.txs} ${x.txs === 1 ? 'transação' : 'transações'}</span>`}${x.exId ? '<span class="tag">já cadastrado</span>' : ''}</div><input class="inp" name="xn_${x.c}_${x.i}" value="${esc(x.name)}" autocomplete="off" aria-label="Nome do endereço ${x.c}/${x.i}"></div>`).join('')}` : ''; };
+  const H = xiHistOn(), hs = H ? r.hist : null;   // histórico ligado e montado (1.8.17)
+  // importar só os endereços com saldo: escolha manual da pessoa, desligada por padrão (1.8.16); com o histórico, entram todos (1.8.17)
+  const only = !!f.only && !r.derived && !H, sel = only ? rows.filter(x => x.bal > 0) : rows, nBal = rows.filter(x => x.bal > 0).length;
+  const grp = (c, title) => { const list = sel.filter(x => x.c === c); return list.length ? `<h3 class="mini">${title} · ${list.length}</h3>${list.map(x => `<div class="xi-row"><div class="xi-a"><span class="xi-i">${x.c}/${x.i}</span><span class="mono">${esc(shortAddr(x.addr))}</span>${r.derived ? '' : `<span class="xi-v">${AMT(x.bal)} · ${x.txs} ${x.txs === 1 ? 'transação' : 'transações'}</span>`}${x.exId ? '<span class="tag">já cadastrado</span>' : ''}</div><input class="inp" name="xn_${x.c}_${x.i}" value="${esc(x.name)}" autocomplete="off" aria-label="Nome do endereço ${x.c}/${x.i}"></div>`).join('')}` : ''; };
+  const pick = (name, o, lbl) => `<select class="inp" name="${name}" data-inp="xi-origin" aria-label="${lbl}"><option value="saque" ${o === 'saque' ? 'selected' : ''}>Saque da corretora</option><option value="externo" ${o === 'externo' ? 'selected' : ''}>Entrada externa</option></select>`;
+  const ent = H ? hs.recv : fresh, all = ent.length > 1 ? `<p class="xi-all">Marcar todas como <button class="link-btn small" data-act="xi-all" data-v="saque">saque da corretora</button> ou <button class="link-btn small" data-act="xi-all" data-v="externo">entrada externa</button></p>` : '';
+  const hl = H ? hs.recv.map(u => `<div class="xi-u"><div><b>${AMT(u.sats)}</b><span class="small muted">${fmtDate(u.date)}${u.conf ? '' : ' · sem confirmação'} · ${esc(u.row ? u.row.name : '')}${u.by ? ' · já gasta' : ''}${u.mix ? ' · transação conjunta' : ''}</span></div>${pick(`xr_${u.j}`, u.origin, 'Origem da entrada')}</div>`).join('') : '';
   return `<h2>Revise antes de importar</h2>
     <p class="sub">${esc(r.prefix)} · ${esc(typeLabel(r.type))}${r.fp ? ` · impressão digital ${esc(r.fp)}` : ''}. ${r.derived ? `${rows.length} endereços gerados, sem consulta de saldo.` : rows.length ? `${rows.length} ${rows.length === 1 ? 'endereço' : 'endereços'} com movimento · ${AMT(tot)} em ${utx.length} ${utx.length === 1 ? 'UTXO' : 'UTXOs'}.` : 'Nenhum endereço com movimento foi encontrado.'}${known ? ` ${known} já estavam cadastrados.` : ''}</p>
     ${r.hosts && r.hosts.length > 1 ? `<p class="hint" style="margin:-6px 0 12px">Consultado em ${r.hosts.map(esc).join(' e ')}.</p>` : ''}
     ${r.gap ? `<p class="hint" style="margin:-6px 0 12px">${xiGapLine(rows, r.gap)}</p>` : ''}
     ${r.note ? `<p class="note warn" style="margin-bottom:12px">${esc(r.note)}</p>` : ''}
-    ${rows.length ? `<div class="field"><label for="xi-w">Importar para a carteira</label><select class="inp" id="xi-w" name="xwallet" data-inp="xi-wallet">${state.wallets.map(w => `<option value="${w.id}">${esc(w.name)}</option>`).join('')}<option value="__new" selected>+ Nova carteira…</option></select></div>
-    <div class="field" id="xi-nwf"><label for="xi-wn">Nome da nova carteira</label><input class="inp" id="xi-wn" name="xwname" value="Carteira ${esc(r.tag)}" autocomplete="off"></div>
+    ${rows.length ? `<div class="field"><label for="xi-w">Importar para a carteira</label><select class="inp" id="xi-w" name="xwallet" data-inp="xi-wallet">${state.wallets.map(w => `<option value="${w.id}"${r.wsel === w.id ? ' selected' : ''}>${esc(w.name)}</option>`).join('')}<option value="__new"${!r.wsel || r.wsel === '__new' ? ' selected' : ''}>+ Nova carteira…</option></select></div>
+    <div class="field" id="xi-nwf"${r.wsel && r.wsel !== '__new' ? ' hidden' : ''}><label for="xi-wn">Nome da nova carteira</label><input class="inp" id="xi-wn" name="xwname" value="${esc(r.wname || `Carteira ${r.tag}`)}" autocomplete="off"></div>
+    ${r.derived ? '' : `<div class="switch xi-only"><span><span class="t">Importar só os endereços com saldo</span><br><span class="d">${H ? 'Com o histórico, entram todos os endereços: as transações passaram por eles.' : nBal ? `${nBal} de ${rows.length} ${nBal === 1 ? 'tem' : 'têm'} saldo agora. Ligada, os endereços vazios ficam de fora; os UTXOs entram do mesmo jeito.` : 'Nenhum endereço tem saldo agora.'}</span></span><button class="tog${only ? ' on' : ''}" data-act="xi-only" aria-pressed="${only}" aria-label="Importar só os endereços com saldo"${nBal && !H ? '' : ' disabled'}></button></div>${xiHistHTML(f, r, H)}`}
     <p class="hint" style="margin:-4px 0 6px">Dê um nome a cada endereço. Você pode mudar depois, na página do endereço.</p>
     ${grp(0, 'Recebimento')}${grp(1, 'Troco')}
-    ${utx.length ? `<h3 class="mini">UTXOs encontrados</h3><p class="hint" style="margin:-4px 0 8px">Para não contar duas vezes: diga de onde veio cada UTXO novo. Saque da corretora desconta do saldo da corretora; entrada externa (presente, pagamento, compra fora do app) não mexe nos aportes.</p>
-      ${utx.map(u => `<div class="xi-u"><div><b>${AMT(u.sats)}</b><span class="small muted">${fmtDate(u.date)}${u.conf ? '' : ' · sem confirmação'} · ${esc(u.x.name)}</span></div>${u.match ? '<span class="tag">já registrado</span>' : `<select class="inp" name="xo_${u.k}" data-inp="xi-origin" aria-label="Origem do UTXO"><option value="saque" ${u.origin === 'saque' ? 'selected' : ''}>Saque da corretora</option><option value="externo" ${u.origin === 'externo' ? 'selected' : ''}>Entrada externa</option></select>`}</div>`).join('')}
+    ${H ? `<h3 class="mini">Entradas de fora · ${hs.recv.length}</h3><p class="hint" style="margin:-4px 0 8px">Para não contar duas vezes: diga de onde veio cada entrada, inclusive as já gastas. Saque da corretora desconta do saldo da corretora; entrada externa (presente, pagamento, compra fora do app) não mexe nos aportes.</p>${all}
+      ${hs.recv.length > 20 ? `<details class="xi-more"><summary>Ver as ${hs.recv.length} entradas</summary>${hl}</details>` : hl}
+      <div class="calc-line" id="xi-prev"></div>`
+    : utx.length ? `<h3 class="mini">UTXOs encontrados</h3><p class="hint" style="margin:-4px 0 8px">Para não contar duas vezes: diga de onde veio cada UTXO novo. Saque da corretora desconta do saldo da corretora; entrada externa (presente, pagamento, compra fora do app) não mexe nos aportes.</p>${all}
+      ${utx.map(u => `<div class="xi-u"><div><b>${AMT(u.sats)}</b><span class="small muted">${fmtDate(u.date)}${u.conf ? '' : ' · sem confirmação'} · ${esc(u.x.name)}</span></div>${u.match ? '<span class="tag">já registrado</span>' : pick(`xo_${u.k}`, u.origin, 'Origem do UTXO')}</div>`).join('')}
       <div class="calc-line" id="xi-prev"></div>` : ''}
     <p class="err form" hidden></p>
-    <button class="btn btn-p block" data-act="xi-apply">Importar ${rows.length} ${rows.length === 1 ? 'endereço' : 'endereços'}${fresh.length ? ` e ${fresh.length} ${fresh.length === 1 ? 'UTXO' : 'UTXOs'}` : ''}</button>` : ''}
+    <button class="btn btn-p block" data-act="xi-apply">Importar ${sel.length} ${sel.length === 1 ? 'endereço' : 'endereços'}${H ? ` e ${hs.n} ${hs.n === 1 ? 'transação' : 'transações'}` : fresh.length ? ` e ${fresh.length} ${fresh.length === 1 ? 'UTXO' : 'UTXOs'}` : ''}</button>` : ''}
     <button class="btn btn-q block" style="margin-top:10px" data-act="xi-back">Voltar</button>
-    ${fresh.some(u => u.origin === 'saque') && last ? `<p class="hint" style="margin-top:10px">Os saques entram como da ${esc(last)}, com taxa zero. Ajuste depois em cada saque, se precisar.</p>` : ''}`;
+    ${ent.some(u => u.origin === 'saque') && last ? `<p class="hint" style="margin-top:10px">Os saques entram como da ${esc(last)}, com taxa zero. Ajuste depois em cada saque, se precisar.</p>` : ''}`;
 }
 function xiPreview() {
   const el = $('#xi-prev'), f = ui.form; if (!el || !f.res) return;
-  const c = calc(); let sq = 0, inn = 0;
-  for (const x of f.res.rows) for (const u of x.utxos) if (!u.match) { inn += u.sats; if ((fv(`xo_${u.k}`) || u.origin) === 'saque') sq += u.sats; }
+  const c = calc(), H = xiHistOn(); let sq = 0, inn = 0;
+  if (H) { for (const u of f.res.hist.recv) if ((fv(`xr_${u.j}`) || u.origin) === 'saque') sq += u.sats; inn = f.res.hist.cur; }
+  else for (const x of f.res.rows) for (const u of x.utxos) if (!u.match) { inn += u.sats; if ((fv(`xo_${u.k}`) || u.origin) === 'saque') sq += u.sats; }
   const ex = c.ex - sq;
-  el.innerHTML = `Depois de importar: corretora <b>${AMT(Math.max(0, ex))}</b> · autocustódia <b>${AMT(c.self + inn)}</b>${ex < 0 ? `<br><span class="neg">A corretora ficaria ${AMT(ex)} negativa: marque alguns como entrada externa.</span>` : ''}`;
+  el.innerHTML = `Depois de importar: corretora <b>${AMT(Math.max(0, ex))}</b> · autocustódia <b>${AMT(c.self + inn)}</b>${ex < 0 ? `<br><span class="neg">A corretora ficaria ${AMT(ex)} negativa: marque ${H ? 'algumas' : 'alguns'} como entrada externa.</span>` : ''}`;
+}
+/* guarda o que já foi digitado e escolhido na revisão antes de redesenhá-la (1.8.16; entradas do histórico na 1.8.17) */
+function xiKeep() {
+  const f = ui.form, r = f && f.res; if (!r) return;
+  for (const x of r.rows) { const v = fv(`xn_${x.c}_${x.i}`); if (v) x.name = v.slice(0, 60); for (const u of x.utxos) { const o = fv(`xo_${u.k}`); if (o) u.origin = o; } }
+  if (r.hist && r.hist.ok) for (const u of r.hist.recv) { const o = fv(`xr_${u.j}`); if (o) u.origin = o; }
+  r.wsel = fv('xwallet') || r.wsel; const wn = fv('xwname'); if (wn) r.wname = wn;
 }
 function xiApply() {
   const f = ui.form, r = f.res; if (!r || !r.rows.length) return;
-  let sq = 0; for (const x of r.rows) for (const u of x.utxos) if (!u.match && (fv(`xo_${u.k}`) || u.origin) === 'saque') sq += u.sats;
-  if (calc().ex - sq < 0) return formErr('A corretora ficaria com saldo negativo. Marque como entrada externa os UTXOs que não vieram de saque.');
-  let wid = fv('xwallet') || '__new', nNew = 0, nU = 0;
+  const H = xiHistOn(), hs = H ? r.hist : null;   // histórico ligado e montado (1.8.17)
+  const rows = f.only && !r.derived && !H ? r.rows.filter(x => x.bal > 0) : r.rows;   // só os com saldo, se a pessoa ligou a opção (1.8.16)
+  if (!rows.length) return formErr('Nenhum endereço com saldo para importar.');
+  const og = u => (fv(H ? `xr_${u.j}` : `xo_${u.k}`) || u.origin) === 'saque' ? 'saque' : 'externo';
+  let sq = 0;
+  if (H) { for (const u of hs.recv) if (og(u) === 'saque') sq += u.sats; } else for (const x of rows) for (const u of x.utxos) if (!u.match && og(u) === 'saque') sq += u.sats;
+  if (calc().ex - sq < 0) return formErr(`A corretora ficaria com saldo negativo. Marque como entrada externa ${H ? 'as entradas' : 'os UTXOs'} que não vieram de saque.`);
+  let wid = fv('xwallet') || '__new', nNew = 0, nU = 0, nT = 0;
   const ok = attempt(() => {
     if (wid === '__new') { wid = ensureWallet('__new', fv('xwname') || `Carteira ${r.tag}`); const w = byId(state.wallets, wid); if (!state.addresses.some(a => a.wallet === wid)) w.type = r.type; }
-    const exName = exNames().slice(-1)[0] || 'Corretora';
-    for (const x of r.rows) {
+    const exName = exNames().slice(-1)[0] || 'Corretora', addrOf = new Map();
+    for (const x of rows) {
       const name = ((fv(`xn_${x.c}_${x.i}`) || '').trim() || x.name).slice(0, 60);
       let a = x.exId ? addrById(x.exId) : null;
       if (a) { a.label = name; a.path = a.path || `${x.c}/${x.i}`; if (x.c === 1) a.role = 'troco'; }
       else { a = { id: uid(), wallet: wid, label: name, addr: x.addr, type: r.type, role: x.c ? 'troco' : 'recebimento', createdAt: todayISO(), path: `${x.c}/${x.i}` }; state.addresses.push(a); nNew++; }
+      addrOf.set(x.addr, a);
+      if (H) continue;   // com o histórico, os UTXOs saem das transações, depois de todos os endereços (1.8.17)
       for (const u of x.utxos) {
         if (u.match) { const y = byId(state.utxos, u.match); if (y && !y.txid) { y.txid = u.txid; y.vout = String(u.vout); } continue; }
-        const origin = (fv(`xo_${u.k}`) || u.origin) === 'saque' ? 'saque' : 'externo';
+        const origin = og(u);
         const nu = { id: uid(), sats: u.sats, address: a.id, wallet: a.wallet, type: a.type, label: origin === 'saque' ? `Saque ${fmtYM(u.date.slice(0, 7))}` : 'Entrada externa', date: u.date, txid: u.txid, vout: String(u.vout), origin, kyc: origin === 'saque', frozen: false, spent: false };
         if (origin === 'saque') { const w = { id: uid(), date: u.date, sats: u.sats, fee: 0, ex: exName, utxoId: nu.id }; state.saques.push(w); nu.saqueId = w.id; }
         state.utxos.push(nu); nU++;
       }
     }
+    if (H) nT = xiHistApply(hs, addrOf, og, exName);
     S().utxo = true;
   });
   if (!ok) return false;
   save(); closeSheet(); ui.stack = []; ui.page = null; ui.tab = 'carteira'; render(); window.scrollTo(0, 0);
-  toast(`${nNew} ${nNew === 1 ? 'endereço importado' : 'endereços importados'}${nU ? ` · ${nU} ${nU === 1 ? 'UTXO' : 'UTXOs'}` : ''}`);
+  toast(`${nNew} ${nNew === 1 ? 'endereço importado' : 'endereços importados'}${H ? ` · histórico com ${nT} ${nT === 1 ? 'transação' : 'transações'}` : nU ? ` · ${nU} ${nU === 1 ? 'UTXO' : 'UTXOs'}` : ''}`);
 }
 function xiSection() {
   return `<section class="sec"><h2 class="sec-t">Importar pela chave pública</h2><p class="small muted">Traga todos os endereços de uma carteira pela chave pública mestra (xpub, ypub ou zpub), já com o saldo, e dê nome a cada um antes de importar. Só leitura: com ela não dá para mover bitcoins.</p><button class="btn btn-q block" data-act="xpub-import">Importar pela chave pública mestra</button></section>`;
@@ -4000,15 +4177,30 @@ function xiSection() {
 Object.assign(ACT, {
   'xpub-import': () => { closeSheet(true); sheetXpub(); },
   'xi-ok': () => { ui.form.step = 'form'; xiRender(); },
-  'xi-scan': () => xiScan(false),
-  'xi-derive': () => xiScan(true),
+  'xi-scan': () => { ui.form.phase = ''; xiScan(false); },
+  'xi-derive': () => { ui.form.phase = ''; xiScan(true); },
   'xi-cancel': () => { if (xiCtl) xiCtl.abort(); },
-  'xi-alt': () => {   // continuar em outro servidor, sem perder o que já foi consultado (1.8.14)
+  'xi-alt': () => {   // continuar em outro servidor, sem perder o que já foi consultado (1.8.14; histórico na 1.8.17)
     const f = ui.form; if (!f || f.kind !== 'xpub' || f.relaunch) return;
     f.server = xiAltOf(f.server); const el = $('#xi-s'); if (el) el.value = f.server;
-    if (xiCtl) { f.relaunch = true; xiCtl.abort(); } else xiScan(false);
+    if (xiCtl) { f.relaunch = true; xiCtl.abort(); return; }
+    if (f.step === 'review') { xiKeep(); Object.assign(f, { hist: true, only: false, herr: '', hfail: false, phase: 'hist' }); } else f.phase = '';
+    xiScan(false);
   },
-  'xi-back': () => { ui.form.step = 'form'; ui.form.res = null; xiRender(); },
+  'xi-only': () => {   // liga e desliga a importação só dos endereços com saldo, guardando o que já foi digitado (1.8.16)
+    const f = ui.form, r = f && f.res; if (!r || r.derived || xiHistOn() || !r.rows.some(x => x.bal > 0)) return;
+    xiKeep(); f.only = !f.only; xiRender();
+  },
+  'xi-hist': () => {   // histórico de movimentações: desligado por padrão, só a pessoa liga; buscado uma vez só (1.8.17)
+    const f = ui.form, r = f && f.res; if (!r || r.derived || !r.rows.length || xiBusy || xiHistWhy(r)) return;
+    xiKeep(); Object.assign(f, { herr: '', hfail: false });
+    if (xiHistOn()) { f.hist = false; return xiRender(); }
+    Object.assign(f, { hist: true, only: false });
+    if (r.hist && r.hist.ok) return xiRender();
+    f.phase = 'hist'; xiScan(false);
+  },
+  'xi-all': el => { for (const s of document.querySelectorAll('#sheet-body select[data-inp="xi-origin"]')) s.value = el.dataset.v === 'saque' ? 'saque' : 'externo'; xiPreview(); },
+  'xi-back': () => { Object.assign(ui.form, { step: 'form', res: null, phase: '', hist: false, herr: '', hfail: false }); xiRender(); },
   'xi-apply': () => xiApply()
 });
 Object.assign(INP, {
