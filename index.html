@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="App do Projeto Hold BTC 100: registre seus aportes mensais em bitcoin, acompanhe preço médio e resultado, gerencie UTXOs e aprenda autocustódia.">
 <title>Hold BTC 100</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-onqPyFQJM4mSOSdc/chMTNNV4tAmqogBbyp7HulNVyQ='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-48/pv2Ij8bcuCCCmss/ZGlwKCdlrwjqQXZj65ovvIcs='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -531,6 +531,10 @@ a.set-row{color:inherit;text-decoration:none}
 .bk-sw{margin:2px 0 8px}
 #bk-pin-f{margin:0 0 10px}
 #bk-pin-f .hint{margin:0 0 4px}
+/* valor pago pelas entradas externas (1.8.19) */
+.xi-cost{margin:14px 0 6px}
+input.inp[readonly]{color:var(--muted)}
+.seg button[disabled]{opacity:.45;cursor:not-allowed}
 
 .ic{display:block;width:24px;height:24px}
 </style>
@@ -827,7 +831,7 @@ const KS_CARDS = {
    Claude, também espelha num documento privado do usuário.
    ========================================================= */
 
-const APP_VERSION = '1.8.18';
+const APP_VERSION = '1.8.19';
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const HIST = {"start":"2015-01","usd":[269,236,249,240,233,247,274,257,233,275,346,404,400,404,427,433,490,602,649,600,593,655,724,855,967,1075,1126,1210,1817,2384,2684,3787,4520,5404,8338,12178,12166,10318,8680,8122,8372,6952,7096,7394,6818,6489,5192,3887,3595,3654,3979,4704,6942,9680,10459,9914,9056,8766,8345,7372,8268,8948,7481,7512,9050,9296,10232,11509,11218,12286,16730,24328,31072,39024,51906,58338,47486,36155,38354,44318,45439,52582,59166,51586,42365,40791,44360,41879,35044,25823,21591,21674,19744,19962,18841,16851,19838,23126,25804,28897,28234,28846,29858,27587,26456,30805,36179,39982,42444,51946,66244,65986,64146,65194,63729,61864,61188,66861,83364,95022,97976,93433,83444,88373,99394,105848,111410,111996,111124,111840,99685,88638,83198,72854,67640,72356,75048,66150,60768,70714,81095,80570],"brl":[708,663,783,731,714,768,883,904,911,1067,1307,1564,1620,1603,1583,1542,1734,2062,2125,1926,1930,2088,2418,2866,3091,3338,3522,3795,5832,7858,8605,11932,14171,17247,27175,40087,39062,33444,28462,27676,30443,26233,27169,29059,28068,24388,19662,15101,13451,13608,15305,18328,27776,37353,39528,39856,37326,35825,34676,30296,34306,38845,36536,40003,51073,48305,54030,62853,60569,69121,90640,125185,166425,211371,293069,324482,251253,181928,197777,232745,239904,291307,328780,291530,234452,211975,220398,199260,173644,130385,115903,111476,103397,104809,99381,88340,103169,119603,134475,145054,140682,139952,143345,135273,130613,156021,177216,195797,208587,257883,329902,338449,329261,351333,353186,343509,339079,376033,484100,579349,589992,538697,479536,511123,563308,587149,615933,610031,596450,602314,532408,483352,444108,378882,353863,364172,374017,339193,310759,364403,417209,413273]}; // médias mensais estimadas: {start:'2015-01', usd:[…], brl:[…]}
 const REF_PRICE = { BRL: 416900, USD: 75800, EUR: 68000, at: Date.UTC(2026, 10, 7, 18, 0), src: 'ref' }; // US$ do CoinLore × PTAX de 06/11/2026 (R$ 5,50; € 6,13)
@@ -953,7 +957,7 @@ const SAFE_ID = /^[A-Za-z0-9_-]{1,64}$/, SAFE_URL = /^(https:\/\/[^\s"'<>`\\]+|h
 const SF = {
   ids: new Set(['id', 'wallet', 'address', 'utxoId', 'txId', 'spendId', 'spendId0', 'aporteId', 'saqueId', 'saleId', 'utxo', 'out', 'key']),
   nums: new Set(['fiat', 'price', 'sats', 'fee', 'dolar', 'vsize', 'outSats', 'sent']),
-  bools: new Set(['kyc', 'frozen', 'spent', 'rem', 'vsizeReal', 'sale']),
+  bools: new Set(['kyc', 'frozen', 'spent', 'rem', 'vsizeReal', 'sale', 'entrada']),
   texts: new Set(['note', 'ex', 'name', 'label', 'addr']),
   opts: new Set(['type', 'kind', 'role', 'origin', 'dest', 'src']),
   dates: new Set(['date', 'spentAt'])
@@ -1451,7 +1455,7 @@ function viewAportes() {
       continue;
     }
     const v = c.P / a.price - 1;
-    h += `<button class="row-btn" data-act="edit-aporte" data-id="${a.id}"><span class="a">${fmtDate(a.date)} · ${MV(a.fiat)}</span><span class="r"><b>${AMT(a.sats)}</b></span><span class="b">${esc(fmtV(a.price, 0))}${a.ex ? ' · ' + esc(a.ex) : ''}${a.fee ? ' · taxa ' + MV(a.fee) : ''}${S().utxo && a.dest === 'self' ? ' · ◈ direto na carteira' : ''}${fxt}</span><span class="r b ${v >= 0 ? 'pos' : 'neg'}">${esc(fmtPct(v))}</span></button>`;
+    h += `<button class="row-btn" data-act="edit-aporte" data-id="${a.id}"><span class="a">${fmtDate(a.date)} · ${MV(a.fiat)}</span><span class="r"><b>${AMT(a.sats)}</b></span><span class="b">${esc(fmtV(a.price, 0))}${a.ex ? ' · ' + esc(a.ex) : ''}${a.fee ? ' · taxa ' + MV(a.fee) : ''}${S().utxo && a.dest === 'self' ? (a.entrada ? ' · ◈ entrada externa' : ' · ◈ direto na carteira') : ''}${fxt}</span><span class="r b ${v >= 0 ? 'pos' : 'neg'}">${esc(fmtPct(v))}</span></button>`;
   }
   return h + `</section>`;
 }
@@ -1711,7 +1715,7 @@ const srcHint = s => s === 'self' ? 'Venda P2P ou direto da sua carteira: escolh
 function apHTML() {
   const f = ui.form, set = S(), a = f.id ? byId(state.aportes, f.id) : null, u = a && a.utxoId ? byId(state.utxos, a.utxoId) : null, d = f.d, sale = f.type === 'venda', pa = f.presetAddr, pm = f.mode === 'price';
   const exList = exNames();
-  const dest = `<div class="field"><span class="lbl">Para onde foram os sats</span><div class="seg"><button class="${f.dest === 'ex' ? 'on' : ''}" data-act="ap-dest" data-dest="ex">Ficaram na corretora</button><button class="${f.dest === 'self' ? 'on' : ''}" data-act="ap-dest" data-dest="self">Direto na carteira</button></div></div>
+  const dest = `<div class="field"><span class="lbl">Para onde foram os sats</span><div class="seg"><button class="${f.dest === 'ex' ? 'on' : ''}" data-act="ap-dest" data-dest="ex"${a && a.entrada ? ' disabled' : ''}>Ficaram na corretora</button><button class="${f.dest === 'self' ? 'on' : ''}" data-act="ap-dest" data-dest="self">Direto na carteira</button></div>${a && a.entrada ? '<p class="hint">Entrada externa com valor pago: os sats já estão na carteira. Aqui você corrige o valor pago, a data e a corretora.</p>' : ''}</div>
     <div id="dest-self" ${f.dest === 'self' ? '' : 'hidden'}>
       ${addrPicker('ap_', u ? u.wallet : pa ? (addrById(pa) || {}).wallet : (state.wallets[0] || {}).id, u ? u.address : (pa || '__new'), { addrLabel: 'Endereço que recebeu', exclude: u ? u.id : '' })}
       <div class="switch"><span><span class="t">Compra com cadastro (KYC)</span><br><span class="d">Desligue para compras P2P sem cadastro</span></span><button class="tog ${f.kyc ? 'on' : ''}" data-act="ap-kyc" aria-pressed="${f.kyc}" aria-label="Compra com cadastro"></button></div>
@@ -1724,9 +1728,9 @@ function apHTML() {
     ${a ? '' : `<div class="field"><div class="seg" role="group" aria-label="Tipo de registro"><button class="${sale ? '' : 'on'}" data-act="ap-type" data-t="compra" aria-pressed="${!sale}">Compra</button><button class="${sale ? 'on' : ''}" data-act="ap-type" data-t="venda" aria-pressed="${sale}">Venda</button></div></div>`}
     <div class="field"><label for="f-date">Data da ${sale ? 'venda' : 'compra'}</label><input class="inp" id="f-date" name="date" type="date" value="${esc(d.date)}" max="${todayISO()}" data-inp="ap-date"></div>
     <div class="field"><label for="f-fiat">Valor ${sale ? 'recebido' : 'pago'} (${curSym()})</label><input class="inp big" id="f-fiat" name="fiat" inputmode="decimal" autocomplete="off" data-num="money" data-neg="1" placeholder="0,00" value="${esc(d.fiat)}" data-inp="ap-calc"></div>
-    <div class="field"><span class="lbl">Você vai informar</span><div class="seg" role="group" aria-label="Forma de informar"><button class="${pm ? 'on' : ''}" data-act="ap-mode" data-mode="price" aria-pressed="${pm}">A cotação</button><button class="${pm ? '' : 'on'}" data-act="ap-mode" data-mode="sats" aria-pressed="${!pm}">Os ${isBTCu() ? 'BTC' : 'sats'} ${sale ? 'vendidos' : 'recebidos'}</button></div></div>
+    <div class="field"${a && a.entrada ? ' hidden' : ''}><span class="lbl">Você vai informar</span><div class="seg" role="group" aria-label="Forma de informar"><button class="${pm ? 'on' : ''}" data-act="ap-mode" data-mode="price" aria-pressed="${pm}">A cotação</button><button class="${pm ? '' : 'on'}" data-act="ap-mode" data-mode="sats" aria-pressed="${!pm}">Os ${isBTCu() ? 'BTC' : 'sats'} ${sale ? 'vendidos' : 'recebidos'}</button></div></div>
     <div class="field" id="fld-price" ${pm ? '' : 'hidden'}><label for="f-price">Cotação do bitcoin na ${sale ? 'venda' : 'compra'} (${curSym()})</label><input class="inp" id="f-price" name="price" inputmode="decimal" autocomplete="off" data-num="int" value="${esc(d.price)}" data-inp="ap-price"><p class="hint" id="price-hint">${a ? '' : priceHint(d.date)}</p></div>
-    <div class="field" id="fld-sats" ${pm ? 'hidden' : ''}><label for="f-sats">${isBTCu() ? 'BTC' : 'Sats'} ${sale ? 'vendidos' : 'recebidos'}</label><input class="inp" id="f-sats" name="sats" ${amtAttrs()} autocomplete="off" value="${esc(d.sats)}" data-inp="ap-calc"><p class="hint">Confira no comprovante. 1 BTC = 100.000.000 sats.</p></div>
+    <div class="field" id="fld-sats" ${pm ? 'hidden' : ''}><label for="f-sats">${isBTCu() ? 'BTC' : 'Sats'} ${sale ? 'vendidos' : 'recebidos'}</label><input class="inp" id="f-sats" name="sats" ${amtAttrs()} autocomplete="off" value="${esc(d.sats)}" data-inp="ap-calc"${a && a.entrada ? ' readonly' : ''}><p class="hint">${a && a.entrada ? 'Os sats desta entrada são os do UTXO na carteira e não mudam aqui.' : 'Confira no comprovante. 1 BTC = 100.000.000 sats.'}</p></div>
     <div class="field"><label for="f-afee">Taxa da operação (opcional)</label><div class="fee-in"><input class="inp" id="f-afee" name="afee" inputmode="decimal" data-num="${f.feeU === 'pct' ? 'dec' : 'money'}" autocomplete="off" placeholder="${f.feeU === 'pct' ? '0' : '0,00'}" value="${esc(d.afee || '')}" data-inp="ap-calc"><div class="seg" role="group" aria-label="Unidade da taxa"><button class="${f.feeU === 'pct' ? '' : 'on'}" data-act="ap-feeu" data-u="fiat">${curSym()}</button><button class="${f.feeU === 'pct' ? 'on' : ''}" data-act="ap-feeu" data-u="pct">%</button></div></div><p class="hint">${sale ? 'Corretagem, spread ou taxa do P2P, já descontada do valor recebido.' : 'Corretagem, spread ou taxa do P2P, já incluída no valor pago. Ela entra no custo de aquisição.'}</p></div>
     ${apDolField(d, sale)}
     <div class="calc-line" id="ap-calc" aria-live="polite"></div>
@@ -1848,6 +1852,7 @@ function saveAporte() {
   const base0 = apBase(fiat, feeV, sale);
   if (f.mode === 'price') { if (!(price > 0)) return formErr(`Informe a cotação do bitcoin na ${sale ? 'venda' : 'compra'}.`); sats = Math.round(base0 / price * 1e8); }
   else { if (!(sats > 0)) return formErr(sale ? 'Informe os sats vendidos.' : 'Informe os sats recebidos.'); price = base0 / (sats / 1e8); }
+  if (prev && prev.entrada) { sats = prev.sats; price = base0 / (sats / 1e8); }   // entrada externa com valor pago (1.8.19): os sats são os do UTXO
   if (sats < 1) return formErr('O valor resulta em menos de 1 sat. Confira os números.');
   const est = histPrice(date.slice(0, 7));
   if (est && !f.warned && (price > est * 2.5 || price < est / 2.5)) { f.warned = true; const b = $('[data-act="save-aporte"]'); if (b) b.textContent = 'Salvar mesmo assim'; return formErr(`A cotação ficou bem diferente da média do mês (${fmtMoney(est, cur(), 0)}). Confira se não faltou ou sobrou um zero.`); }
@@ -1896,6 +1901,7 @@ function saveAporte() {
     toast(prev ? 'Venda atualizada' : 'Venda registrada'); fxSync(); return;
   }
   const ap = { ...base, type: 'compra', dest: set.utxo ? f.dest : (prev ? prev.dest || 'ex' : 'ex'), utxoId: prev ? prev.utxoId : undefined };
+  if (prev && prev.entrada && ap.dest !== 'self') return formErr('Os sats desta entrada já estão na carteira: o destino continua Direto na carteira.');   // 1.8.19
   const L = ledger(state.aportes.filter(x => x.id !== ap.id).concat([ap])); if (L.err) return formErr(ledgerErrText(L.err));
   if (set.utxo) {
     const old = ap.utxoId ? byId(state.utxos, ap.utxoId) : null;
@@ -1922,13 +1928,15 @@ function saveAporte() {
 function delAporte(id) {
   const a = byId(state.aportes, id); if (!a) return;
   const sale = isSale(a), u = a.utxoId ? byId(state.utxos, a.utxoId) : null;
-  if (u && u.spent) { toast('O UTXO deste aporte já foi gasto. Desfaça a transação primeiro.'); return; }
+  if (u && u.spent && !a.entrada) { toast('O UTXO deste aporte já foi gasto. Desfaça a transação primeiro.'); return; }
   if (!sale && ledger(state.aportes.filter(x => x.id !== id)).err) { toast('Não dá para excluir: uma venda depois dele ficaria maior que o saldo registrado.'); return; }
   const sp = sale && a.txId ? byId(state.spends, a.txId) : null;
   if (sp) { const used = sp.outputs.filter(o => o.kind === 'own').map(o => byId(state.utxos, o.utxo)).find(x => x && x.spent); if (used) { toast(`O troco desta venda foi gasto em ${fmtDate(used.spentAt)}. Desfaça antes aquela transação.`); return; } }
-  confirmSheet(sale ? 'Excluir venda?' : 'Excluir aporte?', `${esc(fmtDate(a.date))} · ${esc(fmtMoney(a.fiat))} · ${esc(amtTxt(a.sats))}.${sp ? ' A transação ligada também é desfeita: os UTXOs usados voltam a ficar disponíveis.' : ''} Essa ação não pode ser desfeita.`, sale ? 'Excluir venda' : 'Excluir aporte', () => {
+  confirmSheet(sale ? 'Excluir venda?' : 'Excluir aporte?', `${esc(fmtDate(a.date))} · ${esc(fmtMoney(a.fiat))} · ${esc(amtTxt(a.sats))}.${sp ? ' A transação ligada também é desfeita: os UTXOs usados voltam a ficar disponíveis.' : ''}${a.entrada ? ' O valor pago sai do total aportado; o UTXO continua na carteira, como entrada externa.' : ''} Essa ação não pode ser desfeita.`, sale ? 'Excluir venda' : 'Excluir aporte', () => {
     if (sp) { for (const i of sp.inputs) { const x = byId(state.utxos, i); if (x) { x.spent = false; delete x.spentAt; delete x.spendId; } } const outIds = new Set(sp.outputs.filter(o => o.kind === 'own').map(o => o.utxo)); state.utxos = state.utxos.filter(x => !outIds.has(x.id)); state.spends = state.spends.filter(s => s.id !== sp.id); }
-    state.aportes = state.aportes.filter(x => x.id !== id); if (u) state.utxos = state.utxos.filter(x => x.id !== u.id);
+    state.aportes = state.aportes.filter(x => x.id !== id);
+    if (u && a.entrada) { u.origin = 'externo'; delete u.aporteId; if (/^Compra /.test(u.label)) u.label = 'Entrada externa'; }   // 1.8.19: os sats ficam
+    else if (u) state.utxos = state.utxos.filter(x => x.id !== u.id);
     save(); closeSheet(); render(); toast(sale ? 'Venda excluída' : 'Aporte excluído');
   }, true);
 }
@@ -2583,7 +2591,7 @@ const ACT = {
   'del-saque': el => delSaque(el.dataset.id),
   'wd-all': () => { const c = calc(), fee = parseIntSafe(fv('fee')) || 0; $('#sheet-body [name="sats"]').value = amtIn(Math.max(0, c.ex - fee)); updateWdCalc(); },
   'new-utxo': () => sheetNewUtxo(),
-  'un-origin': el => { ui.form.origin = el.dataset.o; $$('[data-act="un-origin"]').forEach(b => b.classList.toggle('on', b === el)); $('#un-hint').textContent = ui.form.origin === 'externo' ? 'Presente, pagamento recebido ou compra que não está nos aportes. Não sai da corretora.' : 'Sai do saldo da corretora, como um saque já feito.'; $('#fld-fee').hidden = ui.form.origin === 'externo'; const t = $('#sheet-body [data-act="form-kyc"]'); ui.form.kyc = ui.form.origin !== 'externo'; t.classList.toggle('on', ui.form.kyc); },
+  'un-origin': el => { ui.form.origin = el.dataset.o; $$('[data-act="un-origin"]').forEach(b => b.classList.toggle('on', b === el)); $('#un-hint').textContent = ui.form.origin === 'externo' ? 'Presente, pagamento recebido ou compra que não está nos aportes. Não sai da corretora; se você pagou, informe o valor para somar ao total aportado.' : 'Sai do saldo da corretora, como um saque já feito.'; $('#fld-fee').hidden = ui.form.origin === 'externo'; const fc = $('#fld-cost'); if (fc) fc.hidden = ui.form.origin !== 'externo'; const t = $('#sheet-body [data-act="form-kyc"]'); ui.form.kyc = ui.form.origin !== 'externo'; t.classList.toggle('on', ui.form.kyc); },
   'save-new-utxo': saveNewUtxo,
   'edit-utxo': el => { closeSheet(true); sheetEditUtxo(el.dataset.id); },
   'save-edit-utxo': saveEditUtxo,
@@ -2888,11 +2896,12 @@ function delSaque(id) {
   confirmSheet('Desfazer saque?', `Os ${esc(fmtSats(w.sats + (w.fee || 0)))} sats voltam para o saldo da corretora e o UTXO é removido. O endereço continua registrado.`, 'Desfazer saque', () => { state.saques = state.saques.filter(x => x.id !== id); if (u) state.utxos = state.utxos.filter(x => x.id !== u.id); save(); closeSheet(); render(); toast('Saque desfeito'); }, true);
 }
 function sheetNewUtxo() {
-  ui.form = { kind: 'utxo-new', origin: 'aportes', kyc: true };
+  ui.form = { kind: 'utxo-new', origin: 'aportes', kyc: true, warned: false };
   openSheet('utxo-new', () => `<h2>Adicionar UTXO</h2><p class="sub">Para moedas que já estão na sua carteira.</p>
     <div class="field"><span class="lbl">De onde vieram estes sats</span><div class="seg"><button class="on" data-act="un-origin" data-o="aportes">Dos meus aportes</button><button data-act="un-origin" data-o="externo">Entrada externa</button></div><p class="hint" id="un-hint">Sai do saldo da corretora, como um saque já feito.</p></div>
     <div class="field"><label for="n-s">Valor do UTXO (${unitName()})</label><input class="inp big" id="n-s" name="sats" ${amtAttrs()} autocomplete="off"></div>
     <div class="field" id="fld-fee"><label for="n-f">Taxa de saque paga (sats, opcional)</label><input class="inp" id="n-f" name="fee" inputmode="numeric" autocomplete="off" data-num="int" value="0"></div>
+    <div class="field" id="fld-cost" hidden><label for="n-c">Valor pago (${curSym()}, opcional)</label><input class="inp" id="n-c" name="cost" inputmode="decimal" data-num="money" placeholder="0,00" autocomplete="off"><p class="hint">Se você comprou estes sats fora do app, informe quanto pagou: o valor entra no total aportado, como aporte direto na carteira.</p></div>
     ${addrPicker('n_', (state.wallets[0] || {}).id, '__new', { addrLabel: 'Endereço' })}
     <div class="two"><div class="field"><label for="n-d">Data</label><input class="inp" id="n-d" name="date" type="date" value="${todayISO()}" max="${todayISO()}"></div><div class="field"><label for="n-l">Etiqueta</label><input class="inp" id="n-l" name="label" autocomplete="off" placeholder="Origem da moeda"></div></div>
     <div class="two"><div class="field"><label for="n-t">TXID (opcional)</label><input class="inp mono" id="n-t" name="txid" autocomplete="off" autocapitalize="off" spellcheck="false"></div><div class="field"><label for="n-v">vout (opcional)</label><input class="inp" id="n-v" name="vout" inputmode="numeric" autocomplete="off"></div></div>
@@ -2906,19 +2915,32 @@ function saveNewUtxo() {
   if (!validTxid(txid)) return formErr('O TXID tem 64 caracteres (0-9 e a-f).');
   if (vout && !/^\d+$/.test(vout)) return formErr('O vout é um número inteiro, como 0 ou 1.');
   if (pickerBad('n_')) return formErr('O endereço informado não é válido.');
+  const cTxt = f.origin === 'externo' ? (fv('cost') || '').trim() : '', cost = cTxt ? parseNum(cTxt) : 0;   // valor pago pela entrada externa (1.8.19)
+  if (cTxt && !(cost >= 0)) return formErr('Confira o valor pago: use só números, como 1.500,00. Ou deixe o campo vazio.');
+  if (cost > 0 && !f.warned) { const est = histPrice(date.slice(0, 7)), pr = cost / (sats / 1e8); if (est && (pr > est * 2.5 || pr < est / 2.5)) { f.warned = true; const b = $('[data-act="save-new-utxo"]'); if (b) b.textContent = 'Adicionar mesmo assim'; return formErr(`O valor pago dá ${fmtMoney(pr, cur(), 0)} por bitcoin, bem diferente da média do mês (${fmtMoney(est, cur(), 0)}). Confira se não faltou ou sobrou um zero.`); } }
   const def = f.origin === 'externo' ? 'Entrada externa' : 'Saque antigo';
   const ok = attempt(() => {
     const r = resolvePicker('n_', def); if (r.err) throw new Error(r.err); const a = addrById(r.aid);
     const u = { id: uid(), sats, address: a.id, wallet: a.wallet, type: a.type, label: (fv('label').trim() || def).slice(0, 80), date, txid, vout, origin: f.origin === 'externo' ? 'externo' : 'saque', kyc: f.kyc, frozen: false, spent: false };
     if (f.origin !== 'externo') { const sid = uid(); u.saqueId = sid; state.saques.push({ id: sid, date, sats, fee, ex: S().exchange || '', utxoId: u.id }); }
     state.utxos.push(u);
+    if (cost > 0) entradaPaga(u, cost, 'Valor pago informado ao adicionar o UTXO');
   });
   if (!ok) return false;
-  save(); closeSheet(); render(); toast('UTXO adicionado');
+  save(); closeSheet(); render(); toast(cost > 0 ? 'UTXO adicionado e valor pago somado ao total aportado' : 'UTXO adicionado'); if (cost > 0) fxSync();
+}
+/* Entrada externa com valor pago (1.8.19, pedido do Nicolas): vira aporte direto na carteira, ligado ao UTXO (origem
+   aporte), e o valor entra no total aportado, no preço médio e no IR. O aporte leva entrada: true; excluir esse aporte tira
+   só o valor pago e devolve o UTXO a entrada externa, sem tirar os sats da carteira. */
+function entradaPaga(u, fiat, note) {
+  const ap = { id: uid(), date: u.date, fiat: round2(fiat), price: round2(fiat / (u.sats / 1e8)), sats: u.sats, ex: DEF_EX('compra'), note: (note || '').slice(0, 140), fee: 0, type: 'compra', dest: 'self', utxoId: u.id, entrada: true };
+  state.aportes.push(ap); Object.assign(u, { origin: 'aporte', aporteId: ap.id }); delete u.saqueId;
+  if (!u.label || u.label === 'Entrada externa') u.label = `Compra ${fmtYM(u.date.slice(0, 7))}`;
+  return ap;
 }
 function utxoSource(u) {
   if (u.origin === 'saque') { const w = byId(state.saques, u.saqueId); return { t: `Saque${w && w.ex ? ' da ' + w.ex : ''}`, d: w ? `taxa de saque ${esc(fmtSats(w.fee || 0))} sats` : '', act: 'edit-saque', id: u.saqueId || '' }; }
-  if (u.origin === 'aporte') { const ap = byId(state.aportes, u.aporteId), av = ap && apV(ap); return { t: 'Aporte direto na carteira', d: av ? `${MV(av.fiat)} a ${esc(fmtV(av.price, 0))}` : '', act: 'edit-aporte', id: u.aporteId || '' }; }
+  if (u.origin === 'aporte') { const ap = byId(state.aportes, u.aporteId), av = ap && apV(ap); return { t: ap && ap.entrada ? 'Entrada externa com valor pago' : 'Aporte direto na carteira', d: av ? `${MV(av.fiat)} a ${esc(fmtV(av.price, 0))}` : '', act: 'edit-aporte', id: u.aporteId || '' }; }
   if (u.origin === 'tx') {
     const sp = byId(state.spends, u.txId); if (!sp) return { t: 'Transação', d: '', act: 'edit-utxo', id: u.id };
     const ins = sp.inputs.map(i => byId(state.utxos, i)).filter(Boolean), from = [...new Set(ins.map(x => (addrById(x.address) || {}).label || 'endereço'))];
@@ -4164,11 +4186,12 @@ function xiHistBuild(r) {
 }
 /* grava o histórico (dentro do attempt de xiApply): entradas com a origem escolhida, transações com as saídas na ordem
    da blockchain e os UTXOs criados por elas, gastos ou não */
-function xiHistApply(hs, addrOf, og, exName) {
+function xiHistApply(hs, addrOf, og, exName, custo) {
   const put = (u, extra) => { const a = addrOf.get(u.row.addr), nu = { id: uid(), sats: u.sats, address: a.id, wallet: a.wallet, type: a.type, label: '', date: u.date, txid: u.txid, vout: String(u.vout), frozen: false, spent: false, ...extra }; state.utxos.push(nu); u.id = nu.id; return nu; };
   const entrada = u => {
     const origin = og(u), nu = put(u, { origin, kyc: origin === 'saque', label: origin === 'saque' ? `Saque ${fmtYM(u.date.slice(0, 7))}` : 'Entrada externa' });
     if (origin === 'saque') { const w = { id: uid(), date: u.date, sats: u.sats, fee: 0, ex: exName, utxoId: nu.id }; state.saques.push(w); nu.saqueId = w.id; }
+    else if (custo && custo.has(u)) entradaPaga(nu, custo.get(u), 'Valor pago informado na importação pela chave pública');   // 1.8.19
   };
   let n = 0;
   for (const p of hs.plan) {
@@ -4243,24 +4266,44 @@ function xiReviewHTML() {
     ${r.derived ? '' : `<div class="switch xi-only"><span><span class="t">Importar só os endereços com saldo</span><br><span class="d">${H ? 'Com o histórico, entram todos os endereços: as transações passaram por eles.' : nBal ? `${nBal} de ${rows.length} ${nBal === 1 ? 'tem' : 'têm'} saldo agora. Ligada, os endereços vazios ficam de fora; os UTXOs entram do mesmo jeito.` : 'Nenhum endereço tem saldo agora.'}</span></span><button class="tog${only ? ' on' : ''}" data-act="xi-only" aria-pressed="${only}" aria-label="Importar só os endereços com saldo"${nBal && !H ? '' : ' disabled'}></button></div>${xiHistHTML(f, r, H)}`}
     <p class="hint" style="margin:-4px 0 6px">Dê um nome a cada endereço. Você pode mudar depois, na página do endereço.</p>
     ${grp(0, 'Recebimento')}${grp(1, 'Troco')}
-    ${H ? `<h3 class="mini">Entradas de fora · ${hs.recv.length}</h3><p class="hint" style="margin:-4px 0 8px">Para não contar duas vezes: diga de onde veio cada entrada, inclusive as já gastas. Saque da corretora desconta do saldo da corretora; entrada externa (presente, pagamento, compra fora do app) não mexe nos aportes.</p>${all}
+    ${H ? `<h3 class="mini">Entradas de fora · ${hs.recv.length}</h3><p class="hint" style="margin:-4px 0 8px">Para não contar duas vezes: diga de onde veio cada entrada, inclusive as já gastas. Saque da corretora desconta do saldo da corretora; entrada externa (presente, pagamento, compra fora do app) não mexe nos aportes, a não ser que você informe o valor pago, no fim da lista.</p>${all}
       ${hs.recv.length > 20 ? `<details class="xi-more"><summary>Ver as ${hs.recv.length} entradas</summary>${hl}</details>` : hl}
-      <div class="calc-line" id="xi-prev"></div>`
-    : utx.length ? `<h3 class="mini">UTXOs encontrados</h3><p class="hint" style="margin:-4px 0 8px">Para não contar duas vezes: diga de onde veio cada UTXO novo. Saque da corretora desconta do saldo da corretora; entrada externa (presente, pagamento, compra fora do app) não mexe nos aportes.</p>${all}
+      ${xiCostHTML(r)}<div class="calc-line" id="xi-prev"></div>`
+    : utx.length ? `<h3 class="mini">UTXOs encontrados</h3><p class="hint" style="margin:-4px 0 8px">Para não contar duas vezes: diga de onde veio cada UTXO novo. Saque da corretora desconta do saldo da corretora; entrada externa (presente, pagamento, compra fora do app) não mexe nos aportes, a não ser que você informe o valor pago, no fim da lista.</p>${all}
       ${utx.map(u => `<div class="xi-u"><div><b>${AMT(u.sats)}</b><span class="small muted">${fmtDate(u.date)}${u.conf ? '' : ' · sem confirmação'} · ${esc(u.x.name)}</span></div>${u.match ? '<span class="tag">já registrado</span>' : pick(`xo_${u.k}`, u.origin, 'Origem do UTXO')}</div>`).join('')}
-      <div class="calc-line" id="xi-prev"></div>` : ''}
+      ${fresh.length ? xiCostHTML(r) : ''}<div class="calc-line" id="xi-prev"></div>` : ''}
     <p class="err form" hidden></p>
     <button class="btn btn-p block" data-act="xi-apply">Importar ${sel.length} ${sel.length === 1 ? 'endereço' : 'endereços'}${H ? ` e ${hs.n} ${hs.n === 1 ? 'transação' : 'transações'}` : fresh.length ? ` e ${fresh.length} ${fresh.length === 1 ? 'UTXO' : 'UTXOs'}` : ''}</button>` : ''}
     <button class="btn btn-q block" style="margin-top:10px" data-act="xi-back">Voltar</button>
     ${ent.some(u => u.origin === 'saque') && last ? `<p class="hint" style="margin-top:10px">Os saques entram como da ${esc(last)}, com taxa zero. Ajuste depois em cada saque, se precisar.</p>` : ''}`;
 }
+/* Valor pago pelas entradas externas (1.8.19, pedido do Nicolas): opcional. Dividido entre as entradas marcadas como entrada
+   externa pelo tamanho de cada uma (o mesmo preço médio; os centavos que sobram vão para a maior). Cada uma vira um aporte
+   direto na carteira, na data em que chegou, e o valor entra no total aportado. Saques da corretora já estão nos aportes. */
+const xiCostHTML = r => `<div class="field xi-cost"><label for="xi-f">Valor pago pelas entradas externas (${curSym()}, opcional)</label><input class="inp" id="xi-f" name="xfiat" inputmode="decimal" data-num="money" data-inp="xi-fiat" placeholder="0,00" autocomplete="off" value="${esc(r.fiat || '')}"><p class="hint">Quanto você gastou para ter os bitcoins que entraram de fora. O valor entra no total aportado, dividido entre as entradas externas pelo tamanho de cada uma, com o mesmo preço médio: cada uma vira um aporte direto na carteira, na data em que chegou. Os saques da corretora já estão nos seus aportes e ficam de fora.</p></div>`;
+function xiExtList() {   // as entradas marcadas como entrada externa, com a escolha que está na tela
+  const f = ui.form, r = f.res; if (!r) return [];
+  if (xiHistOn()) return r.hist.recv.filter(u => (fv(`xr_${u.j}`) || u.origin) !== 'saque');
+  const rows = f.only && !r.derived ? r.rows.filter(x => x.bal > 0) : r.rows;
+  return rows.flatMap(x => x.utxos.filter(u => !u.match && (fv(`xo_${u.k}`) || u.origin) !== 'saque'));
+}
+function xiSplit(list, F) {
+  const out = new Map(), tot = list.reduce((t, u) => t + u.sats, 0); if (!(F > 0) || !tot) return out;
+  let rest = round2(F), big = list[0];
+  for (const u of list) { const v = Math.floor(F * u.sats / tot * 100 + 1e-6) / 100; out.set(u, v); rest = round2(rest - v); if (u.sats > big.sats) big = u; }
+  out.set(big, round2(out.get(big) + rest)); return out;
+}
+const xiMarket = list => { let v = 0; for (const u of list) { const p = histPrice(u.date.slice(0, 7)); if (!p) return 0; v += u.sats / 1e8 * p; } return v; };   // quanto valiam quando chegaram
+function xiCostReset() { const f = ui.form, b = $('#sheet-body [data-act="xi-apply"]'); if (f) f.costOk = false; if (b && b.dataset.t) b.textContent = b.dataset.t; }   // valor ou origem mudou: confere de novo
 function xiPreview() {
   const el = $('#xi-prev'), f = ui.form; if (!el || !f.res) return;
   const c = calc(), H = xiHistOn(); let sq = 0, inn = 0;
   if (H) { for (const u of f.res.hist.recv) if ((fv(`xr_${u.j}`) || u.origin) === 'saque') sq += u.sats; inn = f.res.hist.cur; }
   else for (const x of f.res.rows) for (const u of x.utxos) if (!u.match) { inn += u.sats; if ((fv(`xo_${u.k}`) || u.origin) === 'saque') sq += u.sats; }
   const ex = c.ex - sq;
-  el.innerHTML = `Depois de importar: corretora <b>${AMT(Math.max(0, ex))}</b> · autocustódia <b>${AMT(c.self + inn)}</b>${ex < 0 ? `<br><span class="neg">A corretora ficaria ${AMT(ex)} negativa: marque ${H ? 'algumas' : 'alguns'} como entrada externa.</span>` : ''}`;
+  const F = parseNum(fv('xfiat')), ext = F > 0 ? xiExtList() : [], es = ext.reduce((t, u) => t + u.sats, 0);   // valor pago (1.8.19)
+  const cl = !(F > 0) ? '' : ext.length ? `<br>Total aportado: <b>+${priv(fmtMoney(F, cur()))}</b> em ${ext.length} ${ext.length === 1 ? 'entrada externa' : 'entradas externas'} (${AMT(es)}), a ${priv(fmtMoney(F / (es / 1e8), cur(), 0))} por bitcoin` : '<br><span class="neg">Nenhuma entrada externa para receber o valor pago: marque como entrada externa o que você comprou fora do app.</span>';
+  el.innerHTML = `Depois de importar: corretora <b>${AMT(Math.max(0, ex))}</b> · autocustódia <b>${AMT(c.self + inn)}</b>${ex < 0 ? `<br><span class="neg">A corretora ficaria ${AMT(ex)} negativa: marque ${H ? 'algumas' : 'alguns'} como entrada externa.</span>` : ''}${cl}`;
 }
 /* guarda o que já foi digitado e escolhido na revisão antes de redesenhá-la (1.8.16; entradas do histórico na 1.8.17) */
 function xiKeep() {
@@ -4268,6 +4311,7 @@ function xiKeep() {
   for (const x of r.rows) { const v = fv(`xn_${x.c}_${x.i}`); if (v) x.name = v.slice(0, 60); for (const u of x.utxos) { const o = fv(`xo_${u.k}`); if (o) u.origin = o; } }
   if (r.hist && r.hist.ok) for (const u of r.hist.recv) { const o = fv(`xr_${u.j}`); if (o) u.origin = o; }
   r.wsel = fv('xwallet') || r.wsel; const wn = fv('xwname'); if (wn) r.wname = wn;
+  const fe = $('#xi-f'); if (fe) r.fiat = fe.value; f.costOk = false;   // valor pago (1.8.19)
 }
 function xiApply() {
   const f = ui.form, r = f.res; if (!r || !r.rows.length) return;
@@ -4278,6 +4322,16 @@ function xiApply() {
   let sq = 0;
   if (H) { for (const u of hs.recv) if (og(u) === 'saque') sq += u.sats; } else for (const x of rows) for (const u of x.utxos) if (!u.match && og(u) === 'saque') sq += u.sats;
   if (calc().ex - sq < 0) return formErr(`A corretora ficaria com saldo negativo. Marque como entrada externa ${H ? 'as entradas' : 'os UTXOs'} que não vieram de saque.`);
+  // valor pago pelas entradas externas (1.8.19): opcional; dividido pelo tamanho de cada uma e conferido com o preço da época
+  const fTxt = (fv('xfiat') || '').trim(), F = fTxt ? parseNum(fTxt) : 0, ext = F > 0 ? xiExtList() : [];
+  if (fTxt && !(F >= 0)) return formErr('Confira o valor pago: use só números, como 1.500,00. Ou deixe o campo vazio.');
+  if (F > 0 && !ext.length) return formErr('Nenhuma entrada externa para receber o valor pago. Marque como entrada externa o que você comprou fora do app, ou deixe o campo vazio.');
+  const custo = xiSplit(ext, F);
+  if ([...custo.values()].some(v => !(v >= 0.01))) return formErr(`O valor pago é pequeno demais para dividir entre ${ext.length} entradas.`);
+  if (F > 0 && !f.costOk) {
+    const m = xiMarket(ext);
+    if (m > 0 && (F > m * 2.5 || F < m / 2.5)) { f.costOk = true; const b = $('#sheet-body [data-act="xi-apply"]'); if (b) { b.dataset.t = b.dataset.t || b.textContent; b.textContent = 'Importar mesmo assim'; } return formErr(`O valor pago ficou bem diferente do que esses bitcoins valiam quando chegaram (cerca de ${fmtMoney(m, cur(), 0)}). Confira se não faltou ou sobrou um zero. Se você comprou bem antes de trazer para esta carteira, é normal: toque de novo para importar.`); }
+  }
   let wid = fv('xwallet') || '__new', nNew = 0, nU = 0, nT = 0;
   const ok = attempt(() => {
     if (wid === '__new') { wid = ensureWallet('__new', fv('xwname') || `Carteira ${r.tag}`); const w = byId(state.wallets, wid); if (!state.addresses.some(a => a.wallet === wid)) w.type = r.type; }
@@ -4295,14 +4349,16 @@ function xiApply() {
         const nu = { id: uid(), sats: u.sats, address: a.id, wallet: a.wallet, type: a.type, label: origin === 'saque' ? `Saque ${fmtYM(u.date.slice(0, 7))}` : 'Entrada externa', date: u.date, txid: u.txid, vout: String(u.vout), origin, kyc: origin === 'saque', frozen: false, spent: false };
         if (origin === 'saque') { const w = { id: uid(), date: u.date, sats: u.sats, fee: 0, ex: exName, utxoId: nu.id }; state.saques.push(w); nu.saqueId = w.id; }
         state.utxos.push(nu); nU++;
+        if (custo.has(u)) entradaPaga(nu, custo.get(u), 'Valor pago informado na importação pela chave pública');   // 1.8.19
       }
     }
-    if (H) nT = xiHistApply(hs, addrOf, og, exName);
+    if (H) nT = xiHistApply(hs, addrOf, og, exName, custo);
     S().utxo = true;
   });
   if (!ok) return false;
   save(); closeSheet(); ui.stack = []; ui.page = null; ui.tab = 'carteira'; render(); window.scrollTo(0, 0);
-  toast(`${nNew} ${nNew === 1 ? 'endereço importado' : 'endereços importados'}${H ? ` · histórico com ${nT} ${nT === 1 ? 'transação' : 'transações'}` : nU ? ` · ${nU} ${nU === 1 ? 'UTXO' : 'UTXOs'}` : ''}`);
+  toast(`${nNew} ${nNew === 1 ? 'endereço importado' : 'endereços importados'}${H ? ` · histórico com ${nT} ${nT === 1 ? 'transação' : 'transações'}` : nU ? ` · ${nU} ${nU === 1 ? 'UTXO' : 'UTXOs'}` : ''}${custo.size ? ' · valor pago somado ao total aportado' : ''}`);
+  if (custo.size) fxSync();
 }
 function xiSection() {
   return `<section class="sec"><h2 class="sec-t">Importar pela chave pública</h2><p class="small muted">Traga todos os endereços de uma carteira pela chave pública mestra (xpub, ypub ou zpub), já com o saldo, e dê nome a cada um antes de importar. Só leitura: com ela não dá para mover bitcoins.</p><button class="btn btn-q block" data-act="xpub-import">Importar pela chave pública mestra</button></section>`;
@@ -4332,14 +4388,15 @@ Object.assign(ACT, {
     if (r.hist && r.hist.ok) return xiRender();
     f.phase = 'hist'; xiScan(false);
   },
-  'xi-all': el => { for (const s of document.querySelectorAll('#sheet-body select[data-inp="xi-origin"]')) s.value = el.dataset.v === 'saque' ? 'saque' : 'externo'; xiPreview(); },
+  'xi-all': el => { for (const s of document.querySelectorAll('#sheet-body select[data-inp="xi-origin"]')) s.value = el.dataset.v === 'saque' ? 'saque' : 'externo'; xiCostReset(); xiPreview(); },
   'xi-back': () => { Object.assign(ui.form, { step: 'form', res: null, phase: '', hist: false, herr: '', hfail: false }); xiRender(); },
   'xi-apply': () => xiApply()
 });
 Object.assign(INP, {
   'xi-key': el => xiKeyHint(el),
   'xi-wallet': el => { const nf = $('#xi-nwf'); if (nf) nf.hidden = el.value !== '__new'; },
-  'xi-origin': () => xiPreview()
+  'xi-origin': () => { xiCostReset(); xiPreview(); },
+  'xi-fiat': () => { xiCostReset(); xiPreview(); }   // valor pago (1.8.19)
 });
 
 /* ---------- status da mempool (topo da aba Aprender) ----------

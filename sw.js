@@ -7,7 +7,7 @@
    site (a política de privacidade) gravava essa página no lugar do app, e o app aberto sem internet mostrava a política.
    A política fica guardada também, para abrir sem internet (1.8.12).
    Troque CACHE a cada versão publicada para os aparelhos baixarem a nova. */
-const CACHE = 'holdbtc100-v1.8.18';
+const CACHE = 'holdbtc100-v1.8.19';
 const FLAGS = 'holdbtc100-flags';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 const EXTRA = ['./privacidade.html'];   // se faltar no site, a instalação segue sem ela
