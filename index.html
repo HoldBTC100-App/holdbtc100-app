@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="App do Projeto Hold BTC 100: registre seus aportes mensais em bitcoin, acompanhe preço médio e resultado, gerencie UTXOs e aprenda autocustódia.">
 <title>Hold BTC 100</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-8ufBEEO0W9Mn96+G04Fn4BTNudyqhfXKeS0iVgLJ61k='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-GilM4IbOZXGleOqfaVWyTGP9zvrhFG3J7L4aT5xBFuM='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -557,6 +557,24 @@ a.set-row{color:inherit;text-decoration:none}
 input.inp[readonly]{color:var(--muted)}
 .seg button[disabled]{opacity:.45;cursor:not-allowed}
 
+/* 1.8.22 (polimento da auditoria, M1 a M10) */
+h1,h2,h3,p,li,b,strong,small,label,.k,.v,.t,.d,.sub,.lead,.note,.hint,.tool b,.tool span,.chip,.sec-t{overflow-wrap:anywhere}
+.row,.tool,.set-row,.addr-row,.utxo,.rcpt,.receipt li,.sec-head,.switch>span{min-width:0}
+.row-btn{grid-template-columns:minmax(0,1fr) auto}
+.row-btn .a,.row-btn .b,.wg-head b{min-width:0;overflow-wrap:anywhere}
+.wg-head span{flex:none;max-width:55%}
+.hero-price.velha .a{display:inline-block;margin-top:3px;background:#000;color:#fff;border-radius:999px;padding:3px 10px;font-weight:600}
+.set-atalhos{margin:2px 0 14px;flex-wrap:wrap}
+.toast{display:flex;align-items:center;gap:12px;width:max-content}
+.toast-act{flex:none;background:transparent;border:1.5px solid currentColor;border-radius:999px;color:inherit;font:inherit;font-weight:800;padding:5px 12px;cursor:pointer;white-space:nowrap}
+.pin-forca{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:8px 0 2px}
+.pin-forca i{height:5px;border-radius:3px;background:var(--line)}
+.pin-forca span{grid-column:1/-1;font-size:13px;color:var(--muted);margin-top:4px}
+.pin-forca.n1 i:nth-child(1){background:var(--neg)}
+.pin-forca.n2 i:nth-child(-n+2){background:#E0A100}
+.pin-forca.n3 i{background:var(--pos)}
+.fundo-oculto #app,.fundo-oculto nav.tabs,.fundo-oculto #sheet-root,.fundo-oculto #toast-root{visibility:hidden}
+
 .ic{display:block;width:24px;height:24px}
 </style>
 </head>
@@ -853,7 +871,7 @@ const KS_CARDS = {
    Claude, também espelha num documento privado do usuário.
    ========================================================= */
 
-const APP_VERSION = '1.8.21';
+const APP_VERSION = '1.8.22';
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const HIST = {"start":"2015-01","usd":[269,236,249,240,233,247,274,257,233,275,346,404,400,404,427,433,490,602,649,600,593,655,724,855,967,1075,1126,1210,1817,2384,2684,3787,4520,5404,8338,12178,12166,10318,8680,8122,8372,6952,7096,7394,6818,6489,5192,3887,3595,3654,3979,4704,6942,9680,10459,9914,9056,8766,8345,7372,8268,8948,7481,7512,9050,9296,10232,11509,11218,12286,16730,24328,31072,39024,51906,58338,47486,36155,38354,44318,45439,52582,59166,51586,42365,40791,44360,41879,35044,25823,21591,21674,19744,19962,18841,16851,19838,23126,25804,28897,28234,28846,29858,27587,26456,30805,36179,39982,42444,51946,66244,65986,64146,65194,63729,61864,61188,66861,83364,95022,97976,93433,83444,88373,99394,105848,111410,111996,111124,111840,99685,88638,83198,72854,67640,72356,75048,66150,60768,70714,81095,80570],"brl":[708,663,783,731,714,768,883,904,911,1067,1307,1564,1620,1603,1583,1542,1734,2062,2125,1926,1930,2088,2418,2866,3091,3338,3522,3795,5832,7858,8605,11932,14171,17247,27175,40087,39062,33444,28462,27676,30443,26233,27169,29059,28068,24388,19662,15101,13451,13608,15305,18328,27776,37353,39528,39856,37326,35825,34676,30296,34306,38845,36536,40003,51073,48305,54030,62853,60569,69121,90640,125185,166425,211371,293069,324482,251253,181928,197777,232745,239904,291307,328780,291530,234452,211975,220398,199260,173644,130385,115903,111476,103397,104809,99381,88340,103169,119603,134475,145054,140682,139952,143345,135273,130613,156021,177216,195797,208587,257883,329902,338449,329261,351333,353186,343509,339079,376033,484100,579349,589992,538697,479536,511123,563308,587149,615933,610031,596450,602314,532408,483352,444108,378882,353863,364172,374017,339193,310759,364403,417209,413273]}; // médias mensais estimadas: {start:'2015-01', usd:[…], brl:[…]}
 const REF_PRICE = { BRL: 416900, USD: 75800, EUR: 68000, at: Date.UTC(2026, 10, 7, 18, 0), src: 'ref' }; // US$ do CoinLore × PTAX de 06/11/2026 (R$ 5,50; € 6,13)
@@ -962,7 +980,7 @@ function defaultState() {
   };
 }
 let state = defaultState();
-const ui = { tab: 'home', page: null, arg: null, sel: new Set(), selMode: false, showSpent: false, sheet: null, form: {}, locked: false, hiddenAt: 0, sim: null, irYear: null, gl: '', stack: [], hl: null };
+const ui = { tab: 'home', page: null, arg: null, sel: new Set(), selMode: false, showSpent: false, sheet: null, form: {}, locked: false, hiddenAt: 0, sim: null, irYear: null, gl: '', stack: [], hl: null, tabTop: {} };
 const caps = { downloads: null };
 const cur = () => state.settings.currency;
 const S = () => state.settings;
@@ -1328,12 +1346,16 @@ function viewHome() {
 function resultChip(c) {
   if (!c.invested) return `<span class="chip neutral">O resultado aparece depois do primeiro aporte</span>`;
   const pos = c.result >= 0;
-  return `<span class="chip ${pos ? 'pos' : 'neg'}">${esc(fmtPct(c.pct))} · ${S().hide ? OCULTO : esc((pos ? '+' : '−') + fmtV(Math.abs(c.result)))}</span>`;
+  return `<span class="chip ${pos ? 'pos' : 'neg'}">${esc(fmtPct(c.pct))} · ${S().hide ? OCULTO : esc((pos ? '+' : '−') + fmtV(Math.abs(c.result)))}${cotVelha() ? ` · cotação de ${esc(cotDia())}` : ''}</span>`;
 }
 /* cotação do bitcoin no topo do Início; o toque abre a cotação (atualizar ou informar à mão) */
+/* Cotação velha (1.8.22, auditoria M4): a de referência embutida ou uma com mais de 1 hora ganha um selo no topo, e o
+   resultado diz de quando é a cotação que ele usa. */
+const cotVelha = () => state.price.src === 'ref' || Date.now() - state.price.at > 3600000;
+const cotDia = () => { const d = new Date(state.price.at); return `${pad2(d.getDate())}/${pad2(d.getMonth() + 1)}`; };
 function heroPrice(c) {
-  const v = fmtV(c.P, 0), age = priceAge() + (priceStale() ? ' · atualize' : '');
-  return `<button class="hero-price" data-act="price-sheet" aria-label="${esc(`Cotação do bitcoin: ${v}, ${age}. Toque para ver ou atualizar.`)}"><span class="pv"><span class="k">Bitcoin hoje</span><b>${esc(v)}</b></span><span class="a">${esc(age)}</span><span class="chev" aria-hidden="true">›</span></button>`;
+  const v = fmtV(c.P, 0), velha = cotVelha(), age = velha ? `${state.price.src === 'ref' ? 'referência' : 'cotação'} de ${cotDia()} · toque para atualizar` : priceAge();
+  return `<button class="hero-price${velha ? ' velha' : ''}" data-act="price-sheet" aria-label="${esc(`Cotação do bitcoin: ${v}, ${age}. Toque para ver ou atualizar.`)}"><span class="pv"><span class="k">Bitcoin hoje</span><b>${esc(v)}</b></span><span class="a">${esc(age)}</span><span class="chev" aria-hidden="true">›</span></button>`;
 }
 function monthsGrid(map, st = 0) {
   const now = new Date(), cy = now.getFullYear(), cm = now.getMonth() + 1;
@@ -1704,7 +1726,21 @@ function confirmSheet(title, text, okLabel, onOk, danger = false, extra = '') {
   openSheet('confirm', () => `<h2>${esc(title)}</h2><p class="sub">${text}</p>${extra}<div class="btn-row"><button class="btn ${danger ? 'btn-d' : 'btn-p'}" data-act="confirm-ok">${esc(okLabel)}</button><button class="btn btn-q" data-act="close-sheet">Cancelar</button></div>`, { label: title });
   ui.form = { onOk };
 }
-function toast(msg) { const r = $('#toast-root'); r.innerHTML = `<div class="toast" role="status">${esc(msg)}</div>`; clearTimeout(toast.t); toast.t = setTimeout(() => { r.innerHTML = ''; }, 2800); }
+/* Aviso flutuante (1.8.22, auditoria M6 e M7): fica de 2,8 s a 7 s, conforme o tamanho do texto (o.ms fixa o tempo), e pode
+   levar um botão (o.act, o.label), como o Desfazer depois de uma exclusão. Aviso crítico vai também como nota fixa na folha. */
+function toast(msg, o = {}) {
+  const r = $('#toast-root'), ms = o.ms || (o.act ? 6000 : Math.max(2800, Math.min(7000, 1200 + msg.length * 45)));
+  r.innerHTML = `<div class="toast" role="status"><span>${esc(msg)}</span>${o.act ? `<button class="toast-act" data-act="${esc(o.act)}">${esc(o.label || 'Ok')}</button>` : ''}</div>`;
+  clearTimeout(toast.t); toast.t = setTimeout(() => { r.innerHTML = ''; }, ms);
+}
+// Desfazer uma exclusão (1.8.22, auditoria M7): vale por 6 s e só enquanto nada mais foi gravado depois dela.
+/* Desfazer uma exclusão (1.8.22, auditoria M7): guarda só os registros (aportes, saques, UTXOs, carteiras, endereços e
+   transações) de antes e de logo depois da exclusão. O Desfazer devolve os de antes se ninguém mexeu neles desde então;
+   cotação, câmbio e ajustes gravados no meio do caminho não atrapalham. */
+const DADOS = ['aportes', 'saques', 'utxos', 'wallets', 'addresses', 'spends'];
+const desfazer = { antes: null, depois: null };
+function fotoDados() { const o = {}; for (const k of DADOS) o[k] = state[k]; return JSON.stringify(o); }
+function toastDesfazer(msg, antes) { desfazer.antes = antes; desfazer.depois = fotoDados(); toast(msg, { act: 'desfazer', label: 'Desfazer' }); }
 /* ---------------- botão Voltar (1.8.12) ----------------
    O Voltar do Android (e o do navegador) volta um passo dentro do app em vez de fechá-lo. Cada nível aberto por cima do
    Início ganha uma entrada no histórico, no mesmo endereço ({ hb100: 1, d: profundidade }): outra aba, cada página
@@ -1735,8 +1771,12 @@ function histQueue() { if (hist.q) return; hist.q = true; queueMicrotask(() => {
 function goBack() {
   if (ui.sheet) { const x = $('#ov .sheet-x'), fn = x && ACT[x.dataset.act]; if (fn) fn(x); return; }
   if (ui.page) { ACT.back(); return; }
-  if (ui.tab !== 'home') ACT.tab({ dataset: { tab: 'home' } });
+  if (ui.tab !== 'home') { ACT.tab({ dataset: { tab: 'home' } }); window.scrollTo(0, ui.tabTop.home || 0); }   // M1 (1.8.22): volta à rolagem do Início
 }
+// Rolagem (1.8.22, auditoria M1): ao sair da tela de uma aba para uma página, guarda a rolagem; o Voltar a devolve.
+function guardaTopo() { if (!ui.page) ui.tabTop[ui.tab] = window.scrollY; }
+// Sem isto, o navegador devolveria, depois do popstate, a rolagem gravada quando a entrada foi criada (já no topo da página nova).
+try { history.scrollRestoration = 'manual'; } catch (e) { }
 window.addEventListener('popstate', () => {
   if (hist.leaving) { clearTimeout(hist.leaving); hist.leaving = 0; histSync(); return; }
   for (let n = backLevels() - histDepth(); n > 0 && !ui.locked; n--) { const antes = backLevels(); goBack(); if (backLevels() >= antes) break; }
@@ -1974,12 +2014,13 @@ function delAporte(id) {
   if (!sale && ledger(state.aportes.filter(x => x.id !== id)).err) { toast('Não dá para excluir: uma venda depois dele ficaria maior que o saldo registrado.'); return; }
   const sp = sale && a.txId ? byId(state.spends, a.txId) : null;
   if (sp) { const used = sp.outputs.filter(o => o.kind === 'own').map(o => byId(state.utxos, o.utxo)).find(x => x && x.spent); if (used) { toast(`O troco desta venda foi gasto em ${fmtDate(used.spentAt)}. Desfaça antes aquela transação.`); return; } }
-  confirmSheet(sale ? 'Excluir venda?' : 'Excluir aporte?', `${esc(fmtDate(a.date))} · ${esc(fmtMoney(a.fiat))} · ${esc(amtTxt(a.sats))}.${sp ? ' A transação ligada também é desfeita: os UTXOs usados voltam a ficar disponíveis.' : ''}${a.entrada ? ' O valor pago sai do total aportado; o UTXO continua na carteira, como entrada externa.' : ''} Essa ação não pode ser desfeita.`, sale ? 'Excluir venda' : 'Excluir aporte', () => {
+  confirmSheet(sale ? 'Excluir venda?' : 'Excluir aporte?', `${esc(fmtDate(a.date))} · ${esc(fmtMoney(a.fiat))} · ${esc(amtTxt(a.sats))}.${sp ? ' A transação ligada também é desfeita: os UTXOs usados voltam a ficar disponíveis.' : ''}${a.entrada ? ' O valor pago sai do total aportado; o UTXO continua na carteira, como entrada externa.' : ''} Logo depois, dá para desfazer por alguns segundos.`, sale ? 'Excluir venda' : 'Excluir aporte', () => {
+    const snap = fotoDados();   // para o Desfazer (1.8.22)
     if (sp) { for (const i of sp.inputs) { const x = byId(state.utxos, i); if (x) { x.spent = false; delete x.spentAt; delete x.spendId; } } const outIds = new Set(sp.outputs.filter(o => o.kind === 'own').map(o => o.utxo)); state.utxos = state.utxos.filter(x => !outIds.has(x.id)); state.spends = state.spends.filter(s => s.id !== sp.id); }
     state.aportes = state.aportes.filter(x => x.id !== id);
     if (u && a.entrada) { u.origin = 'externo'; delete u.aporteId; if (/^Compra /.test(u.label)) u.label = 'Entrada externa'; }   // 1.8.19: os sats ficam
     else if (u) state.utxos = state.utxos.filter(x => x.id !== u.id);
-    save(); closeSheet(); render(); toast(sale ? 'Venda excluída' : 'Aporte excluído');
+    save(); closeSheet(); render(); toastDesfazer(sale ? 'Venda excluída' : 'Aporte excluído', snap);
   }, true);
 }
 function newAporte(presetDate, type) {
@@ -2027,7 +2068,8 @@ function sheetSettings() {
   openSheet('settings', () => {
     const s = S(), locked = state.aportes.length > 0;
     const seg = (key, opts) => `<div class="seg">${opts.map(([v, l]) => `<button class="${s[key] === v ? 'on' : ''}" data-act="set" data-k="${key}" data-v="${v}">${l}</button>`).join('')}</div>`;
-    return `<h2>Configurações</h2><p class="sub">Versão ${APP_VERSION} · dados guardados ${cloud.on && !s.offline ? 'neste aparelho e no seu espaço privado do Claude' : `neste aparelho (${storageMode})`}${s.offline ? ' · modo 100% offline' : ''}</p>
+    const atalhos = `<div class="chips set-atalhos" role="navigation" aria-label="Ir para um grupo">${[['set-dados', 'Dados'], ['set-seg', 'Segurança'], ['set-con', 'Conexão'], ['set-exib', 'Exibição'], ['set-sobre', 'Sobre']].map(([id, l]) => `<button class="chip-btn" data-act="set-ir" data-id="${id}">${l}</button>`).join('')}</div>`;   // M5 (1.8.22)
+    return `<h2>Configurações</h2><p class="sub">Versão ${APP_VERSION} · dados guardados ${cloud.on && !s.offline ? 'neste aparelho e no seu espaço privado do Claude' : `neste aparelho (${storageMode})`}${s.offline ? ' · modo 100% offline' : ''}</p>${atalhos}
     <div class="set-group"><h3>Aporte</h3>
       <div class="field"><span class="lbl">Moeda dos aportes</span>${locked ? `<p class="small muted" style="margin:0">${s.currency} · para trocar, exporte um backup e comece um registro novo.${fxPairOk() ? ` Para só ver os valores em ${s.currency === 'USD' ? 'R$' : 'US$'}, use Exibição › Moeda dos valores.` : ''}</p>` : seg('currency', [['BRL', 'R$'], ['USD', 'US$'], ['EUR', '€']])}</div>
       <div class="two"><div class="field"><label for="s-m">Valor mensal (${curSym()})</label><input placeholder="0,00" class="inp" id="s-m" inputmode="decimal" data-num="money" value="${fmtInput(s.monthly)}" data-chg="monthly"></div>
@@ -2035,29 +2077,29 @@ function sheetSettings() {
       <div class="btn-row"><button class="btn btn-q btn-s" data-act="calendar">Lembrete no Google Agenda</button>${!caps.downloads && !IN_CLAUDE ? '<button class="btn btn-q btn-s" data-act="ics">Baixar lembrete .ics</button>' : ''}</div></div>
     <div class="set-group"><h3>Meta</h3><div class="chips" id="goal">${[[1e6, '1 milhão de sats'], [5e6, '5 milhões'], [1e7, '0,1 BTC'], [5e7, '0,5 BTC'], [1e8, '1 BTC']].map(([v, l]) => `<button class="chip-btn ${s.goalSats === v ? 'on' : ''}" data-act="set" data-k="goalSats" data-v="${v}">${l}</button>`).join('')}</div>
       <div class="field" style="margin-top:10px"><label for="s-g">Outra meta (${unitName()})</label><input class="inp" id="s-g" ${amtAttrs()} placeholder="${amtIn(s.goalSats)}" data-chg="goalSats"></div></div>
-    <div class="set-group"><h3>Exibição</h3>
+    <div class="set-group" id="set-exib"><h3>Exibição</h3>
       ${viewCurField()}
       <div class="field"><span class="lbl">Unidade principal</span>${seg('unit', [['sats', 'sats'], ['btc', 'BTC']])}</div>
       <div class="field"><span class="lbl">Tema</span>${seg('theme', [['auto', 'Automático'], ['light', 'Claro'], ['dark', 'Escuro']])}</div>
       <div class="switch"><span><span class="t">Ocultar valores</span><br><span class="d">Esconde saldos e valores. Também no ícone do olho.</span></span><button class="tog ${s.hide ? 'on' : ''}" data-act="toggle-hide" aria-pressed="${s.hide}" aria-label="Ocultar valores"></button></div></div>
     <div class="set-group"><h3>Carteira</h3>
       <div class="switch"><span><span class="t">Gestão de UTXOs</span><br><span class="d">Opcional: saques, autocustódia, taxas e etiquetas.</span></span><button class="tog ${s.utxo ? 'on' : ''}" data-act="toggle-utxo" aria-pressed="${s.utxo}" aria-label="Gestão de UTXOs"></button></div></div>
-    <div class="set-group"><h3>Segurança</h3>
+    <div class="set-group" id="set-seg"><h3>Segurança</h3>
       ${s.pin ? `<button class="set-row" data-act="pin-change">Alterar PIN<span class="v">ativo</span></button><button class="set-row" data-act="pin-remove">Remover PIN</button>
         <div class="field" style="margin-top:12px"><span class="lbl">Bloquear depois de</span>${seg('lockMin', [[1, '1 min'], [5, '5 min'], [15, '15 min']])}</div>
         ${bio.ok ? `<div class="switch"><span><span class="t">Desbloquear com biometria</span><br><span class="d">Digital ou rosto do aparelho; o PIN continua valendo.</span></span><button class="tog ${s.bio ? 'on' : ''}" data-act="toggle-bio" aria-pressed="${!!s.bio}" aria-label="Biometria"></button></div>` : ''}`
         : `<button class="set-row" data-act="pin-set">Criar PIN de acesso<span class="v">desligado</span></button>`}
       <p class="hint">O PIN protege o acesso ao app neste aparelho. Seus registros não incluem chaves nem seed.</p></div>
-    <div class="set-group"><h3>Conexão</h3>
+    <div class="set-group" id="set-con"><h3>Conexão</h3>
       <div class="switch"><span><span class="t">Modo 100% offline</span><br><span class="d">${s.offline ? 'Ligado: o app não se conecta à internet e a cotação é informada por você.' : 'Desligado: o app busca a cotação e as taxas da rede sozinho.'}</span></span><button class="tog ${s.offline ? 'on' : ''}" data-act="toggle-offline" aria-pressed="${!!s.offline}" aria-label="Modo 100% offline"></button></div>
       ${s.offline ? `<button class="set-row" data-act="price-sheet">Atualizar a cotação<span class="v">${esc(fmtV(priceNow(vcur()), 0))} · ${esc(priceAge())}</span></button>` : ''}</div>
-    <div class="set-group"><h3>Dados</h3>
+    <div class="set-group" id="set-dados"><h3>Dados</h3>
       <button class="set-row" data-act="export">Exportar (CSV ou backup)</button>
       <button class="set-row" data-act="import">Importar (planilha, CSV ou backup)</button>
       <button class="set-row" data-act="price-sheet">Cotação<span class="v">${esc(fmtV(priceNow(vcur()), 0))}</span></button>
       ${deferredInstall ? `<button class="set-row" data-act="install">Instalar o app neste aparelho</button>` : ''}
       <button class="set-row" data-act="wipe" style="color:var(--neg)">Apagar todos os dados</button></div>
-    <div class="set-group"><h3>Sobre</h3><p class="small muted">App do Projeto Hold BTC 100: R$ 100 em bitcoin todo mês, registrado e guardado no longo prazo. Funciona offline e sem cadastro. Preços históricos: CoinLore (BTC/USD) e Banco Central (PTAX). Cotação ao vivo: CoinGecko, Binance e mempool.space. Dólar do dia, só com os valores na outra moeda: Banco Central (PTAX), com o BCE de reserva. No modo 100% offline, o app não faz nenhuma conexão. Não é recomendação de investimento.</p>
+    <div class="set-group" id="set-sobre"><h3>Sobre</h3><p class="small muted">App do Projeto Hold BTC 100: R$ 100 em bitcoin todo mês, registrado e guardado no longo prazo. Funciona offline e sem cadastro. Preços históricos: CoinLore (BTC/USD) e Banco Central (PTAX). Cotação ao vivo: CoinGecko, Binance e mempool.space. Dólar do dia, só com os valores na outra moeda: Banco Central (PTAX), com o BCE de reserva. No modo 100% offline, o app não faz nenhuma conexão. Não é recomendação de investimento.</p>
       ${extLink('https://t.me/nicolasmaia42', 'Contato<span class="v">Telegram @nicolasmaia42</span>', 'set-row')}
       ${extLink('https://t.me/HoldBTC100', 'Grupo do projeto<span class="v">Telegram @HoldBTC100</span>', 'set-row')}
       ${extLink(PRIV_URL, `Política de privacidade<span class="v">${I.ext}</span>`, 'set-row')}</div>`;
@@ -2217,6 +2259,16 @@ async function backupJSON(pin = '') {
   return JSON.stringify(env, null, 1);
 }
 let bkBusy = false;
+/* Força do PIN do backup (1.8.22, auditoria M9 e S10): estimativa pelo tamanho e pelos tipos de caractere, pensando em
+   quem tem o arquivo e várias placas de vídeo (perto de um milhão de tentativas por segundo, mesmo com 600.000 rodadas):
+   abaixo de 36 bits cai em horas; de 47 bits para cima, leva anos. */
+function bkForca(v) {
+  const box = $('#bk-forca'); if (!box) return;
+  const pool = (/[0-9]/.test(v) ? 10 : 0) + (/[a-z]/.test(v) ? 26 : 0) + (/[A-Z]/.test(v) ? 26 : 0) + (/[^0-9a-zA-Z]/.test(v) ? 33 : 0);
+  const bits = v ? v.length * Math.log2(Math.max(pool, 2)) : 0, n = !v ? 0 : bits < 36 ? 1 : bits < 47 ? 2 : 3;
+  box.className = 'pin-forca n' + n;
+  box.querySelector('span').textContent = ['Digite o PIN para ver a força dele.', 'Fraco: afasta curiosos, mas quem tiver o arquivo e placas de vídeo acha este PIN em minutos ou horas.', 'Razoável: dá trabalho até com placas de vídeo. Para guardar na nuvem ou no e-mail, use mais caracteres, com letras.', 'Forte: bom até para guardar na nuvem ou no e-mail.'][n];
+}
 async function exportBackup(copy) {
   const f = ui.form || {}, comPin = f.kind === 'export' && !!f.bkPin;
   let pin = '';
@@ -2231,16 +2283,18 @@ async function exportBackup(copy) {
   let txt;
   try { txt = await backupJSON(pin); } catch (e) { return formErr('Não deu para gerar o backup neste navegador.'); } finally { bkBusy = false; }
   const aviso = 'Guarde o PIN: sem ele, o backup não abre.';
-  if (copy) { if (await copyText(txt) && comPin) toast(`Backup com PIN copiado. ${aviso}`); return; }
-  if (await saveFile(`holdbtc100-backup-${todayISO()}${comPin ? '-pin' : ''}.json`, txt, 'application/json') && comPin) toast(`Backup com PIN baixado. ${aviso}`);
+  const nota = feito => { const b = $('#sheet-body'); if (!b || ui.form.kind !== 'export') return; let p = $('#bk-nota'); if (!p) { p = document.createElement('p'); p.id = 'bk-nota'; p.className = 'note restore-warn'; p.setAttribute('role', 'alert'); const e = b.querySelector('.err.form'); b.insertBefore(p, e || null); } p.innerHTML = `<b>${esc(feito)}</b> ${esc(aviso)}`; };
+  if (copy) { if (await copyText(txt) && comPin) { toast(`Backup com PIN copiado. ${aviso}`, { ms: 5000 }); nota('Backup com PIN copiado.'); } return; }
+  if (await saveFile(`holdbtc100-backup-${todayISO()}${comPin ? '-pin' : ''}.json`, txt, 'application/json') && comPin) { toast(`Backup com PIN baixado. ${aviso}`, { ms: 5000 }); nota('Backup com PIN baixado.'); }
 }
 function sheetExport() {
   ui.form = { kind: 'export', bkPin: false };   // PIN do backup (1.8.18): desligado por padrão, só a pessoa liga
   openSheet('export', () => `<h2>Exportar</h2><p class="sub">Os arquivos têm só os seus registros: nada de chaves ou seed.</p>
     <button class="tool" data-act="exp-csv"><b>Planilha das movimentações (.csv)</b><span>${movimentos().length ? 'Para ver e filtrar no Excel e no Google Planilhas: aportes, vendas, saques e transações, com a coluna tipo. Não restaura a carteira' : 'Ainda sem movimentações. A planilha traz o que está registrado no app (aportes, vendas, saques, entradas e transações). Endereços importados sem saldo só viram movimentação se você importar também o histórico, opção da revisão na importação pela chave pública'}</span><span class="chev" aria-hidden="true">›</span></button>
     <div class="switch bk-sw"><span><span class="t">Proteger o backup com PIN</span><br><span class="d">${subtleOk() ? 'Criptografa o backup: sem o PIN, ninguém lê nem altera o arquivo. Se você esquecer o PIN, o backup não abre.' : 'Este navegador não permite criptografar o backup.'}</span></span><button class="tog${ui.form.bkPin ? ' on' : ''}" data-act="bk-pin-tog" aria-pressed="${!!ui.form.bkPin}" aria-label="Proteger o backup com PIN"${subtleOk() ? '' : ' disabled'}></button></div>
-    <div id="bk-pin-f"${ui.form.bkPin ? '' : ' hidden'}><div class="two"><div class="field"><label for="bk-p1">PIN do backup</label><input class="inp" id="bk-p1" name="bkpin" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"></div><div class="field"><label for="bk-p2">Repita o PIN</label><input class="inp" id="bk-p2" name="bkpin2" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"></div></div>
-      <p class="hint">Pelo menos ${BK_PIN_MIN} caracteres, números ou letras. Só números afastam curiosos; para guardar na nuvem ou no e-mail, use 10 ou mais, com letras. O PIN não fica guardado no app.</p></div>
+    <div id="bk-pin-f"${ui.form.bkPin ? '' : ' hidden'}><div class="two"><div class="field"><label for="bk-p1">PIN do backup</label><input class="inp" id="bk-p1" name="bkpin" data-inp="bk-forca" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"></div><div class="field"><label for="bk-p2">Repita o PIN</label><input class="inp" id="bk-p2" name="bkpin2" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"></div></div>
+      <div class="pin-forca" id="bk-forca" aria-live="polite"><i></i><i></i><i></i><span>Digite o PIN para ver a força dele.</span></div>
+      <p class="hint">Pelo menos ${BK_PIN_MIN} caracteres, números ou letras. O PIN não fica guardado no app.</p></div>
     <p class="err form" hidden></p>
     <button class="tool" data-act="exp-json"><b>Backup completo (.json)</b><span>Tudo o que está no app, menos o PIN de bloqueio: aportes, carteiras, UTXOs, transações, lições e ajustes. É ele que traz tudo de volta, aqui ou em outro aparelho</span><span class="chev" aria-hidden="true">›</span></button>
     <button class="tool" data-act="exp-copy"><b>Copiar backup</b><span>Para colar num e-mail ou nota, se o download não funcionar</span><span class="chev" aria-hidden="true">›</span></button>
@@ -2264,14 +2318,14 @@ async function handleFile(file) {
     if (name.endsWith('.xlsx')) { const sheets = await readXlsx(await file.arrayBuffer()); return previewXlsx(sheets); }
     const text = await file.text();
     if (name.endsWith('.json') || text.trim().startsWith('{')) return importBackupText(text);
-    return previewList(parseCSVAportes(text), cur(), 'CSV');
+    ui.form.csv = { text, from: 'Da planilha CSV' }; return previewList(parseCSVAportes(text), cur(), 'Da planilha CSV');
   } catch (e) { formErr(e && e.message === 'grande' ? 'A planilha descompactada passa de 20 MB, o limite da importação. Confira se é a planilha certa.' : 'Não consegui ler este arquivo. Confira o formato e tente de novo.'); }
 }
 function previewXlsx(sheets) {
   const found = [];
   for (const sh of sheets) { const r = aportesFromSheet(sh); if (r.list.length) found.push({ name: sh.name, cur: /usd/i.test(sh.name) ? 'USD' : /eur/i.test(sh.name) ? 'EUR' : 'BRL', ...r }); }
   if (!found.length) return formErr(`Não encontrei aportes na planilha. Ela tem as abas ${sheets.map(s => s.name).join(', ')}, mas as linhas de compra (data, valor e cotação) estão vazias.`);
-  if (found.length === 1) return previewList(found[0], found[0].cur, `aba ${found[0].name}`);
+  if (found.length === 1) return previewList(found[0], found[0].cur, `Da aba ${found[0].name}`);
   ui.form.xlsx = found;
   $('#sheet-body').innerHTML = `<h2>Qual aba importar?</h2><p class="sub">Encontrei aportes em mais de uma aba.</p>${found.map((f, i) => `<button class="tool" data-act="xlsx-pick" data-i="${i}"><b>${esc(f.name)}</b><span>${f.list.length} aportes em ${f.cur}</span><span class="chev" aria-hidden="true">›</span></button>`).join('')}`;
 }
@@ -2286,12 +2340,13 @@ function previewList(r, currency, from) {
   const sorted = [...fresh].sort((a, b) => a.date.localeCompare(b.date)), money = v => esc(fmtMoney(v, currency));
   ui.form.pending = { list: fresh, currency };
   const nw = fresh.filter(a => a.wal).length;   // 1.8.13: aportes e vendas feitos na carteira entram como da corretora
-  $('#sheet-body').innerHTML = `<h2>Importar ${fresh.length} ${fresh.length === 1 ? 'registro' : 'registros'}?</h2><p class="sub">Da ${esc(from)}${sorted.length ? `, de ${fmtDate(sorted[0].date)} a ${fmtDate(sorted[sorted.length - 1].date)}` : ''}.</p>
+  $('#sheet-body').innerHTML = `<h2>Importar ${fresh.length} ${fresh.length === 1 ? 'registro' : 'registros'}?</h2><p class="sub">${esc(from)}${sorted.length ? `, de ${fmtDate(sorted[0].date)} a ${fmtDate(sorted[sorted.length - 1].date)}` : ''}.</p>
     <ul class="receipt"><li><span class="k">${buys.length} ${buys.length === 1 ? 'compra' : 'compras'}</span><span class="dots"></span><span class="v">${money(buys.reduce((t, a) => t + a.fiat, 0))}<small>${esc(amtTxt(buys.reduce((t, a) => t + a.sats, 0)))}</small></span></li>
     ${sales.length ? `<li><span class="k">${sales.length} ${sales.length === 1 ? 'venda' : 'vendas'}</span><span class="dots"></span><span class="v">${money(sales.reduce((t, a) => t + a.fiat, 0))}<small>${esc(amtTxt(-sales.reduce((t, a) => t + a.sats, 0)))}</small></span></li>` : ''}
     ${list.length - fresh.length ? `<li><span class="k">Já registrados (ignorados)</span><span class="dots"></span><span class="v">${list.length - fresh.length}</span></li>` : ''}${skipped ? `<li><span class="k">Linhas incompletas (ignoradas)</span><span class="dots"></span><span class="v">${skipped}</span></li>` : ''}${wallet ? `<li><span class="k">Saques e transações (ficam de fora)</span><span class="dots"></span><span class="v">${wallet}</span></li>` : ''}</ul>
     ${wallet || nw ? `<p class="note" style="margin-top:12px">Pela planilha entram só aportes e vendas${nw ? ` (${nw === 1 ? 'o feito na carteira entra' : `os ${nw} feitos na carteira entram`} como da corretora)` : ''}. Saques, UTXOs e transações só voltam pelo backup (.json), que traz tudo e substitui os dados atuais.</p>
     <button class="btn btn-q block" style="margin-top:10px" data-act="pick-file" data-accept=".json,application/json">Escolher backup (.json)</button><input type="file" id="file-in" hidden data-file="1">` : ''}
+    ${r.datas === 'mdy' && !r.forcado ? '<p class="note" style="margin-top:12px">As datas estão no formato mês/dia (o americano): algumas passam de 12 no segundo número.</p>' : ''}${r.ambigua || r.forcado ? `<p class="note" style="margin-top:12px">${r.forcado ? 'Datas lidas como mês/dia (o formato americano), como você pediu.' : 'As datas foram lidas como dia/mês, o formato do Brasil. Se a planilha usa mês/dia (o formato americano), leia de novo.'}</p><button class="btn btn-q block" style="margin-top:10px" data-act="csv-${r.forcado ? 'dmy' : 'mdy'}">${r.forcado ? 'Ler como dia/mês' : 'Ler como mês/dia'}</button>` : ''}
     ${L.err ? `<p class="err" style="margin-top:12px">${esc(ledgerErrText(L.err))}</p>` : ''}
     ${state.demo ? '<p class="note" style="margin-top:12px">Os dados de exemplo serão apagados.</p>' : ''}${!state.aportes.length && currency !== cur() ? `<p class="note" style="margin-top:12px">A moeda do app passa a ser ${currency}.</p>` : ''}
     <p class="err form" hidden></p><button class="btn btn-p block" style="margin-top:14px" data-act="import-apply" ${fresh.length && !L.err ? '' : 'disabled'}>Importar ${fresh.length} ${fresh.length === 1 ? 'registro' : 'registros'}</button>`;
@@ -2400,14 +2455,23 @@ function parseCSV(text) {
   return rows.filter(r => r.some(c => String(c).trim()));
 }
 const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-function parseCSVAportes(text) {
+/* Datas do CSV (1.8.22, auditoria M8): dia/mês é o padrão. Se algum segundo número passar de 12 (e nenhum primeiro), as datas
+   são mês/dia, o formato americano. Se nenhum passar de 12, a leitura fica em dia/mês e a prévia oferece ler como mês/dia.
+   A planilha de movimentações do próprio app (colunas taxa_sats e txid) sempre usa dia/mês. */
+function ordemDatas(vals) {
+  let dm = false, md = false, barra = false;
+  for (const v of vals) { const m = String(v == null ? '' : v).trim().match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})/); if (!m) continue; barra = true; if (+m[1] > 12) dm = true; if (+m[2] > 12) md = true; }
+  return { ordem: md && !dm ? 'mdy' : 'dmy', ambigua: barra && !dm && !md };
+}
+function parseCSVAportes(text, forcar) {
   const rows = parseCSV(text); if (rows.length < 2) return { list: [], skipped: 0 };
   const h = rows[0].map(norm), find = (...names) => h.findIndex(x => names.some(n => x === n || x.startsWith(n)));
   const iD = find('data', 'date', 'buy date'), iT = find('tipo', 'type'), iV = find('valor', 'compra', 'aporte', 'input', 'amount'), iP = find('cotacao', 'preco', 'price', 'purchase value'), iS = find('sats'), iB = find('btc'), iE = find('corretora', 'exchange'), iN = find('observacao', 'nota', 'note'), iF = find('taxa', 'fee'), iL = find('local');
   const list = []; let skipped = 0, wallet = 0;
+  const od = forcar ? { ordem: forcar, ambigua: false } : h.includes('taxa_sats') && h.includes('txid') ? { ordem: 'dmy', ambigua: false } : ordemDatas(rows.slice(1).map(r => r[iD]));
   for (const r of rows.slice(1)) {
     if (iT >= 0 && TIPO_CARTEIRA.test(norm(r[iT]))) { wallet++; continue; }   // saques e transações da planilha de movimentações (1.8.12)
-    const date = parseDateAny(r[iD]); let fiat = parseNum(r[iV]), price = iP >= 0 ? parseNum(r[iP]) : NaN, sats = iS >= 0 ? parseNum(r[iS]) : NaN;
+    const date = parseDateAny(r[iD], od.ordem === 'mdy'); let fiat = parseNum(r[iV]), price = iP >= 0 ? parseNum(r[iP]) : NaN, sats = iS >= 0 ? parseNum(r[iS]) : NaN;
     if (!(Math.abs(sats) > 0) && iB >= 0) { const b = parseNum(r[iB]); if (Math.abs(b) > 0) sats = b * 1e8; }
     const tipo = iT >= 0 ? norm(r[iT]) : '', sale = tipo.startsWith('vend') || tipo === 'sell' || tipo === 'sale' || fiat < 0 || sats < 0;
     fiat = Math.abs(fiat); sats = Math.round(Math.abs(sats)); price = Math.abs(price);
@@ -2417,15 +2481,15 @@ function parseCSVAportes(text) {
     if (price > 0) { if (!(sats > 0)) sats = Math.round(base / price * 1e8); } else if (sats > 0) price = base / (sats / 1e8); else { skipped++; continue; }
     list.push({ date, fiat: round2(fiat), price: round2(price), sats, fee: round2(fee), type: sale ? 'venda' : 'compra', ex: iE >= 0 ? String(r[iE] || '').trim().slice(0, 60) : '', note: iN >= 0 ? String(r[iN] || '').trim().slice(0, 140) : '', wal: iL >= 0 && norm(r[iL]) === 'carteira' });
   }
-  return { list, skipped, wallet };
+  return { list, skipped, wallet, datas: od.ordem, ambigua: od.ambigua, forcado: !!forcar };
 }
 function isoDate(y, m, d) { if (!(m >= 1 && m <= 12 && d >= 1 && d <= 31 && y > 2008 && y < 2100)) return null; const t = new Date(Date.UTC(y, m - 1, d)); if (t.getUTCMonth() !== m - 1) return null; return `${y}-${pad2(m)}-${pad2(d)}`; }
-function parseDateAny(v) {
+function parseDateAny(v, mdy = false) {
   if (v == null || v === '') return null;
   if (typeof v === 'number' && isFinite(v)) { if (v > 39000 && v < 80000) return new Date(Math.round((Math.floor(v) - 25569) * 86400000)).toISOString().slice(0, 10); return null; }
   const s = String(v).trim(); let m;
   if ((m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))) return isoDate(+m[1], +m[2], +m[3]);
-  if ((m = s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})/))) { let y = +m[3]; if (y < 100) y += 2000; return isoDate(y, +m[2], +m[1]); }
+  if ((m = s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})/))) { let y = +m[3]; if (y < 100) y += 2000; return mdy ? isoDate(y, +m[1], +m[2]) : isoDate(y, +m[2], +m[1]); }
   if (/^\d+(\.\d+)?$/.test(s)) return parseDateAny(parseFloat(s));
   return null;
 }
@@ -2638,10 +2702,10 @@ function obCommit() {
 let deferredInstall = null;
 const ACT = {
   // tab, page e lesson zeram a pilha de páginas e o destaque (ui.stack, ui.hl); o Voltar das páginas fica no utxo_glue.js
-  'tab': el => { ui.stack = []; ui.hl = null; ui.tab = el.dataset.tab; ui.page = null; ui.selMode = false; ui.sel.clear(); render(); window.scrollTo(0, 0); },
-  'page': el => { ui.stack = []; ui.hl = null; ui.page = el.dataset.page; ui.arg = el.dataset.id || null; closeSheet(true); render(); window.scrollTo(0, 0); },
-  'goto-carteira': () => { ui.tab = 'carteira'; ui.page = null; render(); window.scrollTo(0, 0); },
-  'lesson': el => { ui.stack = []; ui.hl = null; ui.page = 'lesson'; ui.arg = el.dataset.id; closeSheet(true); render(); window.scrollTo(0, 0); },
+  'tab': el => { guardaTopo(); ui.stack = []; ui.hl = null; ui.tab = el.dataset.tab; ui.page = null; ui.selMode = false; ui.sel.clear(); render(); window.scrollTo(0, 0); },
+  'page': el => { guardaTopo(); ui.stack = []; ui.hl = null; ui.page = el.dataset.page; ui.arg = el.dataset.id || null; closeSheet(true); render(); window.scrollTo(0, 0); },
+  'goto-carteira': () => ACT.tab({ dataset: { tab: 'carteira' } }),   // como o toque na aba: zera a pilha das páginas
+  'lesson': el => { guardaTopo(); ui.stack = []; ui.hl = null; ui.page = 'lesson'; ui.arg = el.dataset.id; closeSheet(true); render(); window.scrollTo(0, 0); },
   'quiz': el => { const id = el.dataset.id; if (state.learn.quiz[id] != null) return; state.learn.quiz[id] = +el.dataset.k; save(); render(); const q = $('.quiz'); if (q) q.scrollIntoView({ block: 'nearest' }); },
   'lesson-done': el => { state.learn.done[el.dataset.id] = Date.now(); save(); render(); toast('Lição concluída'); },
   'toggle-ui': el => { ui[el.dataset.k] = !ui[el.dataset.k]; render(); },
@@ -2665,6 +2729,14 @@ const ACT = {
   'toggle-hide': () => { S().hide = !S().hide; save(); render(); refreshSheet(); },
   'open-settings': () => sheetSettings(),
   'set': el => setValue(el.dataset.k, el.dataset.v),
+  'set-ir': el => { const g = $('#' + el.dataset.id), sh = $('#ov .sheet'); if (!g || !sh) return; sh.scrollTo({ top: sh.scrollTop + g.getBoundingClientRect().top - sh.getBoundingClientRect().top - 12, behavior: 'smooth' }); },
+  'desfazer': () => {
+    const antes = desfazer.antes; if (!antes) return;
+    desfazer.antes = null; if (fotoDados() !== desfazer.depois) return toast('Não dá mais para desfazer: os registros mudaram depois da exclusão.');
+    Object.assign(state, JSON.parse(antes)); save(); render(); toast('Exclusão desfeita');
+  },
+  'csv-mdy': () => { const f = ui.form; if (f && f.csv) previewList(parseCSVAportes(f.csv.text, 'mdy'), cur(), f.csv.from); },
+  'csv-dmy': () => { const f = ui.form; if (f && f.csv) previewList(parseCSVAportes(f.csv.text), cur(), f.csv.from); },
   'price-sheet': () => sheetPrice(),
   'refresh-price': () => { refreshPrice(true); fxSync(true); },
   'save-mprice': saveManualPrice,
@@ -2677,9 +2749,9 @@ const ACT = {
   'import': () => sheetImport(),
   'export': () => sheetExport(),
   'pick-file': el => { const i = $('#file-in'); i.accept = el.dataset.accept; i.value = ''; i.click(); },
-  'xlsx-pick': el => { const f = ui.form.xlsx[+el.dataset.i]; previewList(f, f.cur, `aba ${f.name}`); },
+  'xlsx-pick': el => { const f = ui.form.xlsx[+el.dataset.i]; previewList(f, f.cur, `Da aba ${f.name}`); },
   'import-apply': applyImport,
-  'import-paste': () => { const t = fv('paste').trim(); if (!t) return formErr('Cole o texto do backup ou de um CSV.'); if (t.length > IMPORT_MAX) return formErr(`Este texto tem ${mbTxt(t.length)}, acima do limite de 20 MB da importação.`); if (t.startsWith('{')) importBackupText(t); else previewList(parseCSVAportes(t), cur(), 'texto colado'); },
+  'import-paste': () => { const t = fv('paste').trim(); if (!t) return formErr('Cole o texto do backup ou de um CSV.'); if (t.length > IMPORT_MAX) return formErr(`Este texto tem ${mbTxt(t.length)}, acima do limite de 20 MB da importação.`); if (t.startsWith('{')) importBackupText(t); else { ui.form.csv = { text: t, from: 'Do texto colado' }; previewList(parseCSVAportes(t), cur(), 'Do texto colado'); } },
   'exp-csv': () => { if (!movimentos().length) return toast('Nenhuma movimentação para exportar.'); saveFile(`holdbtc100-movimentacoes-${todayISO()}.csv`, movimentosCSV(), 'text/csv'); },
   'exp-json': () => exportBackup(false),
   'exp-copy': () => exportBackup(true),
@@ -2714,7 +2786,7 @@ const ACT = {
   'fee-preset': el => { S().feeRate = +el.dataset.v; save(); render(); },
   'bip329-save': () => { const t = bip329(); if (!t) return toast('Preencha TXID e vout dos UTXOs para exportar etiquetas.'); saveFile(`holdbtc100-etiquetas-bip329.${caps.downloads ? 'txt' : 'jsonl'}`, t + '\n', 'application/jsonl'); },
   'bip329-copy': () => { const t = bip329(); if (!t) return toast('Preencha TXID e vout dos UTXOs para exportar etiquetas.'); copyText(t); },
-  'open-ir': () => { ui.page = 'ir'; render(); window.scrollTo(0, 0); },
+  'open-ir': () => openPage('ir'),
   'sim-cur': el => { ui.sim.c = el.dataset.c; render(); },
   'pin-set': () => sheetPin('set'), 'pin-change': () => sheetPin('change'), 'pin-remove': () => sheetPin('remove'), 'save-pin': savePin,
   'toggle-bio': () => { if (S().bio) { S().bio = null; save(); refreshSheet(); toast('Biometria desativada'); } else bioRegister(); },
@@ -2756,6 +2828,7 @@ document.addEventListener('input', e => {
   else if (k === 'gl') { ui.gl = e.target.value; $('#gl-list').innerHTML = glList(); }
   else if (k === 'ir-year') { ui.irYear = +e.target.value; render(); }
   else if (k === 'lk-apagar') lkApagar();
+  else if (k === 'bk-forca') bkForca(e.target.value);
   else if (INP[k]) INP[k](e.target, e);
 });
 document.addEventListener('change', e => {
@@ -2775,7 +2848,8 @@ document.addEventListener('keydown', e => {
   if (ui.locked && e.key === 'Escape' && $('#lk-apagar')) lockPad();
 });
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) { ui.hiddenAt = Date.now(); clearTimeout(saveTimer); persist(); return; }
+  if (document.hidden) { ui.hiddenAt = Date.now(); clearTimeout(saveTimer); persist(); if (S().pin) document.documentElement.classList.add('fundo-oculto'); return; }   // M10 (1.8.22): miniatura de apps recentes sem saldo
+  document.documentElement.classList.remove('fundo-oculto');
   if (S().pin && !ui.locked && ui.hiddenAt && Date.now() - ui.hiddenAt > S().lockMin * 60000) lock();
   if (!IN_CLAUDE && NET() && Date.now() - state.price.at > 10 * 60000) refreshPrice();
   if (!IN_CLAUDE && NET()) fxSync();
@@ -3095,7 +3169,7 @@ function saveEditUtxo() {
   if (!ok) return false;
   save(); closeSheet(); render(); toast('UTXO atualizado');
 }
-function delUtxo(id) { const u = byId(state.utxos, id); if (!u || u.spent || u.origin !== 'externo') return; confirmSheet('Excluir UTXO?', `${esc(amtTxt(u.sats))} · ${esc(u.label)}`, 'Excluir UTXO', () => { state.utxos = state.utxos.filter(x => x.id !== id); save(); closeSheet(); render(); toast('UTXO excluído'); }, true); }
+function delUtxo(id) { const u = byId(state.utxos, id); if (!u || u.spent || u.origin !== 'externo') return; confirmSheet('Excluir UTXO?', `${esc(amtTxt(u.sats))} · ${esc(u.label)}. Logo depois, dá para desfazer por alguns segundos.`, 'Excluir UTXO', () => { const snap = fotoDados(); state.utxos = state.utxos.filter(x => x.id !== id); save(); closeSheet(); render(); toastDesfazer('UTXO excluído', snap); }, true); }
 
 /* ---------- endereços e carteiras ---------- */
 function sheetAddr(id, walletId) {
@@ -3522,15 +3596,16 @@ function pageWallet() {
    Tela da Carteira, navegação entre páginas (endereço › transação › carteira),
    ações e entradas de formulário, dados de exemplo. */
 
+// Páginas empilhadas: cada uma guarda a rolagem de onde saiu, e o Voltar a devolve (1.8.22, auditoria M1).
 function openPage(page, arg, hl = null) {
-  if (ui.page) ui.stack.push({ page: ui.page, arg: ui.arg, hl: ui.hl });
+  if (ui.page) ui.stack.push({ page: ui.page, arg: ui.arg, hl: ui.hl, top: window.scrollY }); else guardaTopo();
   ui.page = page; ui.arg = arg; ui.hl = hl;
   closeSheet(true); render(); window.scrollTo(0, 0);
 }
 function back() {
-  const p = ui.stack.pop();
-  if (p) { ui.page = p.page; ui.arg = p.arg; ui.hl = p.hl; } else { ui.page = null; ui.hl = null; }
-  render(); window.scrollTo(0, 0);
+  const p = ui.stack.pop(); let top = 0;
+  if (p) { ui.page = p.page; ui.arg = p.arg; ui.hl = p.hl; top = p.top || 0; } else { ui.page = null; ui.hl = null; top = ui.tabTop[ui.tab] || 0; }
+  render(); window.scrollTo(0, top);
 }
 const addrOf = u => addrById(u.address) || { label: 'Endereço', wallet: u.wallet, type: u.type };
 function isReuse(u) {
@@ -3685,8 +3760,9 @@ Object.assign(ACT, {
   // Exclusões com confirmação (1.8.20, auditoria C5): a mensagem diz o que sai junto (DIRETRIZES §12).
   'del-addr': el => {
     const a = addrById(el.dataset.id); if (!a || addrUtxos(a.id).length) return;
-    confirmSheet('Excluir endereço?', `"${esc(a.label)}" sai da lista da carteira. Nenhum UTXO usa este endereço, e os registros de aportes e transações não mudam.`, 'Excluir endereço', () => {
-      state.addresses = state.addresses.filter(x => x.id !== a.id); save(); closeSheet(); if (ui.page === 'addr' && ui.arg === a.id) back(); else render(); toast('Endereço excluído');
+    confirmSheet('Excluir endereço?', `"${esc(a.label)}" sai da lista da carteira. Nenhum UTXO usa este endereço, e os registros de aportes e transações não mudam. Logo depois, dá para desfazer por alguns segundos.`, 'Excluir endereço', () => {
+      const snap = fotoDados();
+      state.addresses = state.addresses.filter(x => x.id !== a.id); save(); closeSheet(); if (ui.page === 'addr' && ui.arg === a.id) back(); else render(); toastDesfazer('Endereço excluído', snap);
     }, true);
   },
   'tx-new': el => txNew(el.dataset.k === 'send' ? 'send' : undefined),
@@ -3738,8 +3814,9 @@ Object.assign(ACT, {
     const id = el.dataset.id, w = byId(state.wallets, id); if (!w) return;
     if (state.utxos.some(u => u.wallet === id)) return toast('Esta carteira tem UTXOs registrados.');
     const n = state.addresses.filter(a => a.wallet === id).length;
-    confirmSheet('Excluir carteira?', `"${esc(w.name)}" sai do app${n ? ` junto com ${n} ${n === 1 ? 'endereço cadastrado' : 'endereços cadastrados'} nela` : ''}. Nenhum UTXO usa esta carteira.`, 'Excluir carteira', () => {
-      state.wallets = state.wallets.filter(x => x.id !== id); state.addresses = state.addresses.filter(a => a.wallet !== id); save(); closeSheet(); if (ui.page === 'wallet' && ui.arg === id) back(); else render(); toast(n ? `Carteira e ${n} ${n === 1 ? 'endereço excluídos' : 'endereços excluídos'}` : 'Carteira excluída');
+    confirmSheet('Excluir carteira?', `"${esc(w.name)}" sai do app${n ? ` junto com ${n} ${n === 1 ? 'endereço cadastrado' : 'endereços cadastrados'} nela` : ''}. Nenhum UTXO usa esta carteira. Logo depois, dá para desfazer por alguns segundos.`, 'Excluir carteira', () => {
+      const snap = fotoDados();
+      state.wallets = state.wallets.filter(x => x.id !== id); state.addresses = state.addresses.filter(a => a.wallet !== id); save(); closeSheet(); if (ui.page === 'wallet' && ui.arg === id) back(); else render(); toastDesfazer(n ? `Carteira e ${n} ${n === 1 ? 'endereço excluídos' : 'endereços excluídos'}` : 'Carteira excluída', snap);
     }, true);
   }
 });
