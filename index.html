@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="App do Projeto Hold BTC 100: registre seus aportes mensais em bitcoin, acompanhe preço médio e resultado, gerencie UTXOs e aprenda autocustódia.">
 <title>Hold BTC 100</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-GilM4IbOZXGleOqfaVWyTGP9zvrhFG3J7L4aT5xBFuM='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ioRogUFuZt8EVQVTKdZP9KsUdAq2gaarquyh+96KYFY='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -575,6 +575,11 @@ h1,h2,h3,p,li,b,strong,small,label,.k,.v,.t,.d,.sub,.lead,.note,.hint,.tool b,.t
 .pin-forca.n3 i{background:var(--pos)}
 .fundo-oculto #app,.fundo-oculto nav.tabs,.fundo-oculto #sheet-root,.fundo-oculto #toast-root{visibility:hidden}
 
+/* 1.8.23: lembrete de backup no Início */
+.bk-card{margin:14px 14px 0;padding:14px;background:var(--surface);border:1px solid var(--line);border-radius:16px}
+.bk-card h2{font-family:var(--fc);font-weight:700;font-size:20px;line-height:1.15;margin:0 0 4px}
+.bk-card p{margin:0 0 12px;font-size:14.5px;color:var(--muted)}
+
 .ic{display:block;width:24px;height:24px}
 </style>
 </head>
@@ -871,7 +876,7 @@ const KS_CARDS = {
    Claude, também espelha num documento privado do usuário.
    ========================================================= */
 
-const APP_VERSION = '1.8.22';
+const APP_VERSION = '1.8.23';
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const HIST = {"start":"2015-01","usd":[269,236,249,240,233,247,274,257,233,275,346,404,400,404,427,433,490,602,649,600,593,655,724,855,967,1075,1126,1210,1817,2384,2684,3787,4520,5404,8338,12178,12166,10318,8680,8122,8372,6952,7096,7394,6818,6489,5192,3887,3595,3654,3979,4704,6942,9680,10459,9914,9056,8766,8345,7372,8268,8948,7481,7512,9050,9296,10232,11509,11218,12286,16730,24328,31072,39024,51906,58338,47486,36155,38354,44318,45439,52582,59166,51586,42365,40791,44360,41879,35044,25823,21591,21674,19744,19962,18841,16851,19838,23126,25804,28897,28234,28846,29858,27587,26456,30805,36179,39982,42444,51946,66244,65986,64146,65194,63729,61864,61188,66861,83364,95022,97976,93433,83444,88373,99394,105848,111410,111996,111124,111840,99685,88638,83198,72854,67640,72356,75048,66150,60768,70714,81095,80570],"brl":[708,663,783,731,714,768,883,904,911,1067,1307,1564,1620,1603,1583,1542,1734,2062,2125,1926,1930,2088,2418,2866,3091,3338,3522,3795,5832,7858,8605,11932,14171,17247,27175,40087,39062,33444,28462,27676,30443,26233,27169,29059,28068,24388,19662,15101,13451,13608,15305,18328,27776,37353,39528,39856,37326,35825,34676,30296,34306,38845,36536,40003,51073,48305,54030,62853,60569,69121,90640,125185,166425,211371,293069,324482,251253,181928,197777,232745,239904,291307,328780,291530,234452,211975,220398,199260,173644,130385,115903,111476,103397,104809,99381,88340,103169,119603,134475,145054,140682,139952,143345,135273,130613,156021,177216,195797,208587,257883,329902,338449,329261,351333,353186,343509,339079,376033,484100,579349,589992,538697,479536,511123,563308,587149,615933,610031,596450,602314,532408,483352,444108,378882,353863,364172,374017,339193,310759,364403,417209,413273]}; // médias mensais estimadas: {start:'2015-01', usd:[…], brl:[…]}
 const REF_PRICE = { BRL: 416900, USD: 75800, EUR: 68000, at: Date.UTC(2026, 10, 7, 18, 0), src: 'ref' }; // US$ do CoinLore × PTAX de 06/11/2026 (R$ 5,50; € 6,13)
@@ -893,7 +898,8 @@ const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 
 const round2 = v => Math.round(v * 100) / 100;
 const byId = (arr, id) => arr.find(x => x.id === id);
 const pad2 = n => String(n).padStart(2, '0');
-function todayISO() { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; }
+function todayISO() { return isoDeTs(Date.now()); }
+function isoDeTs(ts) { const d = new Date(ts); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; }
 function nowYM() { return todayISO().slice(0, 7); }
 function fmtDate(iso) { const [y, m, d] = iso.split('-'); return `${d}/${m}/${y}`; }
 function fmtYM(ym) { const [y, m] = ym.split('-'); return `${MONTHS[+m - 1]}/${y}`; }
@@ -973,7 +979,7 @@ function curSym(c = cur()) { return c === 'BRL' ? 'R$' : c === 'USD' ? 'US$' : '
 function defaultState() {
   return {
     v: 2, createdAt: Date.now(), updatedAt: 0, demo: false,
-    settings: { offline: false, currency: 'BRL', monthly: 100, day: 10, goalSats: 1000000, unit: 'sats', theme: 'auto', hide: false, utxo: false, feeRate: 5, wdFee: 0, wdPct: 1, exchange: '', onboarded: false, pin: null, bio: null, lockMin: 5, gridAll: false, viewCur: null },
+    settings: { offline: false, currency: 'BRL', monthly: 100, day: 10, goalSats: 1000000, unit: 'sats', theme: 'auto', hide: false, utxo: false, feeRate: 5, wdFee: 0, wdPct: 1, exchange: '', onboarded: false, pin: null, bio: null, lockMin: 5, gridAll: false, viewCur: null, bkAt: 0, bkSig: '', bkAdiar: 0, bkLembrar: true },
     aportes: [], saques: [], utxos: [], wallets: [], addresses: [], spends: [],
     learn: { done: {}, quiz: {} },
     price: { ...REF_PRICE }, fees: null, fxm: null   // fxm: dólar de hoje informado no modo offline (1.8.7)
@@ -1045,8 +1051,9 @@ function sanitizeState(o) {
     for (const x of o[k]) if (x.id == null || x.id === '') { x.id = uid(); n++; }
   }
   const s = o.settings, d = defaultState().settings;
-  for (const k of ['monthly', 'day', 'goalSats', 'feeRate', 'wdFee', 'wdPct', 'lockMin']) if (s[k] != null) { const f = toNum(s[k]); if (!isNum(f)) { s[k] = d[k]; n++; } else if (f !== s[k]) { s[k] = f; n++; } }
-  for (const k of ['offline', 'hide', 'utxo', 'onboarded', 'gridAll']) if (s[k] != null && typeof s[k] !== 'boolean') { s[k] = !!s[k]; n++; }
+  for (const k of ['monthly', 'day', 'goalSats', 'feeRate', 'wdFee', 'wdPct', 'lockMin', 'bkAt', 'bkAdiar']) if (s[k] != null) { const f = toNum(s[k]); if (!isNum(f)) { s[k] = d[k]; n++; } else if (f !== s[k]) { s[k] = f; n++; } }
+  for (const k of ['offline', 'hide', 'utxo', 'onboarded', 'gridAll', 'bkLembrar']) if (s[k] != null && typeof s[k] !== 'boolean') { s[k] = !!s[k]; n++; }
+  if (s.bkSig != null && !(typeof s.bkSig === 'string' && /^[0-9a-f]{0,16}$/.test(s.bkSig))) { s.bkSig = ''; n++; }
   const pick = (k, list, def) => { if (s[k] != null && !list.includes(s[k])) { s[k] = def; n++; } };
   pick('currency', ['BRL', 'USD', 'EUR'], 'BRL'); pick('unit', ['sats', 'btc'], 'sats'); pick('theme', ['auto', 'light', 'dark'], 'auto'); pick('viewCur', ['BRL', 'USD'], null);
   if (s.exchange != null && typeof s.exchange !== 'string') { s.exchange = ''; n++; }
@@ -1323,6 +1330,7 @@ function viewHome() {
     ${heroPrice(c)}
     ${ctaAporte(map)}
   </section>
+  ${avisoBackup()}
   ${monthsGrid(map, st)}
   <section class="sec">
     <ul class="receipt">
@@ -1741,6 +1749,32 @@ const DADOS = ['aportes', 'saques', 'utxos', 'wallets', 'addresses', 'spends'];
 const desfazer = { antes: null, depois: null };
 function fotoDados() { const o = {}; for (const k of DADOS) o[k] = state[k]; return JSON.stringify(o); }
 function toastDesfazer(msg, antes) { desfazer.antes = antes; desfazer.depois = fotoDados(); toast(msg, { act: 'desfazer', label: 'Desfazer' }); }
+/* Lembrete de backup (1.8.23, ESTADO §11, item 2): os registros só existem no aparelho. O Início avisa quando há registros
+   e nenhum backup registrado, com o app em uso há 3 dias ou mais, ou quando o último backup tem 30 dias ou mais e os
+   registros mudaram desde ele (bkSig é um resumo dos registros no momento do backup). "Lembrar em 7 dias" adia, e a
+   pessoa desliga em Configurações › Dados. Quem registra um aporte ou uma venda com o backup em atraso também é lembrado. */
+const DIA = 86400000;
+function resumoDados() {   // resumo de 53 bits (cyrb53): só diz se os registros mudaram, não protege nada
+  const t = fotoDados(); let a = 0xdeadbeef, b = 0x41c6ce57;
+  for (let i = 0; i < t.length; i++) { const c = t.charCodeAt(i); a = Math.imul(a ^ c, 2654435761); b = Math.imul(b ^ c, 1597334677); }
+  a = Math.imul(a ^ (a >>> 16), 2246822507) ^ Math.imul(b ^ (b >>> 13), 3266489909); b = Math.imul(b ^ (b >>> 16), 2246822507) ^ Math.imul(a ^ (a >>> 13), 3266489909);
+  return (4294967296 * (2097151 & b) + (a >>> 0)).toString(16);
+}
+const temRegistros = () => DADOS.some(k => state[k].length > 0);
+function backupDevido() {
+  const s = S(), agora = Date.now();
+  if (state.demo || s.bkLembrar === false || !temRegistros() || agora < (s.bkAdiar || 0)) return null;
+  if (!s.bkAt) return agora - (state.createdAt || agora) >= 3 * DIA ? { dias: null } : null;
+  const dias = Math.floor((agora - s.bkAt) / DIA);
+  return dias >= 30 && s.bkSig !== resumoDados() ? { dias } : null;
+}
+function backupFeito(ts = Date.now()) { const s = S(); s.bkAt = ts; s.bkSig = resumoDados(); s.bkAdiar = 0; save(); render(); }
+function avisoBackup() {
+  const d = backupDevido(); if (!d) return '';
+  const txt = d.dias == null ? 'Se ele quebrar ou sumir, ou se o navegador apagar os dados, é o backup que traz tudo de volta.' : `O último foi em ${fmtDate(isoDeTs(S().bkAt))}, há ${d.dias} dias, e os registros mudaram desde então.`;
+  return `<section class="bk-card" aria-label="Lembrete de backup"><h2>Hora do backup</h2><p>Seus registros só existem neste aparelho. ${esc(txt)}</p><div class="btn-row"><button class="btn btn-p btn-s" data-act="export">Fazer backup</button><button class="btn btn-q btn-s" data-act="bk-adiar">Lembrar em 7 dias</button></div></section>`;
+}
+const toastRegistro = msg => backupDevido() ? toast(`${msg}. Hora de fazer o backup.`, { act: 'export', label: 'Fazer backup' }) : toast(msg);
 /* ---------------- botão Voltar (1.8.12) ----------------
    O Voltar do Android (e o do navegador) volta um passo dentro do app em vez de fechá-lo. Cada nível aberto por cima do
    Início ganha uma entrada no histórico, no mesmo endereço ({ hb100: 1, d: profundidade }): outra aba, cada página
@@ -1980,7 +2014,7 @@ function saveAporte() {
     if (prev) Object.assign(prev, ap); else state.aportes.push(ap);
     if (ap.ex && !isDefEx(ap.ex)) set.exchange = ap.ex;
     save(); closeSheet(); render();
-    toast(prev ? 'Venda atualizada' : 'Venda registrada'); fxSync(); return;
+    if (prev) toast('Venda atualizada'); else toastRegistro('Venda registrada'); fxSync(); return;
   }
   const ap = { ...base, type: 'compra', dest: set.utxo ? f.dest : (prev ? prev.dest || 'ex' : 'ex'), utxoId: prev ? prev.utxoId : undefined };
   if (prev && prev.entrada && ap.dest !== 'self') return formErr('Os sats desta entrada já estão na carteira: o destino continua Direto na carteira.');   // 1.8.19
@@ -2005,7 +2039,7 @@ function saveAporte() {
   const cur0 = prev ? byId(state.aportes, prev.id) : null;
   if (cur0) Object.assign(cur0, ap); else state.aportes.push(ap);
   if (ap.ex && !isDefEx(ap.ex)) set.exchange = ap.ex;
-  save(); closeSheet(); render(); toast(prev ? 'Aporte atualizado' : 'Aporte registrado'); fxSync();
+  save(); closeSheet(); render(); if (prev) toast('Aporte atualizado'); else toastRegistro('Aporte registrado'); fxSync();
 }
 function delAporte(id) {
   const a = byId(state.aportes, id); if (!a) return;
@@ -2096,6 +2130,7 @@ function sheetSettings() {
     <div class="set-group" id="set-dados"><h3>Dados</h3>
       <button class="set-row" data-act="export">Exportar (CSV ou backup)</button>
       <button class="set-row" data-act="import">Importar (planilha, CSV ou backup)</button>
+      <div class="switch"><span><span class="t">Lembrar de fazer backup</span><br><span class="d">${s.bkAt ? `Último backup em ${fmtDate(isoDeTs(s.bkAt))}.` : 'Nenhum backup registrado neste aparelho.'} O Início avisa quando o backup tem 30 dias e os registros mudaram.</span></span><button class="tog ${s.bkLembrar !== false ? 'on' : ''}" data-act="bk-lembrar" aria-pressed="${s.bkLembrar !== false}" aria-label="Lembrar de fazer backup"></button></div>
       <button class="set-row" data-act="price-sheet">Cotação<span class="v">${esc(fmtV(priceNow(vcur()), 0))}</span></button>
       ${deferredInstall ? `<button class="set-row" data-act="install">Instalar o app neste aparelho</button>` : ''}
       <button class="set-row" data-act="wipe" style="color:var(--neg)">Apagar todos os dados</button></div>
@@ -2284,8 +2319,10 @@ async function exportBackup(copy) {
   try { txt = await backupJSON(pin); } catch (e) { return formErr('Não deu para gerar o backup neste navegador.'); } finally { bkBusy = false; }
   const aviso = 'Guarde o PIN: sem ele, o backup não abre.';
   const nota = feito => { const b = $('#sheet-body'); if (!b || ui.form.kind !== 'export') return; let p = $('#bk-nota'); if (!p) { p = document.createElement('p'); p.id = 'bk-nota'; p.className = 'note restore-warn'; p.setAttribute('role', 'alert'); const e = b.querySelector('.err.form'); b.insertBefore(p, e || null); } p.innerHTML = `<b>${esc(feito)}</b> ${esc(aviso)}`; };
-  if (copy) { if (await copyText(txt) && comPin) { toast(`Backup com PIN copiado. ${aviso}`, { ms: 5000 }); nota('Backup com PIN copiado.'); } return; }
-  if (await saveFile(`holdbtc100-backup-${todayISO()}${comPin ? '-pin' : ''}.json`, txt, 'application/json') && comPin) { toast(`Backup com PIN baixado. ${aviso}`, { ms: 5000 }); nota('Backup com PIN baixado.'); }
+  if (copy) { if (!(await copyText(txt))) return; backupFeito(); if (comPin) { toast(`Backup com PIN copiado. ${aviso}`, { ms: 5000 }); nota('Backup com PIN copiado.'); } return; }
+  if (!(await saveFile(`holdbtc100-backup-${todayISO()}${comPin ? '-pin' : ''}.json`, txt, 'application/json'))) return;
+  backupFeito();   // lembrete de backup (1.8.23)
+  if (comPin) { toast(`Backup com PIN baixado. ${aviso}`, { ms: 5000 }); nota('Backup com PIN baixado.'); }
 }
 function sheetExport() {
   ui.form = { kind: 'export', bkPin: false };   // PIN do backup (1.8.18): desligado por padrão, só a pessoa liga
@@ -2438,6 +2475,7 @@ function restoreBackupState(st, info) {
   ].filter(Boolean);
   confirmSheet('Restaurar backup?', `${bkOrigem(info)}O backup tem ${n} ${n === 1 ? 'aporte' : 'aportes'} e ${m.utxos.length} UTXOs. Ele substitui tudo o que está no app agora.`, 'Restaurar backup', () => {
     const keep = { pin: S().pin, bio: S().bio }; state = m; state.settings.pin = keep.pin; state.settings.bio = keep.bio; state.settings.onboarded = true; state.demo = false;
+    const em = info.at ? Math.min(info.at.getTime(), Date.now()) : 0; Object.assign(state.settings, { bkAt: em, bkSig: em ? resumoDados() : '', bkAdiar: 0 });   // os dados são os do backup, na data dele (1.8.23)
     save(); closeSheet(false, false); ui.page = null; ui.tab = 'home'; render(); toast('Backup restaurado');
   }, true, (sig ? `<p class="note restore-${sig[0]}">${sig[1]}</p>` : '') + avisos.map(t => `<p class="note restore-warn">${t}</p>`).join(''));
 }
@@ -2727,6 +2765,8 @@ const ACT = {
   'grid-all': () => { S().gridAll = !S().gridAll; save(); render(); },
   'toggle-unit': () => { S().unit = S().unit === 'sats' ? 'btc' : 'sats'; save(); render(); },
   'toggle-hide': () => { S().hide = !S().hide; save(); render(); refreshSheet(); },
+  'bk-adiar': () => { S().bkAdiar = Date.now() + 7 * DIA; save(); render(); toast('Combinado: lembro de novo em 7 dias.'); },
+  'bk-lembrar': () => { S().bkLembrar = S().bkLembrar === false; S().bkAdiar = 0; save(); render(); refreshSheet(); toast(S().bkLembrar ? 'Lembrete de backup ligado' : 'Lembrete de backup desligado'); },
   'open-settings': () => sheetSettings(),
   'set': el => setValue(el.dataset.k, el.dataset.v),
   'set-ir': el => { const g = $('#' + el.dataset.id), sh = $('#ov .sheet'); if (!g || !sh) return; sh.scrollTo({ top: sh.scrollTop + g.getBoundingClientRect().top - sh.getBoundingClientRect().top - 12, behavior: 'smooth' }); },
