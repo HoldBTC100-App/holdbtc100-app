@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="App do Projeto Hold BTC 100: registre seus aportes mensais em bitcoin, acompanhe preço médio e resultado, gerencie UTXOs e aprenda autocustódia.">
 <title>Hold BTC 100</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-t90MJa9dHYNUR55Tj0i5AhfjpDldn3ZaWquOLd6WL2g='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-MNGOoJXSULUXbdcsYQkR9TYS+bhfoLIAaEfq/JzNm5I='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -30,7 +30,7 @@
   --ink:#111111; --muted:#5C5C5C; --line:#E2E2E2; --line-2:#ECECEC;
   --pos:#17773A; --pos-bg:rgba(23,119,58,.11); --neg:#B42318; --neg-bg:rgba(180,35,24,.10);
   --warn:#8F4D00; --warn-bg:rgba(247,147,26,.18); --focus:#000; --overlay:rgba(0,0,0,.45); --cell-miss:#E6E6E6;
-  --cell-miss-ink:#6E6E6E; --cell-fut:#D4D4D4; --cell-sale:#17773A; --cell-sale-ink:#FFFFFF; --tip-bg:#111111; --tip-ink:#FFFFFF; --cta:#000000; --on-cta:#FFFFFF; --hero-chip:#FFFFFF; --hero-chip-ink:#5C5C5C;
+  --cell-miss-ink:#6E6E6E; --cell-fut:#D4D4D4; --cell-sale:#17773A; --cell-sale-ink:#FFFFFF; --tip-bg:#111111; --tip-ink:#FFFFFF; --cta:#000000; --on-cta:#FFFFFF; --hero-chip:#FFFFFF; --hero-chip-ink:#3D3D3D;
   --f:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
   --fc:"Barlow Condensed","Arial Narrow","Roboto Condensed",sans-serif-condensed,sans-serif;
   color-scheme:light; box-sizing:border-box;
@@ -41,7 +41,7 @@
   --ink:#F2F2F2; --muted:#A6A6A6; --line:#2A2A2A; --line-2:#1F1F1F;
   --pos:#57C786; --pos-bg:rgba(87,199,134,.14); --neg:#FF8373; --neg-bg:rgba(255,131,115,.13);
   --warn:#F6B45A; --warn-bg:rgba(247,147,26,.16); --focus:#F7931A; --overlay:rgba(0,0,0,.65); --cell-miss:#2A2A2A;
-  --cell-miss-ink:#8C8C8C; --cell-fut:#2A2A2A; --cell-sale:#57C786; --cell-sale-ink:#000000; --tip-bg:#F2F2F2; --tip-ink:#000000; --hero-chip:#000000; --hero-chip-ink:#A6A6A6;
+  --cell-miss-ink:#8C8C8C; --cell-fut:#2A2A2A; --cell-sale:#57C786; --cell-sale-ink:#000000; --tip-bg:#F2F2F2; --tip-ink:#000000; --hero-chip:#000000; --hero-chip-ink:#DADADA;
   color-scheme:dark;
 }}
 :root[data-theme="dark"]{
@@ -49,7 +49,7 @@
   --ink:#F2F2F2; --muted:#A6A6A6; --line:#2A2A2A; --line-2:#1F1F1F;
   --pos:#57C786; --pos-bg:rgba(87,199,134,.14); --neg:#FF8373; --neg-bg:rgba(255,131,115,.13);
   --warn:#F6B45A; --warn-bg:rgba(247,147,26,.16); --focus:#F7931A; --overlay:rgba(0,0,0,.65); --cell-miss:#2A2A2A;
-  --cell-miss-ink:#8C8C8C; --cell-fut:#2A2A2A; --cell-sale:#57C786; --cell-sale-ink:#000000; --tip-bg:#F2F2F2; --tip-ink:#000000; --hero-chip:#000000; --hero-chip-ink:#A6A6A6;
+  --cell-miss-ink:#8C8C8C; --cell-fut:#2A2A2A; --cell-sale:#57C786; --cell-sale-ink:#000000; --tip-bg:#F2F2F2; --tip-ink:#000000; --hero-chip:#000000; --hero-chip-ink:#DADADA;
   color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:border-box}
@@ -92,9 +92,14 @@ p{margin:0 0 12px}
 .hero-label{font-size:15px;color:var(--muted);margin:0 0 2px;display:flex;align-items:center;gap:8px}
 .stack-num{font-family:var(--fc);font-weight:800;font-size:clamp(48px,15vw,68px);line-height:.92;letter-spacing:-.005em;margin:0;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;border:0;background:none;padding:0;text-align:left}
 .stack-num .u{font-size:.36em;font-weight:700;color:var(--muted);letter-spacing:.01em}
-.hero-sub{font-size:16px;margin:8px 0 10px;color:var(--ink)}
-.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 11px;font-weight:600;font-size:14.5px}
-.chip.pos{background:var(--pos-bg)} .chip.neg{background:var(--neg-bg)} .chip.neutral{background:var(--surface-2);color:var(--muted)}
+/* 1.8.30: valor em dinheiro em destaque; box de status com a geometria do botão principal (largura toda, canto 14 px, 50 px) */
+.hero-fiat{display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 10px;margin:10px 0 0}
+.hero-fiat b{font-family:var(--fc);font-weight:800;font-size:clamp(30px,9.4vw,38px);line-height:1;letter-spacing:-.005em}
+.hero-alt{font-size:15px;color:var(--muted);font-variant-numeric:tabular-nums}
+.hero-status{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:50px;margin:14px 0 0;padding:8px 16px;border-radius:14px;background:var(--hero-chip);color:var(--hero-chip-ink);font-weight:600;font-size:15px;line-height:1.25;text-align:center}
+.hero-status .ic{flex:none;display:grid;place-items:center}
+.hero-status .ic svg{width:19px;height:19px}
+.hero-status.pos{color:var(--pos)} .hero-status.neg{color:var(--neg)}
 
 /* months grid */
 .cell.multi::after{content:"";position:absolute;right:3px;top:3px;width:5px;height:5px;border-radius:50%;background:var(--on-orange)}
@@ -486,7 +491,6 @@ button.io:active{background:var(--surface-2)}
 .hero .btn-p{background:var(--cta);color:var(--on-cta)}
 .hero .btn-p:active{background:#2B2B2B}
 .hero .btn-o{border-color:#000;color:#000}
-.hero .chip.neutral{background:var(--hero-chip);color:var(--hero-chip-ink)}
 .hero .link-btn{text-decoration-color:#000}
 .brand img{width:40px;height:40px;object-fit:contain;padding:4px;box-sizing:border-box;background:#000;border-radius:50%}
 
@@ -548,7 +552,8 @@ a.set-row{color:inherit;text-decoration:none}
 .ptx-coin .a small{display:block;font-size:12.5px;color:var(--muted)}
 
 /* cotação do bitcoin no topo do Início (1.8.5) */
-.hero-price{position:relative;display:block;width:100%;margin:14px 0 0;padding:10px 26px 2px 0;border:0;border-top:1px solid rgba(0,0,0,.2);background:none;color:#000;font:inherit;text-align:left}
+.hero-price{position:relative;display:block;width:100%;margin:16px 0 0;padding:12px 26px 0 0;border:0;border-top:1px solid rgba(0,0,0,.2);background:none;color:#000;font:inherit;text-align:left}
+.hero-price+.btn{margin-top:16px}   /* 1.8.30: respiro entre a cotação e o botão, simétrico ao de cima */
 .hero-price .pv{display:flex;align-items:baseline;gap:8px}
 .hero-price .k{font-size:14.5px;color:var(--muted)}
 .hero-price b{font-family:var(--fc);font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
@@ -585,13 +590,12 @@ input.inp[readonly]{color:var(--muted)}
 .seg button[disabled]{opacity:.45;cursor:not-allowed}
 
 /* 1.8.22 (polimento da auditoria, M1 a M10) */
-h1,h2,h3,p,li,b,strong,small,label,.k,.v,.t,.d,.sub,.lead,.note,.hint,.tool b,.tool span,.chip,.sec-t{overflow-wrap:anywhere}
+h1,h2,h3,p,li,b,strong,small,label,.k,.v,.t,.d,.sub,.lead,.note,.hint,.tool b,.tool span,.hero-status,.sec-t{overflow-wrap:anywhere}
 .row,.tool,.set-row,.addr-row,.utxo,.rcpt,.receipt li,.sec-head,.switch>span{min-width:0}
 .row-btn{grid-template-columns:minmax(0,1fr) auto}
 .row-btn .a,.row-btn .b,.wg-head b{min-width:0;overflow-wrap:anywhere}
 .wg-head span{flex:none;max-width:55%}
 .hero-price.velha .a{display:inline-block;margin-top:3px;background:#000;color:#fff;border-radius:999px;padding:3px 10px;font-weight:600}
-.set-atalhos{margin:2px 0 14px;flex-wrap:wrap}
 .toast{display:flex;align-items:center;gap:12px;width:max-content}
 .toast-act{flex:none;background:transparent;border:1.5px solid currentColor;border-radius:999px;color:inherit;font:inherit;font-weight:800;padding:5px 12px;cursor:pointer;white-space:nowrap}
 .pin-forca{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:8px 0 2px}
@@ -606,6 +610,34 @@ h1,h2,h3,p,li,b,strong,small,label,.k,.v,.t,.d,.sub,.lead,.note,.hint,.tool b,.t
 .bk-card{margin:14px 14px 0;padding:14px;background:var(--surface);border:1px solid var(--line);border-radius:16px}
 .bk-card h2{font-family:var(--fc);font-weight:700;font-size:20px;line-height:1.15;margin:0 0 4px}
 .bk-card p{margin:0 0 12px;font-size:14.5px;color:var(--muted)}
+/* Configurações em acordeão (1.8.30): Aporte e Meta abertos; as outras seis seções numa lista, uma aberta por vez, com o resumo */
+.set-accs{margin:2px 0 8px;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.set-acc+.set-acc{border-top:1px solid var(--line)}
+.set-acc h3{margin:0;font:inherit}
+.set-acc-h{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:1px 12px;width:100%;min-height:62px;padding:10px 12px 10px 16px;border:0;border-radius:0;background:none;color:var(--ink);text-align:left;touch-action:manipulation}
+.set-acc-h:active{background:var(--surface-2)}
+.set-acc-h:focus-visible{outline-offset:-3px;border-radius:14px}
+.set-acc-h .t{font-family:var(--fc);font-weight:700;font-size:20px;line-height:1.15}
+.set-acc-h .d{grid-column:1;font-size:13.5px;line-height:1.3;color:var(--muted);min-width:0}
+.set-acc-h .chev{grid-column:2;grid-row:1/3;display:grid;place-items:center;width:30px;height:30px;color:var(--muted);transition:transform .18s ease}
+.set-acc-h .chev svg{width:20px;height:20px}
+.set-acc.on .set-acc-h .chev{transform:rotate(180deg);color:var(--ink)}
+.set-acc.on .set-acc-h .d{color:var(--ink)}
+.set-acc-p{padding:0 16px 10px}
+.set-acc-p>.field:first-child{margin-top:4px}
+.set-acc-p>.switch:last-child,.set-acc-p>.set-row:last-child,.set-acc-p>a.set-row:last-child{border-bottom:0}
+.set-acc-p>.hint:last-child{margin-bottom:4px}
+/* lição concluída (1.8.30): o teste respondido some e fica o resultado, com "Refazer o teste" */
+.quiz-feito{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;margin:26px 0 8px;padding:14px 14px 14px 16px;border-radius:18px;background:var(--surface);border:1px solid var(--line)}
+.quiz-feito .ic{display:grid;place-items:center;width:34px;height:34px;border-radius:50%}
+.quiz-feito .ic svg{width:18px;height:18px}
+.quiz-feito .ic.ok{background:var(--orange);color:#000}
+.quiz-feito .ic.nok{background:var(--surface-2);color:var(--ink)}
+.quiz-feito .t b{display:block;font-weight:700}
+.quiz-feito .t small{display:block;font-size:13.5px;color:var(--muted)}
+.quiz-feito .btn{flex:none}
+.refazer-testes{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px;margin:12px 0 0}
+@media (max-width:359px){.quiz-feito{grid-template-columns:auto minmax(0,1fr)}.quiz-feito .btn{grid-column:1/-1}}
 
 .ic{display:block;width:24px;height:24px}
 </style>
@@ -904,7 +936,7 @@ const KS_CARDS = {
    Claude, sem PIN, também espelha num documento privado.
    ========================================================= */
 
-const APP_VERSION = '1.8.29';
+const APP_VERSION = '1.8.30';
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const HIST = {"start":"2015-01","usd":[269,236,249,240,233,247,274,257,233,275,346,404,400,404,427,433,490,602,649,600,593,655,724,855,967,1075,1126,1210,1817,2384,2684,3787,4520,5404,8338,12178,12166,10318,8680,8122,8372,6952,7096,7394,6818,6489,5192,3887,3595,3654,3979,4704,6942,9680,10459,9914,9056,8766,8345,7372,8268,8948,7481,7512,9050,9296,10232,11509,11218,12286,16730,24328,31072,39024,51906,58338,47486,36155,38354,44318,45439,52582,59166,51586,42365,40791,44360,41879,35044,25823,21591,21674,19744,19962,18841,16851,19838,23126,25804,28897,28234,28846,29858,27587,26456,30805,36179,39982,42444,51946,66244,65986,64146,65194,63729,61864,61188,66861,83364,95022,97976,93433,83444,88373,99394,105848,111410,111996,111124,111840,99685,88638,83198,72854,67640,72356,75048,66150,60768,70714,81095,80570],"brl":[708,663,783,731,714,768,883,904,911,1067,1307,1564,1620,1603,1583,1542,1734,2062,2125,1926,1930,2088,2418,2866,3091,3338,3522,3795,5832,7858,8605,11932,14171,17247,27175,40087,39062,33444,28462,27676,30443,26233,27169,29059,28068,24388,19662,15101,13451,13608,15305,18328,27776,37353,39528,39856,37326,35825,34676,30296,34306,38845,36536,40003,51073,48305,54030,62853,60569,69121,90640,125185,166425,211371,293069,324482,251253,181928,197777,232745,239904,291307,328780,291530,234452,211975,220398,199260,173644,130385,115903,111476,103397,104809,99381,88340,103169,119603,134475,145054,140682,139952,143345,135273,130613,156021,177216,195797,208587,257883,329902,338449,329261,351333,353186,343509,339079,376033,484100,579349,589992,538697,479536,511123,563308,587149,615933,610031,596450,602314,532408,483352,444108,378882,353863,364172,374017,339193,310759,364403,417209,413273]}; // médias mensais estimadas: {start:'2015-01', usd:[…], brl:[…]}
 const REF_PRICE = { BRL: 416900, USD: 75800, EUR: 68000, at: Date.UTC(2026, 10, 7, 18, 0), src: 'ref' }; // US$ do CoinLore × PTAX de 06/11/2026 (R$ 5,50; € 6,13)
@@ -1014,7 +1046,7 @@ function defaultState() {
   };
 }
 let state = defaultState();
-const ui = { tab: 'home', page: null, arg: null, sel: new Set(), selMode: false, showSpent: false, sheet: null, form: {}, locked: false, hiddenAt: 0, sim: null, irYear: null, gl: '', stack: [], hl: null, tabTop: {} };
+const ui = { tab: 'home', page: null, arg: null, sel: new Set(), selMode: false, showSpent: false, sheet: null, form: {}, locked: false, hiddenAt: 0, sim: null, irYear: null, gl: '', stack: [], hl: null, tabTop: {}, setSec: null, quizAberto: null };
 const caps = { downloads: null };
 const cur = () => state.settings.currency;
 const S = () => state.settings;
@@ -1409,7 +1441,10 @@ const I = {
   close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
   up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>',
   down: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>',
-  ext: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>'
+  ext: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
+  ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.6v.1"/></svg>',
+  chev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>'
 };
 const extLink = (url, inner, cls = '') => `<a class="${cls}" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${inner}</a>`;
 
@@ -1438,10 +1473,11 @@ function viewHome() {
   const big = sats ? fmtSats(c.hold) : fmtBTC(c.hold);
   const alt = sats ? fmtBTC(c.hold) + ' BTC' : fmtSats(c.hold) + ' sats';
   const map = monthsMap(), st = streak(map);
+  // 1.8.30: o valor da pilha em dinheiro ganha destaque logo abaixo dos sats, com a outra unidade menor ao lado
   let h = `<section class="hero">
     <p class="hero-label">Sua pilha</p>
     <button class="stack-num" data-act="toggle-unit" aria-label="Trocar entre sats e BTC">${priv(big)}<span class="u">${sats ? 'sats' : 'BTC'}</span></button>
-    <p class="hero-sub">${priv(alt)} · ${MV(c.value)}</p>
+    <p class="hero-fiat"><b class="num"><span class="sr">Valor hoje: </span>${MV(c.value)}</b><span class="hero-alt">${priv(alt)}</span></p>
     ${resultChip(c)}
     ${heroPrice(c)}
     ${ctaAporte(map)}
@@ -1529,10 +1565,12 @@ function grafPilha() {
 }
 function grafRedesenha() { const el = $('#graf-pilha'); if (el) el.outerHTML = grafPilha(); }
 function grafVai(i) { const n = grafDados().length; if (n < 2) return; ui.grafSel = Math.max(0, Math.min(n - 1, i)); grafRedesenha(); const g = $('#graf-pilha .graf-svg'); if (g) g.focus({ preventScroll: true }); }
+/* Box de status do topo (1.8.30): a mesma geometria do botão "Registrar aporte" logo abaixo (largura toda, canto de 14 px,
+   50 px de altura). Não é botão: leva um ícone, fonte mais leve e nenhum efeito de toque. */
 function resultChip(c) {
-  if (!c.invested) return `<span class="chip neutral">O resultado aparece depois do primeiro aporte</span>`;
+  if (!c.invested) return `<p class="hero-status neutral"><span class="ic">${I.info}</span><span>O resultado aparece após o 1º aporte</span></p>`;
   const pos = c.result >= 0;
-  return `<span class="chip ${pos ? 'pos' : 'neg'}">${esc(fmtPct(c.pct))} · ${S().hide ? OCULTO : esc((pos ? '+' : '−') + fmtV(Math.abs(c.result)))}${cotVelha() ? ` · cotação de ${esc(cotDia())}` : ''}</span>`;
+  return `<p class="hero-status ${pos ? 'pos' : 'neg'}"><span class="ic">${pos ? I.up : I.down}</span><span><span class="sr">Resultado: </span>${esc(fmtPct(c.pct))} · ${S().hide ? OCULTO : esc((pos ? '+' : '−') + fmtV(Math.abs(c.result)))}${cotVelha() ? ` · cotação de ${esc(cotDia())}` : ''}</span></p>`;
 }
 /* cotação do bitcoin no topo do Início; o toque abre a cotação (atualizar ou informar à mão) */
 /* Cotação velha (1.8.22, auditoria M4): a de referência embutida ou uma com mais de 1 hora ganha um selo no topo, e o
@@ -1792,9 +1830,10 @@ function lessonRow(l) {
 function viewAprender() {
   setTimeout(mpStart, 0);
   const done = LESSONS.filter(l => state.learn.done[l.id]).length, pct = done / LESSONS.length, C = 2 * Math.PI * 27;
+  const feitos = LESSONS.filter(l => state.learn.done[l.id] && state.learn.quiz[l.id] != null).length;   // testes que não aparecem mais (1.8.30)
   const more = (arr, key, n) => { const open = ui[key]; const list = open ? arr : arr.slice(0, n); return `<div class="links">${list.map(([t, u]) => extLink(u, `<b>${esc(t)}</b><span class="ext">${I.ext}</span>`)).join('')}</div>${arr.length > n ? `<p><button class="link-btn" data-act="toggle-ui" data-k="${key}">${open ? 'Mostrar menos' : `Ver todos (${arr.length})`}</button></p>` : ''}`; };
   return `${mempoolHTML()}<section class="sec"><div class="progress"><svg class="ring" viewBox="0 0 64 64" role="img" aria-label="${done} de ${LESSONS.length} lições concluídas"><circle class="bgc" cx="32" cy="32" r="27"/>${done ? `<circle class="fgc" cx="32" cy="32" r="27" stroke-dasharray="${(C * pct).toFixed(1)} ${C.toFixed(1)}"/>` : ''}<text x="32" y="38" text-anchor="middle">${done}</text></svg><div><h1 class="sec-t" style="font-size:28px;margin:0">Aprender</h1><p class="muted small" style="margin:0">${done} de ${LESSONS.length} lições da trilha do holder</p></div></div></section>
-  <section class="sec"><h2 class="sec-t">Trilha do holder</h2>${LESSONS.map(lessonRow).join('')}</section>
+  <section class="sec"><h2 class="sec-t">Trilha do holder</h2>${LESSONS.map(lessonRow).join('')}${feitos ? `<p class="refazer-testes"><span class="small muted">${feitos === 1 ? '1 teste respondido não aparece mais na lição concluída.' : `${feitos} testes respondidos não aparecem mais nas lições concluídas.`}</span><button class="link-btn" data-act="quiz-refazer-todos">Refazer os testes</button></p>` : ''}</section>
   <section class="sec"><h2 class="sec-t">Ferramentas</h2>
     <button class="tool" data-act="page" data-page="sim"><b>Se eu tivesse começado antes</b><span>Aporte mensal desde 2015, com preços históricos</span><span class="chev" aria-hidden="true">›</span></button>
     <button class="tool" data-act="page" data-page="ir"><b>Relatório para o IR</b><span>Custo de aquisição e quantidade em 31/12</span><span class="chev" aria-hidden="true">›</span></button>
@@ -1848,9 +1887,15 @@ function pageLesson() {
   const body = l.body.map(b => b.p ? `<p>${b.p}</p>` : b.h ? `<h3>${esc(b.h)}</h3>` : b.list ? `<ul>${b.list.map(x => `<li>${x}</li>`).join('')}</ul>` : b.tip ? `<div class="tip">${b.tip}${b.act ? `<br><button class="btn btn-q btn-s" data-act="${b.act}">${esc(b.actLabel)}</button>` : ''}</div>` : b.ks ? ksCard(b.ks) : '').join('');
   const q = l.quiz;
   const opts = q.o.map((o, k) => { let cls = 'opt'; if (ans != null) { if (k === q.a) cls += ' right'; else if (k === ans) cls += ' wrong'; } return `<button class="${cls}" data-act="quiz" data-id="${l.id}" data-k="${k}" ${ans != null ? 'aria-disabled="true"' : ''}>${esc(o)}</button>`; }).join('');
+  // 1.8.30: concluída a lição, o teste respondido deixa de aparecer; fica o resultado e "Refazer o teste" (ou "Refazer os
+  // testes", no Aprender). Logo depois de responder ou de pedir para refazer (ui.quizAberto), o teste continua na tela.
+  const acertou = ans === q.a, fechado = done && ans != null && ui.quizAberto !== l.id;
+  const quiz = fechado
+    ? `<div class="quiz-feito"><span class="ic ${acertou ? 'ok' : 'nok'}" aria-hidden="true">${acertou ? I.ok : I.close}</span><span class="t"><b>Lição concluída</b><small>Teste rápido: você ${acertou ? 'acertou' : 'errou'}.</small></span><button class="btn btn-q btn-s" data-act="quiz-refazer" data-id="${l.id}">Refazer o teste</button></div>`
+    : `<div class="quiz"><h3>Teste rápido</h3><p style="font-weight:600">${esc(q.q)}</p>${opts}${ans != null ? `<p class="why"><b class="${acertou ? 'pos' : 'neg'}">${acertou ? 'Isso mesmo.' : 'Não exatamente.'}</b> ${esc(q.why)}</p>` : ''}</div>
+    ${done ? `<p class="pos" style="font-weight:700">Lição concluída.</p>` : `<button class="btn btn-p block" data-act="lesson-done" data-id="${l.id}" ${ans == null ? 'disabled' : ''}>${ans == null ? 'Responda o teste para concluir' : 'Concluir lição'}</button>`}`;
   return `${pageHead('Lição ' + (i + 1) + ' de ' + LESSONS.length)}<article class="article"><h2 class="lt">${esc(l.title)}</h2><p class="ls">${esc(l.sum)}</p>${body}
-    <div class="quiz"><h3>Teste rápido</h3><p style="font-weight:600">${esc(q.q)}</p>${opts}${ans != null ? `<p class="why"><b class="${ans === q.a ? 'pos' : 'neg'}">${ans === q.a ? 'Isso mesmo.' : 'Não exatamente.'}</b> ${esc(q.why)}</p>` : ''}</div>
-    ${done ? `<p class="pos" style="font-weight:700">Lição concluída.</p>` : `<button class="btn btn-p block" data-act="lesson-done" data-id="${l.id}" ${ans == null ? 'disabled' : ''}>${ans == null ? 'Responda o teste para concluir' : 'Concluir lição'}</button>`}
+    ${quiz}
     ${next ? `<button class="btn btn-o block" style="margin-top:10px" data-act="lesson" data-id="${next.id}">Próxima: ${esc(next.title)}</button>` : ''}</article>`;
 }
 function simulate(start, amount, c) {
@@ -2379,12 +2424,59 @@ function saveManualPrice() {
 /* ---------------- configurações ---------------- */
 // política de privacidade (exigência da Play Store: link dentro do app). Na prévia, a página do site de teste (1.8.12)
 const PRIV_URL = IN_CLAUDE ? 'https://holdbtc100-app.github.io/privacidade.html' : 'privacidade.html';
+/* Configurações (1.8.30, pedido do Nicolas): Aporte e Meta sempre abertos no topo; Exibição, Carteira, Segurança, Conexão,
+   Dados e Sobre num acordeão, uma seção aberta por vez, cada uma com o resumo do estado dela. A seção aberta fica em
+   ui.setSec: a folha aberta a partir das Configurações (Exportar, Criar PIN...) volta com a mesma seção aberta e na mesma
+   rolagem, e salvar algo dentro dela também; a engrenagem abre com todas fechadas. Substitui os atalhos do topo (1.8.22). */
+const SET_SECS = [['exib', 'Exibição'], ['cart', 'Carteira'], ['seg', 'Segurança'], ['con', 'Conexão'], ['dados', 'Dados'], ['sobre', 'Sobre']];
+function setResumo(k) {
+  const s = S();
+  if (k === 'exib') return `${fxPairOk() ? `Valores em ${curSym(vcur())} · ` : ''}${unitName()} · tema ${s.theme === 'light' ? 'claro' : s.theme === 'dark' ? 'escuro' : 'automático'}${s.hide ? ' · valores ocultos' : ''}`;
+  if (k === 'cart') return `Gestão de UTXOs ${s.utxo ? 'ligada' : 'desligada'}`;
+  if (k === 'seg') return !s.pin ? 'Sem PIN' : `PIN ativo · ${cifrado() ? 'dados criptografados' : 'só trava a tela'}${s.bio ? ' · biometria' : ''}`;
+  if (k === 'con') return s.offline ? 'Modo 100% offline: nenhuma conexão' : 'Online: cotação e taxas automáticas';
+  if (k === 'dados') return s.bkAt ? `Último backup em ${fmtDate(isoDeTs(s.bkAt))}` : 'Nenhum backup registrado';
+  return `Versão ${APP_VERSION} · contato e privacidade`;
+}
+function setCorpo(k, s, seg) {
+  if (k === 'exib') return `
+      ${viewCurField()}
+      <div class="field"><span class="lbl">Unidade principal</span>${seg('unit', [['sats', 'sats'], ['btc', 'BTC']])}</div>
+      <div class="field"><span class="lbl">Tema</span>${seg('theme', [['auto', 'Automático'], ['light', 'Claro'], ['dark', 'Escuro']])}</div>
+      <div class="switch"><span><span class="t">Ocultar valores</span><br><span class="d">Esconde saldos e valores. Também no ícone do olho.</span></span><button class="tog ${s.hide ? 'on' : ''}" data-act="toggle-hide" aria-pressed="${s.hide}" aria-label="Ocultar valores"></button></div>`;
+  if (k === 'cart') return `
+      <div class="switch"><span><span class="t">Gestão de UTXOs</span><br><span class="d">Opcional: saques, autocustódia, taxas e etiquetas.</span></span><button class="tog ${s.utxo ? 'on' : ''}" data-act="toggle-utxo" aria-pressed="${s.utxo}" aria-label="Gestão de UTXOs"></button></div>`;
+  if (k === 'seg') return `
+      ${s.pin ? `<button class="set-row" data-act="pin-change">Alterar PIN<span class="v">ativo</span></button><button class="set-row" data-act="pin-remove">Remover PIN</button>
+      <div class="field" style="margin-top:12px"><span class="lbl">Bloquear depois de</span>${seg('lockMin', [[1, '1 min'], [5, '5 min'], [15, '15 min']])}</div>
+      <div class="switch"><span><span class="t">Criptografar os dados</span><br><span class="d">${cifrado() ? `Ligada: seus registros ficam criptografados neste aparelho e só abrem com o PIN${cofre.chaves && cofre.chaves.bio ? ' ou a biometria' : ''}.` : 'Desligada: o PIN e a biometria só travam a tela, e os registros ficam guardados sem criptografia neste aparelho.'}</span></span><button class="tog ${cifrado() ? 'on' : ''}" data-act="toggle-cifra" aria-pressed="${cifrado()}" aria-label="Criptografar os dados"></button></div>
+      ${bio.ok ? `<div class="switch"><span><span class="t">Desbloquear com biometria</span><br><span class="d">${!s.bio ? 'Digital ou rosto do aparelho; o PIN continua valendo.' : !cifrado() || (cofre.chaves && cofre.chaves.bio) ? 'Ativa: abre o app com a digital ou o rosto; o PIN continua valendo.' : 'Só destrava o app já aberto: a biometria deste aparelho não foi liberada para os dados criptografados. Desligue e ligue para tentar de novo, ou desligue a criptografia acima.'}</span></span><button class="tog ${s.bio ? 'on' : ''}" data-act="toggle-bio" aria-pressed="${!!s.bio}" aria-label="Biometria"></button></div>` : ''}`
+      : `<button class="set-row" data-act="pin-set">Criar PIN de acesso<span class="v">desligado</span></button>`}
+      <p class="hint">${!s.pin ? 'Com um PIN, seus registros ficam criptografados neste aparelho. ' : IN_CLAUDE && cifrado() ? 'Nesta prévia, a cópia na sua conta do Claude fica pausada enquanto a criptografia estiver ligada. ' : ''}Os registros não incluem chaves nem seed.</p>`;
+  if (k === 'con') return `
+      <div class="switch"><span><span class="t">Modo 100% offline</span><br><span class="d">${s.offline ? 'Ligado: o app não se conecta à internet e a cotação é informada por você.' : 'Desligado: o app busca a cotação e as taxas da rede sozinho.'}</span></span><button class="tog ${s.offline ? 'on' : ''}" data-act="toggle-offline" aria-pressed="${!!s.offline}" aria-label="Modo 100% offline"></button></div>
+      ${s.offline ? `<button class="set-row" data-act="price-sheet">Atualizar a cotação<span class="v">${esc(fmtV(priceNow(vcur()), 0))} · ${esc(priceAge())}</span></button>` : ''}`;
+  if (k === 'dados') return `
+      <button class="set-row" data-act="export">Exportar (CSV ou backup)</button>
+      <button class="set-row" data-act="import">Importar (planilha, CSV ou backup)</button>
+      <div class="switch"><span><span class="t">Lembrar de fazer backup</span><br><span class="d">${s.bkAt ? `Último backup em ${fmtDate(isoDeTs(s.bkAt))}.` : 'Nenhum backup registrado neste aparelho.'} O Início avisa quando o backup tem 30 dias e os registros mudaram.</span></span><button class="tog ${s.bkLembrar !== false ? 'on' : ''}" data-act="bk-lembrar" aria-pressed="${s.bkLembrar !== false}" aria-label="Lembrar de fazer backup"></button></div>
+      <button class="set-row" data-act="price-sheet">Cotação<span class="v">${esc(fmtV(priceNow(vcur()), 0))}</span></button>
+      ${deferredInstall ? `<button class="set-row" data-act="install">Instalar o app neste aparelho</button>` : ''}
+      <button class="set-row" data-act="wipe" style="color:var(--neg)">Apagar todos os dados</button>`;
+  return `<p class="small muted">App do Projeto Hold BTC 100: R$ 100 em bitcoin todo mês, registrado e guardado no longo prazo. Funciona offline e sem cadastro. Preços históricos: CoinLore (BTC/USD) e Banco Central (PTAX). Cotação ao vivo: CoinGecko, Binance e mempool.space. Dólar do dia, só com os valores na outra moeda: Banco Central (PTAX), com o BCE de reserva. No modo 100% offline, o app não faz nenhuma conexão. Não é recomendação de investimento.</p>
+      ${extLink('https://t.me/nicolasmaia42', 'Contato<span class="v">Telegram @nicolasmaia42</span>', 'set-row')}
+      ${extLink('https://t.me/HoldBTC100', 'Grupo do projeto<span class="v">Telegram @HoldBTC100</span>', 'set-row')}
+      ${extLink(PRIV_URL, `Política de privacidade<span class="v">${I.ext}</span>`, 'set-row')}`;
+}
 function sheetSettings() {
   openSheet('settings', () => {
     const s = S(), locked = state.aportes.length > 0;
     const seg = (key, opts) => `<div class="seg">${opts.map(([v, l]) => `<button class="${s[key] === v ? 'on' : ''}" data-act="set" data-k="${key}" data-v="${v}">${l}</button>`).join('')}</div>`;
-    const atalhos = `<div class="chips set-atalhos" role="navigation" aria-label="Ir para um grupo">${[['set-dados', 'Dados'], ['set-seg', 'Segurança'], ['set-con', 'Conexão'], ['set-exib', 'Exibição'], ['set-sobre', 'Sobre']].map(([id, l]) => `<button class="chip-btn" data-act="set-ir" data-id="${id}">${l}</button>`).join('')}</div>`;   // M5 (1.8.22)
-    return `<h2>Configurações</h2><p class="sub">Versão ${APP_VERSION} · dados guardados ${cloud.on && !s.offline ? 'neste aparelho e no seu espaço privado do Claude' : `neste aparelho (${storageMode})`}${s.offline ? ' · modo 100% offline' : ''}</p>${atalhos}
+    const acc = SET_SECS.map(([k, t]) => {
+      const on = ui.setSec === k;
+      return `<div class="set-acc${on ? ' on' : ''}" id="set-${k}"><h3><button class="set-acc-h" id="set-${k}-h" data-act="set-sec" data-sec="${k}" aria-expanded="${on}" aria-controls="set-${k}-p"><span class="t">${t}</span><span class="d">${esc(setResumo(k))}</span><span class="chev">${I.chev}</span></button></h3><div class="set-acc-p" id="set-${k}-p" role="region" aria-labelledby="set-${k}-h"${on ? '' : ' hidden'}>${on ? setCorpo(k, s, seg) : ''}</div></div>`;
+    }).join('');
+    return `<h2>Configurações</h2><p class="sub">Versão ${APP_VERSION} · dados guardados ${cloud.on && !s.offline ? 'neste aparelho e no seu espaço privado do Claude' : `neste aparelho (${storageMode})`}${s.offline ? ' · modo 100% offline' : ''}</p>
     <div class="set-group"><h3>Aporte</h3>
       <div class="field"><span class="lbl">Moeda dos aportes</span>${locked ? `<p class="small muted" style="margin:0">${s.currency} · para trocar, exporte um backup e comece um registro novo.${fxPairOk() ? ` Para só ver os valores em ${s.currency === 'USD' ? 'R$' : 'US$'}, use Exibição › Moeda dos valores.` : ''}</p>` : seg('currency', [['BRL', 'R$'], ['USD', 'US$'], ['EUR', '€']])}</div>
       <div class="two"><div class="field"><label for="s-m">Valor mensal (${curSym()})</label><input placeholder="0,00" class="inp" id="s-m" inputmode="decimal" data-num="money" value="${fmtInput(s.monthly)}" data-chg="monthly"></div>
@@ -2392,35 +2484,21 @@ function sheetSettings() {
       <div class="btn-row"><button class="btn btn-q btn-s" data-act="calendar">Lembrete no Google Agenda</button>${!caps.downloads && !IN_CLAUDE ? '<button class="btn btn-q btn-s" data-act="ics">Baixar lembrete .ics</button>' : ''}</div></div>
     <div class="set-group"><h3>Meta</h3><div class="chips" id="goal">${[[1e6, '1 milhão de sats'], [5e6, '5 milhões'], [1e7, '0,1 BTC'], [5e7, '0,5 BTC'], [1e8, '1 BTC']].map(([v, l]) => `<button class="chip-btn ${s.goalSats === v ? 'on' : ''}" data-act="set" data-k="goalSats" data-v="${v}">${l}</button>`).join('')}</div>
       <div class="field" style="margin-top:10px"><label for="s-g">Outra meta (${unitName()})</label><input class="inp" id="s-g" ${amtAttrs()} placeholder="${amtIn(s.goalSats)}" data-chg="goalSats"></div></div>
-    <div class="set-group" id="set-exib"><h3>Exibição</h3>
-      ${viewCurField()}
-      <div class="field"><span class="lbl">Unidade principal</span>${seg('unit', [['sats', 'sats'], ['btc', 'BTC']])}</div>
-      <div class="field"><span class="lbl">Tema</span>${seg('theme', [['auto', 'Automático'], ['light', 'Claro'], ['dark', 'Escuro']])}</div>
-      <div class="switch"><span><span class="t">Ocultar valores</span><br><span class="d">Esconde saldos e valores. Também no ícone do olho.</span></span><button class="tog ${s.hide ? 'on' : ''}" data-act="toggle-hide" aria-pressed="${s.hide}" aria-label="Ocultar valores"></button></div></div>
-    <div class="set-group"><h3>Carteira</h3>
-      <div class="switch"><span><span class="t">Gestão de UTXOs</span><br><span class="d">Opcional: saques, autocustódia, taxas e etiquetas.</span></span><button class="tog ${s.utxo ? 'on' : ''}" data-act="toggle-utxo" aria-pressed="${s.utxo}" aria-label="Gestão de UTXOs"></button></div></div>
-    <div class="set-group" id="set-seg"><h3>Segurança</h3>
-      ${s.pin ? `<button class="set-row" data-act="pin-change">Alterar PIN<span class="v">ativo</span></button><button class="set-row" data-act="pin-remove">Remover PIN</button>
-        <div class="field" style="margin-top:12px"><span class="lbl">Bloquear depois de</span>${seg('lockMin', [[1, '1 min'], [5, '5 min'], [15, '15 min']])}</div>
-        <div class="switch"><span><span class="t">Criptografar os dados</span><br><span class="d">${cifrado() ? `Ligada: seus registros ficam criptografados neste aparelho e só abrem com o PIN${cofre.chaves && cofre.chaves.bio ? ' ou a biometria' : ''}.` : 'Desligada: o PIN e a biometria só travam a tela, e os registros ficam guardados sem criptografia neste aparelho.'}</span></span><button class="tog ${cifrado() ? 'on' : ''}" data-act="toggle-cifra" aria-pressed="${cifrado()}" aria-label="Criptografar os dados"></button></div>
-        ${bio.ok ? `<div class="switch"><span><span class="t">Desbloquear com biometria</span><br><span class="d">${!s.bio ? 'Digital ou rosto do aparelho; o PIN continua valendo.' : !cifrado() || (cofre.chaves && cofre.chaves.bio) ? 'Ativa: abre o app com a digital ou o rosto; o PIN continua valendo.' : 'Só destrava o app já aberto: a biometria deste aparelho não foi liberada para os dados criptografados. Desligue e ligue para tentar de novo, ou desligue a criptografia acima.'}</span></span><button class="tog ${s.bio ? 'on' : ''}" data-act="toggle-bio" aria-pressed="${!!s.bio}" aria-label="Biometria"></button></div>` : ''}`
-        : `<button class="set-row" data-act="pin-set">Criar PIN de acesso<span class="v">desligado</span></button>`}
-      <p class="hint">${!s.pin ? 'Com um PIN, seus registros ficam criptografados neste aparelho. ' : IN_CLAUDE && cifrado() ? 'Nesta prévia, a cópia na sua conta do Claude fica pausada enquanto a criptografia estiver ligada. ' : ''}Os registros não incluem chaves nem seed.</p></div>
-    <div class="set-group" id="set-con"><h3>Conexão</h3>
-      <div class="switch"><span><span class="t">Modo 100% offline</span><br><span class="d">${s.offline ? 'Ligado: o app não se conecta à internet e a cotação é informada por você.' : 'Desligado: o app busca a cotação e as taxas da rede sozinho.'}</span></span><button class="tog ${s.offline ? 'on' : ''}" data-act="toggle-offline" aria-pressed="${!!s.offline}" aria-label="Modo 100% offline"></button></div>
-      ${s.offline ? `<button class="set-row" data-act="price-sheet">Atualizar a cotação<span class="v">${esc(fmtV(priceNow(vcur()), 0))} · ${esc(priceAge())}</span></button>` : ''}</div>
-    <div class="set-group" id="set-dados"><h3>Dados</h3>
-      <button class="set-row" data-act="export">Exportar (CSV ou backup)</button>
-      <button class="set-row" data-act="import">Importar (planilha, CSV ou backup)</button>
-      <div class="switch"><span><span class="t">Lembrar de fazer backup</span><br><span class="d">${s.bkAt ? `Último backup em ${fmtDate(isoDeTs(s.bkAt))}.` : 'Nenhum backup registrado neste aparelho.'} O Início avisa quando o backup tem 30 dias e os registros mudaram.</span></span><button class="tog ${s.bkLembrar !== false ? 'on' : ''}" data-act="bk-lembrar" aria-pressed="${s.bkLembrar !== false}" aria-label="Lembrar de fazer backup"></button></div>
-      <button class="set-row" data-act="price-sheet">Cotação<span class="v">${esc(fmtV(priceNow(vcur()), 0))}</span></button>
-      ${deferredInstall ? `<button class="set-row" data-act="install">Instalar o app neste aparelho</button>` : ''}
-      <button class="set-row" data-act="wipe" style="color:var(--neg)">Apagar todos os dados</button></div>
-    <div class="set-group" id="set-sobre"><h3>Sobre</h3><p class="small muted">App do Projeto Hold BTC 100: R$ 100 em bitcoin todo mês, registrado e guardado no longo prazo. Funciona offline e sem cadastro. Preços históricos: CoinLore (BTC/USD) e Banco Central (PTAX). Cotação ao vivo: CoinGecko, Binance e mempool.space. Dólar do dia, só com os valores na outra moeda: Banco Central (PTAX), com o BCE de reserva. No modo 100% offline, o app não faz nenhuma conexão. Não é recomendação de investimento.</p>
-      ${extLink('https://t.me/nicolasmaia42', 'Contato<span class="v">Telegram @nicolasmaia42</span>', 'set-row')}
-      ${extLink('https://t.me/HoldBTC100', 'Grupo do projeto<span class="v">Telegram @HoldBTC100</span>', 'set-row')}
-      ${extLink(PRIV_URL, `Política de privacidade<span class="v">${I.ext}</span>`, 'set-row')}</div>`;
+    <div class="set-accs">${acc}</div>`;
   }, { label: 'Configurações', reopen: sheetSettings });
+}
+/* Abre ou fecha uma seção. O título tocado fica no mesmo lugar da tela (a seção aberta antes, acima dele, fecha) e, ao
+   abrir, a rolagem mostra o conteúdo sem tirar o título de vista. */
+function setSecToggle(k) {
+  const sh = $('#ov .sheet'), h0 = $(`#set-${k}-h`); if (!sh || !h0) return;
+  const antes = h0.getBoundingClientRect().top;
+  ui.setSec = ui.setSec === k ? null : k; refreshSheet();
+  const h = $(`#set-${k}-h`), p = $(`#set-${k}-p`); if (!h) return;
+  sh.scrollTop += h.getBoundingClientRect().top - antes;
+  h.focus({ preventScroll: true });
+  if (ui.setSec !== k || !p) return;
+  const r = sh.getBoundingClientRect(), falta = p.getBoundingClientRect().bottom - r.bottom + 16, folga = h.getBoundingClientRect().top - r.top - 8;
+  if (falta > 0 && folga > 0) sh.scrollBy({ top: Math.min(falta, folga), behavior: 'smooth' });
 }
 function setValue(k, v) {
   const s = S();
@@ -3249,9 +3327,11 @@ const ACT = {
   // seção Vendas, no fim da aba Aportes (1.8.28): do resumo ou do Início, abaixo do topo fixo
   'ver-vendas': () => irSecao('#vendas-sec'),
   'ver-conta': () => irSecao('#conta-sec'),   // 1.8.29
-  'lesson': el => { guardaTopo(); ui.stack = []; ui.hl = null; ui.page = 'lesson'; ui.arg = el.dataset.id; closeSheet(true); render(); window.scrollTo(0, 0); },
-  'quiz': el => { const id = el.dataset.id; if (state.learn.quiz[id] != null) return; state.learn.quiz[id] = +el.dataset.k; save(); render(); const q = $('.quiz'); if (q) q.scrollIntoView({ block: 'nearest' }); },
-  'lesson-done': el => { state.learn.done[el.dataset.id] = Date.now(); save(); render(); toast('Lição concluída'); },
+  'lesson': el => { guardaTopo(); ui.stack = []; ui.hl = null; ui.page = 'lesson'; ui.arg = el.dataset.id; ui.quizAberto = null; closeSheet(true); render(); window.scrollTo(0, 0); },
+  'quiz': el => { const id = el.dataset.id; if (state.learn.quiz[id] != null) return; state.learn.quiz[id] = +el.dataset.k; ui.quizAberto = id; save(); render(); const q = $('.quiz'); if (q) q.scrollIntoView({ block: 'nearest' }); },
+  'quiz-refazer': el => { const id = el.dataset.id; delete state.learn.quiz[id]; ui.quizAberto = id; save(); render(); const q = $('.quiz'); if (q) q.scrollIntoView({ block: 'center' }); const o = $('.quiz .opt'); if (o) o.focus({ preventScroll: true }); },
+  'quiz-refazer-todos': () => confirmSheet('Refazer os testes?', 'As respostas dos testes rápidos são apagadas e os testes voltam a aparecer nas lições. As lições continuam concluídas.', 'Refazer os testes', () => { state.learn.quiz = {}; ui.quizAberto = null; save(); closeSheet(); render(); toast('Pronto: os testes voltaram para as lições'); }),
+  'lesson-done': el => { state.learn.done[el.dataset.id] = Date.now(); ui.quizAberto = null; save(); render(); toast('Lição concluída'); const f = $('.quiz-feito'); if (f) f.scrollIntoView({ block: 'nearest' }); },
   'toggle-ui': el => { ui[el.dataset.k] = !ui[el.dataset.k]; render(); },
   'edit-aporte': el => { closeSheet(true); sheetAporte(el.dataset.id); },
   'save-aporte': saveAporte,
@@ -3279,9 +3359,9 @@ const ACT = {
   'toggle-hide': () => { S().hide = !S().hide; save(); render(); refreshSheet(); },
   'bk-adiar': () => { S().bkAdiar = Date.now() + 7 * DIA; save(); render(); toast('Combinado: lembro de novo em 7 dias.'); },
   'bk-lembrar': () => { S().bkLembrar = S().bkLembrar === false; S().bkAdiar = 0; save(); render(); refreshSheet(); toast(S().bkLembrar ? 'Lembrete de backup ligado' : 'Lembrete de backup desligado'); },
-  'open-settings': () => sheetSettings(),
+  'open-settings': () => { ui.setSec = null; sheetSettings(); },
+  'set-sec': el => setSecToggle(el.dataset.sec),
   'set': el => setValue(el.dataset.k, el.dataset.v),
-  'set-ir': el => { const g = $('#' + el.dataset.id), sh = $('#ov .sheet'); if (!g || !sh) return; sh.scrollTo({ top: sh.scrollTop + g.getBoundingClientRect().top - sh.getBoundingClientRect().top - 12, behavior: 'smooth' }); },
   'desfazer': () => {
     const antes = desfazer.antes; if (!antes) return;
     desfazer.antes = null; if (fotoDados() !== desfazer.depois) return toast('Não dá mais para desfazer: os registros mudaram depois da exclusão.');
