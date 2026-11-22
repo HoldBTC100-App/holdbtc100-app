@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="App do Projeto Hold BTC 100: registre seus aportes mensais em bitcoin, acompanhe preço médio e resultado, gerencie UTXOs e aprenda autocustódia.">
 <title>Hold BTC 100</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-93lRXCzxq9eWXA/rqJjNvYeQ1pFCD+8JCe2wNk1E9SA='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eKvohYRkM2+2psc9UM1Q9XP4yrZ+aTEv3p2v8Wkzy4w='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -30,7 +30,7 @@
   --ink:#111111; --muted:#5C5C5C; --line:#E2E2E2; --line-2:#ECECEC;
   --pos:#17773A; --pos-bg:rgba(23,119,58,.11); --neg:#B42318; --neg-bg:rgba(180,35,24,.10);
   --warn:#8F4D00; --warn-bg:rgba(247,147,26,.18); --focus:#000; --overlay:rgba(0,0,0,.45); --cell-miss:#E6E6E6;
-  --cell-miss-ink:#6E6E6E; --cell-fut:#D4D4D4; --tip-bg:#111111; --tip-ink:#FFFFFF; --cta:#000000; --on-cta:#FFFFFF; --hero-chip:#FFFFFF; --hero-chip-ink:#5C5C5C;
+  --cell-miss-ink:#6E6E6E; --cell-fut:#D4D4D4; --cell-sale:#17773A; --cell-sale-ink:#FFFFFF; --tip-bg:#111111; --tip-ink:#FFFFFF; --cta:#000000; --on-cta:#FFFFFF; --hero-chip:#FFFFFF; --hero-chip-ink:#5C5C5C;
   --f:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
   --fc:"Barlow Condensed","Arial Narrow","Roboto Condensed",sans-serif-condensed,sans-serif;
   color-scheme:light; box-sizing:border-box;
@@ -41,7 +41,7 @@
   --ink:#F2F2F2; --muted:#A6A6A6; --line:#2A2A2A; --line-2:#1F1F1F;
   --pos:#57C786; --pos-bg:rgba(87,199,134,.14); --neg:#FF8373; --neg-bg:rgba(255,131,115,.13);
   --warn:#F6B45A; --warn-bg:rgba(247,147,26,.16); --focus:#F7931A; --overlay:rgba(0,0,0,.65); --cell-miss:#2A2A2A;
-  --cell-miss-ink:#8C8C8C; --cell-fut:#2A2A2A; --tip-bg:#F2F2F2; --tip-ink:#000000; --hero-chip:#000000; --hero-chip-ink:#A6A6A6;
+  --cell-miss-ink:#8C8C8C; --cell-fut:#2A2A2A; --cell-sale:#57C786; --cell-sale-ink:#000000; --tip-bg:#F2F2F2; --tip-ink:#000000; --hero-chip:#000000; --hero-chip-ink:#A6A6A6;
   color-scheme:dark;
 }}
 :root[data-theme="dark"]{
@@ -49,7 +49,7 @@
   --ink:#F2F2F2; --muted:#A6A6A6; --line:#2A2A2A; --line-2:#1F1F1F;
   --pos:#57C786; --pos-bg:rgba(87,199,134,.14); --neg:#FF8373; --neg-bg:rgba(255,131,115,.13);
   --warn:#F6B45A; --warn-bg:rgba(247,147,26,.16); --focus:#F7931A; --overlay:rgba(0,0,0,.65); --cell-miss:#2A2A2A;
-  --cell-miss-ink:#8C8C8C; --cell-fut:#2A2A2A; --tip-bg:#F2F2F2; --tip-ink:#000000; --hero-chip:#000000; --hero-chip-ink:#A6A6A6;
+  --cell-miss-ink:#8C8C8C; --cell-fut:#2A2A2A; --cell-sale:#57C786; --cell-sale-ink:#000000; --tip-bg:#F2F2F2; --tip-ink:#000000; --hero-chip:#000000; --hero-chip-ink:#A6A6A6;
   color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:border-box}
@@ -141,6 +141,7 @@ p{margin:0 0 12px}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden}
 .stats>div{background:var(--surface);padding:12px 14px}
 .stats .k{font-size:13px;color:var(--muted)}
+.stats .v+.k{display:block;line-height:1.35;margin-top:3px}
 .stats .v{font-family:var(--fc);font-weight:700;font-size:23px;line-height:1.15;font-variant-numeric:tabular-nums}
 .stats .wide{grid-column:1/-1}
 
@@ -411,8 +412,6 @@ button.io:active{background:var(--surface-2)}
 
 /* ---------- vendas e troco (v1.2) ---------- */
 .tag.s{background:var(--neg-bg);color:var(--neg)}
-.sold-box{margin:12px 0 0;padding:12px 14px 6px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
-.sold-box .receipt li{padding:7px 0}
 .chart .sale{fill:var(--neg);stroke:var(--bg);stroke-width:1.5}
 .chart-legend i.s{width:9px;height:9px;border-radius:50%;background:var(--neg);vertical-align:0}
 /* gráfico de evolução da pilha (1.8.26) */
@@ -510,6 +509,15 @@ button.io:active{background:var(--surface-2)}
 .cell.pend{border:2px dashed var(--orange);animation:pulse 2.4s ease-in-out infinite}
 .cell.pend::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--orange)}
 .cell.future{border:1.5px dotted var(--cell-fut)}
+/* mês com venda (1.8.28): verde com cifrão; com aporte e venda, dividido na diagonal, laranja com o visto e verde com o cifrão */
+.cell.venda{background:var(--cell-sale);color:var(--cell-sale-ink)}
+.cell.venda.atual{border:2px dashed var(--orange)}
+.cell .cif{font-family:var(--fc);font-weight:800;font-size:16px;line-height:1;pointer-events:none}
+.cell.ambos{background:linear-gradient(135deg,var(--orange) 0 50%,var(--cell-sale) 50% 100%)}
+.cell.ambos .g1{position:absolute;left:8%;top:8%;width:46%;height:46%;color:#000;display:grid;place-items:center;pointer-events:none}
+.cell.ambos .g1 svg{width:100%;height:100%}
+.cell.ambos .cif{position:absolute;right:13%;bottom:9%;font-size:12px;color:var(--cell-sale-ink)}
+.cell.ambos.multi::after{display:none}
 .cell.tip-on{box-shadow:0 0 0 2px var(--ink)}
 .mtip{position:absolute;z-index:6;pointer-events:none;width:180px;transform:translateX(-50%);padding:7px 10px;border-radius:10px;text-align:center;line-height:1.25;background:var(--tip-bg);color:var(--tip-ink);box-shadow:0 6px 18px rgba(0,0,0,.28)}
 .mtip b{display:block;font-size:14px}
@@ -521,6 +529,8 @@ button.io:active{background:var(--surface-2)}
 .legend i.d{background:var(--orange)}
 .legend i.x{background:var(--cell-miss)}
 .legend i.p{border:2px dashed var(--orange);box-sizing:border-box}
+.legend i.v{background:var(--cell-sale)}
+.legend i.a{background:linear-gradient(135deg,var(--orange) 0 50%,var(--cell-sale) 50% 100%)}
 .mc-hint{margin:6px 0 0;font-size:13px;color:var(--muted)}
 
 /* botão +: aporte, saque ou transação */
@@ -894,7 +904,7 @@ const KS_CARDS = {
    Claude, sem PIN, também espelha num documento privado.
    ========================================================= */
 
-const APP_VERSION = '1.8.27';
+const APP_VERSION = '1.8.28';
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const HIST = {"start":"2015-01","usd":[269,236,249,240,233,247,274,257,233,275,346,404,400,404,427,433,490,602,649,600,593,655,724,855,967,1075,1126,1210,1817,2384,2684,3787,4520,5404,8338,12178,12166,10318,8680,8122,8372,6952,7096,7394,6818,6489,5192,3887,3595,3654,3979,4704,6942,9680,10459,9914,9056,8766,8345,7372,8268,8948,7481,7512,9050,9296,10232,11509,11218,12286,16730,24328,31072,39024,51906,58338,47486,36155,38354,44318,45439,52582,59166,51586,42365,40791,44360,41879,35044,25823,21591,21674,19744,19962,18841,16851,19838,23126,25804,28897,28234,28846,29858,27587,26456,30805,36179,39982,42444,51946,66244,65986,64146,65194,63729,61864,61188,66861,83364,95022,97976,93433,83444,88373,99394,105848,111410,111996,111124,111840,99685,88638,83198,72854,67640,72356,75048,66150,60768,70714,81095,80570],"brl":[708,663,783,731,714,768,883,904,911,1067,1307,1564,1620,1603,1583,1542,1734,2062,2125,1926,1930,2088,2418,2866,3091,3338,3522,3795,5832,7858,8605,11932,14171,17247,27175,40087,39062,33444,28462,27676,30443,26233,27169,29059,28068,24388,19662,15101,13451,13608,15305,18328,27776,37353,39528,39856,37326,35825,34676,30296,34306,38845,36536,40003,51073,48305,54030,62853,60569,69121,90640,125185,166425,211371,293069,324482,251253,181928,197777,232745,239904,291307,328780,291530,234452,211975,220398,199260,173644,130385,115903,111476,103397,104809,99381,88340,103169,119603,134475,145054,140682,139952,143345,135273,130613,156021,177216,195797,208587,257883,329902,338449,329261,351333,353186,343509,339079,376033,484100,579349,589992,538697,479536,511123,563308,587149,615933,610031,596450,602314,532408,483352,444108,378882,353863,364172,374017,339193,310759,364403,417209,413273]}; // médias mensais estimadas: {start:'2015-01', usd:[…], brl:[…]}
 const REF_PRICE = { BRL: 416900, USD: 75800, EUR: 68000, at: Date.UTC(2026, 10, 7, 18, 0), src: 'ref' }; // US$ do CoinLore × PTAX de 06/11/2026 (R$ 5,50; € 6,13)
@@ -1399,7 +1409,7 @@ function viewHome() {
       <li><span class="k">Cotação de hoje</span><span class="dots"></span><button class="v" data-act="price-sheet">${esc(fmtV(c.P, 0))}<small class="${priceStale() ? 'warn' : ''}">${esc(priceAge())}${priceStale() ? ' · atualize' : ''}</small></button></li>
       ${fxTodayRow()}
       <li><span class="k">Aportes</span><span class="dots"></span><span class="v">${state.aportes.length - c.sales}${st ? `<small>${st} ${st === 1 ? 'mês' : 'meses'} seguidos</small>` : ''}</span></li>
-      ${c.sales ? `<li><span class="k">Vendas</span><span class="dots"></span><button class="v" data-act="tab" data-tab="aportes">${MV(c.proceeds)}<small>hoje valeriam ${MV(c.soldNow)}</small></button></li>` : ''}
+      ${c.sales ? `<li><span class="k">Vendas</span><span class="dots"></span><button class="v" data-act="ver-vendas">${MV(c.proceeds)}<small>lucro realizado ${S().hide ? OCULTO : esc((c.realized >= 0 ? '+' : '−') + fmtV(Math.abs(c.realized)))}</small></button></li>` : ''}
     </ul>
     ${fxNote()}
     ${goalBlock(c)}
@@ -1493,10 +1503,12 @@ function monthsGrid(map, st = 0) {
   let years = []; for (let y = fy; y <= cy; y++) years.push(y);
   let hidden = 0; const all = S().gridAll;
   if (!all && years.length > 4) { hidden = years.length - 4; years = years.slice(-4); }
-  const fiat = {}; for (const a of state.aportes) if (!isSale(a)) { const k = a.date.slice(0, 7); fiat[k] = (fiat[k] || 0) + toVa(a, a.fiat); }
+  const fiat = {}, vendas = {};
+  for (const a of state.aportes) { const k = a.date.slice(0, 7); if (!isSale(a)) fiat[k] = (fiat[k] || 0) + toVa(a, a.fiat); else { const v = vendas[k] || (vendas[k] = { n: 0, fiat: 0 }); v.n++; v.fiat += toVa(a, a.fiat); } }
+  let comVenda = false;
   const ck = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
   const xx = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M7 7l10 10M17 7 7 17"/></svg>';
-  let h = `<section class="sec months-card" aria-label="Histórico mensal de aportes"><div class="mc-head"><h2 class="sec-t">Seus meses</h2>${st ? `<span class="mc-sum">${st} ${st === 1 ? 'mês seguido' : 'meses seguidos'}</span>` : ''}</div>
+  let h = `<section class="sec months-card" aria-label="Histórico mensal de aportes e vendas"><div class="mc-head"><h2 class="sec-t">Seus meses</h2>${st ? `<span class="mc-sum">${st} ${st === 1 ? 'mês seguido' : 'meses seguidos'}</span>` : ''}</div>
     <div class="mgrid"><div class="mgrid-ml" aria-hidden="true">${'JFMAMJJASOND'.split('').map(l => `<span>${l}</span>`).join('')}</div>`;
   for (const y of years) {
     let done = 0, past = 0, row = '';
@@ -1504,15 +1516,19 @@ function monthsGrid(map, st = 0) {
       const k = `${y}-${pad2(m)}`, o = map[k], cur = y === cy && m === cm;
       if (y === cy && m > cm) { row += '<span class="cell future" aria-hidden="true"></span>'; continue; }
       if (o) { done++; past++; } else if (!cur) past++;
-      const name = `${MONTHS_FULL[m - 1]} de ${y}`;
-      const info = o ? `${o.n} ${o.n > 1 ? 'aportes' : 'aporte'}${fiat[k] ? ' · ' + (S().hide ? OCULTO : MV(fiat[k])) : ''}` : (cur ? 'aporte pendente' : 'sem aporte');
-      row += `<button class="cell ${o ? 'done' + (o.n > 1 ? ' multi' : '') : (cur ? 'pend' : 'miss')}" data-act="month" data-m="${k}" data-t1="${esc(Cap(name))}" data-t2="${esc(info)}" aria-label="${esc(name + ': ' + info)}">${o ? ck : (cur ? '' : xx)}</button>`;
+      // mês com venda (1.8.28): verde com cifrão; com aporte também, dividido na diagonal
+      const v = vendas[k]; if (v) comVenda = true;
+      const name = `${MONTHS_FULL[m - 1]} de ${y}`, din = x => S().hide ? OCULTO : MV(x);
+      const info = (o ? `${o.n} ${o.n > 1 ? 'aportes' : 'aporte'}${fiat[k] ? ' · ' + din(fiat[k]) : ''}` : (cur ? 'aporte pendente' : 'sem aporte')) + (v ? ` · ${v.n} ${v.n > 1 ? 'vendas' : 'venda'} · ${din(v.fiat)}` : '');
+      const cls = o && v ? 'ambos' + (o.n > 1 ? ' multi' : '') : o ? 'done' + (o.n > 1 ? ' multi' : '') : v ? 'venda' + (cur ? ' atual' : '') : (cur ? 'pend' : 'miss');
+      const dentro = o && v ? `<span class="g1">${ck}</span><span class="cif" aria-hidden="true">$</span>` : o ? ck : v ? '<span class="cif" aria-hidden="true">$</span>' : (cur ? '' : xx);
+      row += `<button class="cell ${cls}" data-act="month" data-m="${k}" data-t1="${esc(Cap(name))}" data-t2="${esc(info)}" aria-label="${esc(name + ': ' + info)}">${dentro}</button>`;
     }
     h += `<div class="mgrid-yh"><span class="yl">${y}</span><span class="ys">${done} de ${past} ${past === 1 ? 'mês' : 'meses'}</span></div><div class="mgrid-row">${row}</div>`;
   }
   const more = hidden ? `<button class="link-btn" data-act="grid-all">Ver ${hidden === 1 ? 'o ano anterior' : hidden + ' anos anteriores'}</button>` : (all && fy < cy - 3 ? `<button class="link-btn" data-act="grid-all">Mostrar menos</button>` : '');
   return h + `<div class="mtip" aria-hidden="true" hidden><b></b><span></span><i></i></div></div>
-    <div class="months-foot"><span class="legend"><span><i class="d"></i>com aporte</span><span><i class="x"></i>sem aporte</span><span><i class="p"></i>mês atual</span></span>${more}</div>
+    <div class="months-foot"><span class="legend"><span><i class="d"></i>com aporte</span><span><i class="x"></i>sem aporte</span><span><i class="p"></i>mês atual</span>${comVenda ? '<span><i class="v"></i>com venda</span><span><i class="a"></i>aporte e venda</span>' : ''}</span>${more}</div>
     <p class="mc-hint">Passe o dedo ou o mouse pelos meses para ver cada um.</p></section>`;
 }
 /* dica dos meses: mouse passando por cima, toque segurando ou arrastando; um toque rápido abre o mês */
@@ -1627,19 +1643,12 @@ function viewAportes() {
   const val = c.held / 1e8 * c.P, res = val + c.proceeds - c.invested, pct = c.invested ? res / c.invested : 0, unreal = val - c.cost;
   let h = `<section class="sec"><h1 class="sec-t" style="font-size:28px">Aportes</h1>
   <div class="stats">
-    <div><span class="k">Aporte total</span><div class="v">${MV(c.invested)}</div></div>
+    <div><span class="k">Aporte total</span><div class="v">${MV(c.invested)}</div>${c.sales ? `<span class="k">${MV(c.cost)} ainda aplicados</span>` : ''}</div>
     <div><span class="k">Custo médio</span><div class="v">${c.held ? MV(c.avg, 0) : '—'}</div></div>
     <div><span class="k">Em carteira</span><div class="v">${AMT(c.held)}</div></div>
     <div><span class="k">Valor atual</span><div class="v">${MV(val)}</div></div>
-    <div class="wide"><span class="k">${c.sales ? 'Lucro total, com as vendas' : 'Lucro'}</span><div class="v ${res >= 0 ? 'pos' : 'neg'}">${esc(fmtPct(pct))} · ${sg(res)}</div>${c.sales ? `<span class="k">Não realizado ${sg(unreal)} · realizado nas vendas ${sg(c.realized)}</span>` : ''}${S().utxo && c.fees ? `<span class="k">Sem descontar ${esc(amtTxt(c.fees))} de taxas de saque e de rede.</span>` : ''}</div>
+    <div class="wide"><span class="k">${c.sales ? 'Lucro total, com as vendas' : 'Lucro'}</span><div class="v ${res >= 0 ? 'pos' : 'neg'}">${esc(fmtPct(pct))} · ${sg(res)}</div>${c.sales ? `<span class="k">Não realizado ${sg(unreal)} · realizado nas vendas ${sg(c.realized)}</span><button class="link-btn small" data-act="ver-vendas" style="display:block;margin-top:6px">Ver as vendas</button>` : ''}${S().utxo && c.fees ? `<span class="k">Sem descontar ${esc(amtTxt(c.fees))} de taxas de saque e de rede.</span>` : ''}</div>
   </div>`;
-  if (c.sales) {
-    const diff = c.soldNow - c.proceeds;
-    h += `<div class="sold-box"><div class="sec-head"><b>Vendas</b><span class="small muted">${c.sales} ${c.sales === 1 ? 'venda' : 'vendas'} · ${AMT(c.sold)}</span></div>
-    <ul class="receipt"><li><span class="k">Recebido nas vendas</span><span class="dots"></span><span class="v">${MV(c.proceeds)}</span></li>
-    <li><span class="k">O que foi vendido valeria hoje</span><span class="dots"></span><span class="v">${MV(c.soldNow)}</span></li>
-    <li><span class="k">${diff >= 0 ? 'Teria a mais se não vendesse' : 'Evitou perder ao vender'}</span><span class="dots"></span><span class="v ${diff >= 0 ? 'neg' : 'pos'}">${hide ? OCULTO : esc(fmtV(Math.abs(diff)))}</span></li></ul></div>`;
-  }
   h += fxNote() + tools + `</section>`;
   if (aps.length >= 2) h += `<section class="sec"><h2 class="sec-t">${c.sales ? 'Cotação de cada compra e venda' : 'Cotação de cada compra'}</h2>${chartAportes([...aps].reverse().map(apV), c.avg, c.P)}<div class="chart-legend"><span><i></i>cotação paga</span>${c.avg > 0 ? '<span><i class="d"></i>preço médio</span>' : ''}<span><i class="o"></i>hoje</span>${c.sales ? '<span><i class="s"></i>venda</span>' : ''}</div></section>`;
   h += `<section class="sec">`;
@@ -1657,7 +1666,28 @@ function viewAportes() {
     const v = c.P / a.price - 1;
     h += `<button class="row-btn" data-act="edit-aporte" data-id="${a.id}"><span class="a">${fmtDate(a.date)} · ${MV(a.fiat)}</span><span class="r"><b>${AMT(a.sats)}</b></span><span class="b">${esc(fmtV(a.price, 0))}${a.ex ? ' · ' + esc(a.ex) : ''}${a.fee ? ' · taxa ' + MV(a.fee) : ''}${S().utxo && a.dest === 'self' ? (a.entrada ? ' · ◈ compra de terceiros' : ' · ◈ direto na carteira') : ''}${fxt}</span><span class="r b ${v >= 0 ? 'pos' : 'neg'}">${esc(fmtPct(v))}</span></button>`;
   }
-  return h + `</section>`;
+  return h + `</section>` + (c.sales ? vendasSecao(c) : '');
+}
+/* Vendas, no fim da aba Aportes (1.8.28, pedido do Nicolas). O total aportado continua bruto: soma tudo o que a pessoa já
+   pôs e não muda com a venda. O que a venda muda é o "ainda aplicado" (c.cost, o custo do que ficou, que vai na ficha Bens e
+   Direitos), e o lucro realizado é recebido − custo do que foi vendido (custo médio). A comparação com hoje (o que os sats
+   vendidos valeriam agora × o que entrou) é só para ver: não é lucro nem prejuízo e não vai para o IR. */
+function vendasSecao(c) {
+  const hide = S().hide, sg = v => hide ? OCULTO : esc((v >= 0 ? '+' : '−') + fmtV(Math.abs(v)));
+  const custo = c.proceeds - c.realized, diff = c.soldNow - c.proceeds, lado = Math.abs(diff) < 0.005 ? 0 : diff > 0 ? 1 : -1;
+  return `<section class="sec" id="vendas-sec"><div class="sec-head"><h2 class="sec-t">Vendas</h2><span class="small muted">${c.sales} ${c.sales === 1 ? 'venda' : 'vendas'} · ${AMT(c.sold)}</span></div>
+    <ul class="receipt">
+      <li><span class="k">Recebido nas vendas</span><span class="dots"></span><span class="v">${MV(c.proceeds)}</span></li>
+      <li><span class="k">Custo do que foi vendido</span><span class="dots"></span><span class="v">${MV(custo)}<small>pelo custo médio</small></span></li>
+      <li><span class="k"><b>Lucro realizado</b></span><span class="dots"></span><span class="v ${c.realized >= 0 ? 'pos' : 'neg'}">${sg(c.realized)}</span></li>
+    </ul>
+    <p class="hint">O total aportado não muda com a venda: ele soma tudo o que você já pôs. Muda o que ainda está aplicado, ${MV(c.cost)}: o custo do que ficou, que vai na ficha Bens e Direitos do IR.</p>
+    <h3 class="mini">Comparação com hoje</h3>
+    <ul class="receipt">
+      <li><span class="k">Se não tivesse vendido, hoje valeria</span><span class="dots"></span><span class="v">${MV(c.soldNow)}</span></li>
+      <li><span class="k">Diferença</span><span class="dots"></span><span class="v ${lado > 0 ? 'neg' : lado < 0 ? 'pos' : ''}">${MV(Math.abs(diff))}<small>${lado > 0 ? 'contra a venda' : lado < 0 ? 'a favor da venda' : 'igual ao recebido'}</small></span></li>
+    </ul>
+    <p class="hint">${lado > 0 ? `O bitcoin subiu desde as vendas: se tivesse guardado, hoje você teria ${MV(diff)} a mais.` : lado < 0 ? `O bitcoin caiu desde as vendas: vendendo, você deixou de perder ${MV(-diff)}.` : 'Hoje os sats vendidos valem o mesmo que você recebeu.'} Não é lucro nem prejuízo e não vai para o IR: só compara o que você recebeu com o que os mesmos sats valem hoje.</p></section>`;
 }
 function chartAportes(asc, avg, P) {
   const W = 340, H = 150, pl = 2, pr = 2, pt = 12, pb = 20;
@@ -3125,6 +3155,11 @@ const ACT = {
   'tab': el => { guardaTopo(); ui.stack = []; ui.hl = null; ui.tab = el.dataset.tab; ui.page = null; ui.selMode = false; ui.sel.clear(); render(); window.scrollTo(0, 0); },
   'page': el => { guardaTopo(); ui.stack = []; ui.hl = null; ui.page = el.dataset.page; ui.arg = el.dataset.id || null; closeSheet(true); render(); window.scrollTo(0, 0); },
   'goto-carteira': () => ACT.tab({ dataset: { tab: 'carteira' } }),   // como o toque na aba: zera a pilha das páginas
+  // seção Vendas, no fim da aba Aportes (1.8.28): do resumo ou do Início, abaixo do topo fixo
+  'ver-vendas': () => {
+    const ir = () => { const s = $('#vendas-sec'); if (!s) return; const hd = $('.top'), off = hd ? hd.getBoundingClientRect().height + 8 : 0; window.scrollTo({ top: Math.max(0, s.getBoundingClientRect().top + window.scrollY - off), behavior: 'smooth' }); };
+    if (ui.tab !== 'aportes' || ui.page) { ACT.tab({ dataset: { tab: 'aportes' } }); setTimeout(ir, 60); } else ir();
+  },
   'lesson': el => { guardaTopo(); ui.stack = []; ui.hl = null; ui.page = 'lesson'; ui.arg = el.dataset.id; closeSheet(true); render(); window.scrollTo(0, 0); },
   'quiz': el => { const id = el.dataset.id; if (state.learn.quiz[id] != null) return; state.learn.quiz[id] = +el.dataset.k; save(); render(); const q = $('.quiz'); if (q) q.scrollIntoView({ block: 'nearest' }); },
   'lesson-done': el => { state.learn.done[el.dataset.id] = Date.now(); save(); render(); toast('Lição concluída'); },
@@ -4914,8 +4949,8 @@ function xiHistBuild(r) {
   const left = [...outs.values()].filter(u => !u.by), cur = new Map();
   for (const x of r.rows) for (const u of x.utxos) cur.set(`${String(u.txid).toLowerCase()}:${u.vout}`, u.sats);
   if (left.length !== cur.size || left.some(u => cur.get(u.key) !== u.sats)) return fail('O histórico não fecha com os UTXOs de agora: alguma transação pode ter entrado durante a busca.');
-  let room = Math.max(0, calc().ex);   // de onde veio cada entrada: como nos UTXOs, saque enquanto couber no saldo da corretora
-  recv.forEach((u, j) => { u.j = j; u.origin = !u.mix && room >= u.sats ? 'saque' : 'externo'; if (u.origin === 'saque') room -= u.sats; });
+  recv.forEach((u, j) => { u.j = j; });
+  xiOrigemPadrao(recv);   // de onde veio cada entrada: como nos UTXOs, pela data e pelo saldo da corretora (1.8.28)
   return { ok: true, plan, recv, n: plan.length, nIn, nOut, nMove, fees, sent, cur: left.reduce((t, u) => t + u.sats, 0) };
 }
 /* grava o histórico (dentro do attempt de xiApply): entradas com a origem escolhida, transações com as saídas na ordem
@@ -4954,7 +4989,7 @@ function xiResumeHTML(f) {
 /* nomes sugeridos, endereços já cadastrados e UTXOs já registrados */
 function xiPrepare() {
   Object.assign(ui.form, { hist: false, herr: '', hfail: false });   // resultado novo: histórico desligado (1.8.17)
-  const r = ui.form.res, c0 = calc(); let room = Math.max(0, c0.ex), k = 0;
+  const r = ui.form.res, novos = []; let k = 0;
   for (const x of r.rows) {
     const ex = findAddrByString(x.addr); x.exId = ex ? ex.id : null;
     x.name = ex ? ex.label : `${x.c ? 'Troco' : 'Recebimento'} ${x.i + 1}`;
@@ -4962,9 +4997,41 @@ function xiPrepare() {
       u.k = k++;
       const m = state.utxos.find(y => y.txid && y.txid === u.txid && String(y.vout) === String(u.vout)) || (ex ? state.utxos.find(y => !y.spent && y.address === ex.id && y.sats === u.sats && !y.txid) : null);
       u.match = m ? m.id : null;
-      if (!u.match) { u.origin = room >= u.sats ? 'saque' : 'externo'; if (u.origin === 'saque') room -= u.sats; }
+      if (!u.match) novos.push(u);
     }
   }
+  xiOrigemPadrao(novos);
+}
+/* Origem sugerida para cada entrada nova (1.8.28). Da corretora só quando o saldo dela, pelos registros, cobre a entrada na
+   data em que ela chegou e em todas as datas seguintes: um saque não vem antes da compra, e o saldo da corretora nunca fica
+   negativo. Em ordem de data; cada entrada marcada como da corretora reserva os sats dela dali em diante. As outras, de
+   terceiros. Antes (até a 1.8.27), bastava caber no saldo de hoje, e entradas mais antigas que os aportes viravam saque. */
+function xiSaldoCorretora() {   // saldo da corretora pelos registros: as datas com movimento, em ordem, e o menor saldo dali em diante
+  const set = S(), mov = new Map(), add = (d, v) => mov.set(d, (mov.get(d) || 0) + v);
+  for (const a of state.aportes) { if (isSale(a)) { if (!set.utxo || a.src !== 'self') add(a.date, -a.sats); } else if (!set.utxo || a.dest !== 'self') add(a.date, a.sats); }
+  if (set.utxo) for (const w of state.saques) add(w.date, -(w.sats + (w.fee || 0)));
+  const datas = [...mov.keys()].sort(), min = []; let s = 0;
+  for (const d of datas) { s += mov.get(d); min.push(s); }
+  for (let i = min.length - 2; i >= 0; i--) min[i] = Math.min(min[i], min[i + 1]);
+  return { datas, min };
+}
+function xiMinDesde(T, date) {   // o menor saldo da corretora da data em diante (antes do primeiro registro, zero)
+  let i = -1, lo = 0, hi = T.datas.length - 1;
+  while (lo <= hi) { const m = (lo + hi) >> 1; if (T.datas[m] <= date) { i = m; lo = m + 1; } else hi = m - 1; }
+  return i >= 0 ? T.min[i] : Math.min(0, T.min.length ? T.min[0] : 0);
+}
+function xiOrigemPadrao(list) {
+  const T = xiSaldoCorretora(); let usado = 0;
+  for (const u of [...list].sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')))) {
+    u.origin = !u.mix && xiMinDesde(T, u.date) - usado >= u.sats ? 'saque' : 'externo';
+    if (u.origin === 'saque') usado += u.sats;
+  }
+}
+/* primeira data em que a corretora ficaria negativa com as entradas marcadas como da corretora (ou null) */
+function xiNegativaEm(saques) {
+  const T = xiSaldoCorretora(); let usado = 0;
+  for (const u of [...saques].sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')))) { usado += u.sats; if (xiMinDesde(T, u.date) - usado < 0) return u.date; }
+  return null;
 }
 /* por que a busca trouxe mais (ou menos) endereços que o número escolhido: ele é a margem de vazios seguidos (1.8.15) */
 function xiGapLine(rows, gap) {
@@ -5014,7 +5081,7 @@ function xiReviewHTML() {
 /* De onde veio cada entrada (nomes da 1.8.27): da corretora (saque seu, de sats que já estão nos aportes: o saldo da
    corretora diminui e a pilha não muda) ou de terceiros (compra P2P, presente ou pagamento: sats novos, que somam à pilha).
    Sem essa escolha, o app contaria os mesmos sats duas vezes ou deixaria a corretora com saldo negativo. */
-const XI_ORIGEM_DICA = qual => `Para não contar duas vezes, diga de onde veio ${qual}. <b>Da corretora</b>: um saque seu, de sats que já estão nos seus aportes; o saldo da corretora diminui e a pilha não muda. <b>De terceiros</b>: compra P2P, presente ou pagamento recebido; sats novos, que somam à pilha. Se você pagou por eles, informe o valor no fim da lista.`;
+const XI_ORIGEM_DICA = qual => `Para não contar duas vezes, diga de onde veio ${qual}. <b>Da corretora</b>: um saque seu, de sats que já estão nos seus aportes; o saldo da corretora diminui e a pilha não muda. <b>De terceiros</b>: compra P2P, presente ou pagamento recebido; sats novos, que somam à pilha. Se você pagou por eles, informe o valor no fim da lista. O app já sugere: da corretora quando, na data da entrada, o saldo registrado na corretora a cobria; confira cada uma.`;
 /* Valor pago pelo que veio de terceiros (1.8.19, pedido do Nicolas): opcional. Dividido entre as entradas marcadas como de
    terceiros pelo tamanho de cada uma (o mesmo preço médio; os centavos que sobram vão para a maior). Cada uma vira um aporte
    direto na carteira, na data em que chegou, e o valor entra no total aportado. O que veio da corretora já está nos aportes. */
@@ -5035,13 +5102,16 @@ const xiMarket = list => { let v = 0; for (const u of list) { const p = histPric
 function xiCostReset() { const f = ui.form, b = $('#sheet-body [data-act="xi-apply"]'); if (f) f.costOk = false; if (b && b.dataset.t) b.textContent = b.dataset.t; }   // valor ou origem mudou: confere de novo
 function xiPreview() {
   const el = $('#xi-prev'), f = ui.form; if (!el || !f.res) return;
-  const c = calc(), H = xiHistOn(); let sq = 0, inn = 0;
-  if (H) { for (const u of f.res.hist.recv) if ((fv(`xr_${u.j}`) || u.origin) === 'saque') sq += u.sats; inn = f.res.hist.cur; }
-  else for (const x of f.res.rows) for (const u of x.utxos) if (!u.match) { inn += u.sats; if ((fv(`xo_${u.k}`) || u.origin) === 'saque') sq += u.sats; }
-  const ex = c.ex - sq;
+  const c = calc(), H = xiHistOn(); let sq = 0, inn = 0, ts = 0; const saques = [], terc = [];
+  const conta = (u, o) => { if (o === 'saque') { sq += u.sats; saques.push(u); } else { ts += u.sats; terc.push(u); } };
+  if (H) { for (const u of f.res.hist.recv) conta(u, fv(`xr_${u.j}`) || u.origin); inn = f.res.hist.cur; }
+  else for (const x of f.res.rows) for (const u of x.utxos) if (!u.match) { inn += u.sats; conta(u, fv(`xo_${u.k}`) || u.origin); }
+  const ex = c.ex - sq, neg = ex >= 0 ? xiNegativaEm(saques) : null, q = (n, um, v) => `${n} ${n === 1 ? um : v}`, nome = H ? ['entrada', 'entradas'] : ['UTXO', 'UTXOs'];
+  // o que sai do saldo da corretora (só o marcado como da corretora) e o que entra novo na pilha (de terceiros)
+  const quebra = `<b>Da corretora</b>: ${saques.length ? `${q(saques.length, ...nome)} · ${AMT(sq)} saem do saldo da corretora (${AMT(Math.max(0, c.ex))} → ${AMT(Math.max(0, ex))}).` : 'nenhum, e a corretora não muda.'}<br><b>De terceiros</b>: ${terc.length ? `${q(terc.length, ...nome)} · ${AMT(ts)} entram novos na pilha, sem mexer na corretora.` : 'nenhum.'}<br>`;
   const F = parseNum(fv('xfiat')), ext = F > 0 ? xiExtList() : [], es = ext.reduce((t, u) => t + u.sats, 0);   // valor pago (1.8.19)
   const cl = !(F > 0) ? '' : ext.length ? `<br>Total aportado: <b>+${priv(fmtMoney(F, cur()))}</b> em ${ext.length} ${ext.length === 1 ? 'entrada de terceiros' : 'entradas de terceiros'} (${AMT(es)}), a ${priv(fmtMoney(F / (es / 1e8), cur(), 0))} por bitcoin` : '<br><span class="neg">Nenhuma entrada de terceiros para receber o valor pago: marque como de terceiros o que você comprou fora do app.</span>';
-  el.innerHTML = `Depois de importar: corretora <b>${AMT(Math.max(0, ex))}</b> · autocustódia <b>${AMT(c.self + inn)}</b>${ex < 0 ? `<br><span class="neg">A corretora ficaria ${AMT(ex)} negativa: marque ${H ? 'algumas' : 'alguns'} como de terceiros.</span>` : ''}${cl}`;
+  el.innerHTML = `${quebra}Depois de importar: corretora <b>${AMT(Math.max(0, ex))}</b> · autocustódia <b>${AMT(c.self + inn)}</b>${ex < 0 ? `<br><span class="neg">A corretora ficaria ${AMT(ex)} negativa: marque ${H ? 'algumas' : 'alguns'} como de terceiros.</span>` : ''}${neg ? `<br><span class="warn">Em ${esc(fmtDate(neg))} a corretora ficaria negativa: nessa data, os seus aportes na corretora não cobriam o que está marcado como da corretora. Confira as datas dos aportes ou marque como de terceiros.</span>` : ''}${cl}`;
 }
 /* guarda o que já foi digitado e escolhido na revisão antes de redesenhá-la (1.8.16; entradas do histórico na 1.8.17) */
 function xiKeep() {
