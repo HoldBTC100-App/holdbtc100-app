@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="App do Projeto Hold BTC 100: registre seus aportes mensais em bitcoin, acompanhe preço médio e resultado, gerencie UTXOs e aprenda autocustódia.">
 <title>Hold BTC 100</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ioRogUFuZt8EVQVTKdZP9KsUdAq2gaarquyh+96KYFY='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-kqvFa8zTOLKsRXi1wz3QDncgWcbM5Kuw5Lrm/eOcJp8='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -333,6 +333,9 @@ select.inp{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 5
 .lock{position:fixed;inset:0;z-index:100;background:var(--hero);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;padding-top:calc(24px + env(safe-area-inset-top,0px))}
 .lock img{width:84px;margin-bottom:12px}
 .lock h2{font-family:var(--fc);font-size:26px;margin:0 0 4px}
+.lock #lock-msg{max-width:320px;text-align:center;line-height:1.4;margin:0}
+.lock-erro .lock-txt{max-width:330px;text-align:center}
+.lock-erro .btn-back{min-width:220px;margin-top:6px}
 .pin-dots{display:flex;gap:14px;margin:18px 0 22px;min-height:18px}
 .pin-dots i{width:15px;height:15px;border-radius:50%;border:2px solid var(--ink)}
 .pin-dots i.f{background:var(--ink)}
@@ -872,11 +875,12 @@ const KS_CARDS = {
 /* =========================================================
    Hold BTC 100 · gestão de aportes em bitcoin
    HTML/CSS/JS puro, sem dependências. Local-first:
-   IndexedDB (com fallback para localStorage). Na prévia do
-   Claude, também espelha num documento privado do usuário.
+   IndexedDB (com fallback para localStorage), cifrado com o
+   PIN de bloqueio quando houver um (1.8.24). Na prévia do
+   Claude, sem PIN, também espelha num documento privado.
    ========================================================= */
 
-const APP_VERSION = '1.8.23';
+const APP_VERSION = '1.8.24';
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const HIST = {"start":"2015-01","usd":[269,236,249,240,233,247,274,257,233,275,346,404,400,404,427,433,490,602,649,600,593,655,724,855,967,1075,1126,1210,1817,2384,2684,3787,4520,5404,8338,12178,12166,10318,8680,8122,8372,6952,7096,7394,6818,6489,5192,3887,3595,3654,3979,4704,6942,9680,10459,9914,9056,8766,8345,7372,8268,8948,7481,7512,9050,9296,10232,11509,11218,12286,16730,24328,31072,39024,51906,58338,47486,36155,38354,44318,45439,52582,59166,51586,42365,40791,44360,41879,35044,25823,21591,21674,19744,19962,18841,16851,19838,23126,25804,28897,28234,28846,29858,27587,26456,30805,36179,39982,42444,51946,66244,65986,64146,65194,63729,61864,61188,66861,83364,95022,97976,93433,83444,88373,99394,105848,111410,111996,111124,111840,99685,88638,83198,72854,67640,72356,75048,66150,60768,70714,81095,80570],"brl":[708,663,783,731,714,768,883,904,911,1067,1307,1564,1620,1603,1583,1542,1734,2062,2125,1926,1930,2088,2418,2866,3091,3338,3522,3795,5832,7858,8605,11932,14171,17247,27175,40087,39062,33444,28462,27676,30443,26233,27169,29059,28068,24388,19662,15101,13451,13608,15305,18328,27776,37353,39528,39856,37326,35825,34676,30296,34306,38845,36536,40003,51073,48305,54030,62853,60569,69121,90640,125185,166425,211371,293069,324482,251253,181928,197777,232745,239904,291307,328780,291530,234452,211975,220398,199260,173644,130385,115903,111476,103397,104809,99381,88340,103169,119603,134475,145054,140682,139952,143345,135273,130613,156021,177216,195797,208587,257883,329902,338449,329261,351333,353186,343509,339079,376033,484100,579349,589992,538697,479536,511123,563308,587149,615933,610031,596450,602314,532408,483352,444108,378882,353863,364172,374017,339193,310759,364403,417209,413273]}; // médias mensais estimadas: {start:'2015-01', usd:[…], brl:[…]}
 const REF_PRICE = { BRL: 416900, USD: 75800, EUR: 68000, at: Date.UTC(2026, 10, 7, 18, 0), src: 'ref' }; // US$ do CoinLore × PTAX de 06/11/2026 (R$ 5,50; € 6,13)
@@ -1099,23 +1103,57 @@ const hasData = () => state.aportes.length + state.utxos.length + state.saques.l
 
 /* ---------------- armazenamento local ---------------- */
 const DBN = 'holdbtc100', STORE = 'kv', KEY = 'state', LSKEY = 'holdbtc100:state';
+/* Dados cifrados (1.8.24) em chave própria: as versões até a 1.8.23 não os enxergam nem gravam por cima deles (abrem
+   vazias, e a volta para a 1.8.24 ou mais nova abre os dados de novo). Gravar uma forma, aberta ou cifrada, apaga a outra. */
+const KEY_COFRE = 'cofre', LS_COFRE = 'holdbtc100:cofre';
 let idb = null, storageMode = 'memória', saveTimer = null, persistAsked = false;
 function idbOpen() { return new Promise((res, rej) => { try { const r = indexedDB.open(DBN, 1); r.onupgradeneeded = () => r.result.createObjectStore(STORE); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); } catch (e) { rej(e); } }); }
 function idbGet(k) { return new Promise((res, rej) => { const q = idb.transaction(STORE, 'readonly').objectStore(STORE).get(k); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); }
 function idbSet(k, v) { return new Promise((res, rej) => { const tx = idb.transaction(STORE, 'readwrite'); tx.objectStore(STORE).put(v, k); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }); }
-async function loadLocal() {
-  try { idb = await idbOpen(); storageMode = 'IndexedDB'; const v = await idbGet(KEY); if (v) return v; } catch (e) { idb = null; }
-  try { const s = localStorage.getItem(LSKEY); if (s) { if (!idb) storageMode = 'localStorage'; return JSON.parse(s); } if (!idb) { localStorage.setItem(LSKEY + ':t', '1'); localStorage.removeItem(LSKEY + ':t'); storageMode = 'localStorage'; } } catch (e) { }
-  return null;
+function idbDel(k) { return new Promise((res, rej) => { const tx = idb.transaction(STORE, 'readwrite'); tx.objectStore(STORE).delete(k); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }); }
+const lsTira = k => { try { if (localStorage.getItem(k) != null) localStorage.removeItem(k); } catch (e) { } };
+const COFRE_RUIM = () => ({ app: 'holdbtc100', cofre: 0 });   // algo na chave do cofre que nem se lê: abre como danificado, sem apagar
+async function loadLocal() {   // devolve o envelope cifrado (cofre), o estado aberto ou null; havendo envelope, ele vale
+  let cf = null, st = null;
+  try { idb = await idbOpen(); storageMode = 'IndexedDB'; cf = await idbGet(KEY_COFRE); if (cf == null) st = await idbGet(KEY); } catch (e) { idb = null; }
+  if (cf != null && !ehCofre(cf)) cf = COFRE_RUIM();
+  try {
+    const c = localStorage.getItem(LS_COFRE);
+    if (c != null) { let v = null; try { v = JSON.parse(c); } catch (e) { } if (!ehCofre(v)) v = COFRE_RUIM(); if (!cf || (+v.em || 0) > (+cf.em || 0)) cf = v; }
+    if (!cf && st == null) { const t = localStorage.getItem(LSKEY); if (t) { if (!idb) storageMode = 'localStorage'; st = JSON.parse(t); } }
+    if (!idb && storageMode !== 'localStorage') { localStorage.setItem(LSKEY + ':t', '1'); localStorage.removeItem(LSKEY + ':t'); storageMode = 'localStorage'; }
+  } catch (e) { }
+  return cf || st || null;
 }
 /* Gravação (1.8.20, auditoria C2): cada gravação tenta de novo o IndexedDB e depois o localStorage. Se nenhum gravar
-   (cota cheia, modo restrito), o app segue na memória e um aviso fixo (#warn-root) pede um backup até voltar a gravar. */
-async function persist() {
-  const data = JSON.parse(JSON.stringify(state));
-  if (!idb) { try { idb = await idbOpen(); } catch (e) { idb = null; } }
-  try { if (idb) { await idbSet(KEY, data); storageMode = 'IndexedDB'; storeWarn(true); return; } } catch (e) { idb = null; }
-  try { localStorage.setItem(LSKEY, JSON.stringify(data)); storageMode = 'localStorage'; storeWarn(true); } catch (e) { storageMode = 'memória'; storeWarn(false); }
+   (cota cheia, modo restrito), o app segue na memória e um aviso fixo (#warn-root) pede um backup até voltar a gravar.
+   Com PIN (1.8.24), o que vai para o aparelho é o envelope cifrado do cofre (chave cofre), nunca o estado aberto; gravar
+   uma forma apaga a outra, e as cópias do localStorage saem quando o IndexedDB grava, para não sobrar versão antiga. As gravações vão uma de cada vez, sempre
+   com o estado do momento: a cifra é assíncrona, e uma gravação lenta não pode terminar depois de uma mais nova. */
+let persistFila = null, persistDeNovo = false;
+function persist() {
+  if (persistFila) { persistDeNovo = true; return persistFila; }
+  persistFila = (async () => { try { do { persistDeNovo = false; await persistAgora(); } while (persistDeNovo); } finally { persistFila = null; } })();
+  return persistFila;
 }
+async function persistAgora() {
+  if (cofre.selado) return;                                    // dados ainda fechados: o estado na memória é só o de espera
+  const cifra = !!(S().pin && (S().pin.cofre || cofre.raw));
+  if (cifra && !(cofre.dek && cofre.chaves)) { storageMode = 'memória'; storeWarn(false); return; }   // sem a chave, nada vai em claro
+  let data;
+  try { data = cifra ? await cofreSelar() : JSON.parse(JSON.stringify(state)); } catch (e) { storageMode = 'memória'; storeWarn(false); return; }
+  const [k, outra, ls, lsOutra] = cifra ? [KEY_COFRE, KEY, LS_COFRE, LSKEY] : [KEY, KEY_COFRE, LSKEY, LS_COFRE];
+  if (!idb) { try { idb = await idbOpen(); } catch (e) { idb = null; } }
+  try {
+    if (idb) {
+      await idbSet(k, data); storageMode = 'IndexedDB'; storeWarn(true);
+      await idbDel(outra).catch(() => { }); lsTira(ls); lsTira(lsOutra);   // a outra forma e as cópias do localStorage saem depois da gravação
+      return;
+    }
+  } catch (e) { idb = null; }
+  try { localStorage.setItem(ls, JSON.stringify(data)); storageMode = 'localStorage'; storeWarn(true); lsTira(lsOutra); } catch (e) { storageMode = 'memória'; storeWarn(false); }
+}
+async function gravaJa() { save(); clearTimeout(saveTimer); await persist(); }
 let storeOk = true;
 function storeWarn(ok) {
   const r = $('#warn-root'); if (!r || (ok === storeOk && (ok || r.firstChild))) return;
@@ -1130,29 +1168,35 @@ function save() {
 }
 
 /* ---------------- espelho na conta (só na prévia do Claude) ---------------- */
-const cloud = { ref: null, busy: false, again: false, timer: null, on: false };
+/* Com PIN (1.8.24), o espelho fica pausado: a cópia da conta é trocada por um aviso sem dados e não volta enquanto houver
+   PIN, porque com ele os dados só ficam cifrados, no aparelho. Sem PIN, o espelho volta a guardar a cópia. */
+const cloud = { ref: null, busy: false, again: false, timer: null, on: false, pausado: false };
 function cloudPayload() { const s = JSON.parse(JSON.stringify(state)); s.settings.pin = null; s.settings.bio = null; return s; }
 function cloudSchedule() { if (!cloud.ref || S().offline) return; clearTimeout(cloud.timer); cloud.timer = setTimeout(cloudPush, 1800); }
 async function cloudPush() {
   if (!cloud.ref || S().offline) return;
+  if (S().pin && cloud.pausado) return;
   if (cloud.busy) { cloud.again = true; return; }
   cloud.busy = true;
-  try { const payload = JSON.stringify(cloudPayload()); if (payload.length < 240000) { await cloud.ref.set({ updatedAt: state.updatedAt, payload }); cloud.on = true; } }
+  try {
+    if (S().pin) { await cloud.ref.set({ updatedAt: state.updatedAt, payload: null, pausado: 'pin' }); cloud.pausado = true; cloud.on = true; }
+    else { const payload = JSON.stringify(cloudPayload()); cloud.pausado = false; if (payload.length < 240000) { await cloud.ref.set({ updatedAt: state.updatedAt, payload }); cloud.on = true; } }
+  }
   catch (e) { if (e && ['invalid_argument', 'revoked', 'not_granted', 'capability_disabled', 'capability_removed'].includes(e.code)) { cloud.ref = null; cloud.on = false; } }
   finally { cloud.busy = false; if (cloud.again) { cloud.again = false; cloudSchedule(); } }
 }
 async function cloudPull() {
   try {
-    const snap = await cloud.ref.get();
-    if (snap.exists) {
-      const d = snap.data();
-      if (d && d.payload && (d.updatedAt || 0) > (state.updatedAt || 0)) {
-        const keep = { pin: state.settings.pin, bio: state.settings.bio };
-        state = migrate(JSON.parse(d.payload)); state.settings.pin = keep.pin; state.settings.bio = keep.bio;
-        await persist(); if (ui.sheet && ui.sheet.kind === 'onboarding' && state.settings.onboarded) closeSheet(); render(); toast('Seus dados foram restaurados');
-        cloud.on = true; return true;
-      } else if ((state.updatedAt || 0) > (d.updatedAt || 0)) cloudSchedule();
-    } else if (hasData()) cloudSchedule();
+    const snap = await cloud.ref.get(), d = snap.exists ? snap.data() : null;
+    if (d && d.payload && (d.updatedAt || 0) > (state.updatedAt || 0)) {
+      const keep = { pin: state.settings.pin, bio: state.settings.bio };
+      state = migrate(JSON.parse(d.payload)); state.settings.pin = keep.pin; state.settings.bio = keep.bio;
+      await persist(); if (ui.sheet && ui.sheet.kind === 'onboarding' && state.settings.onboarded) closeSheet(); render(); toast('Seus dados foram restaurados');
+      cloud.on = true; if (S().pin) cloudSchedule();   // com PIN, a cópia aberta da conta sai
+      return true;
+    }
+    if (d && d.pausado && S().pin) cloud.pausado = true;
+    if ((d && (state.updatedAt || 0) > (d.updatedAt || 0)) || (!d && hasData()) || (S().pin && !(d && d.pausado))) cloudSchedule();
     cloud.on = true;
   } catch (e) { cloud.ref = null; cloud.on = false; }
   return false;
@@ -2121,9 +2165,9 @@ function sheetSettings() {
     <div class="set-group" id="set-seg"><h3>Segurança</h3>
       ${s.pin ? `<button class="set-row" data-act="pin-change">Alterar PIN<span class="v">ativo</span></button><button class="set-row" data-act="pin-remove">Remover PIN</button>
         <div class="field" style="margin-top:12px"><span class="lbl">Bloquear depois de</span>${seg('lockMin', [[1, '1 min'], [5, '5 min'], [15, '15 min']])}</div>
-        ${bio.ok ? `<div class="switch"><span><span class="t">Desbloquear com biometria</span><br><span class="d">Digital ou rosto do aparelho; o PIN continua valendo.</span></span><button class="tog ${s.bio ? 'on' : ''}" data-act="toggle-bio" aria-pressed="${!!s.bio}" aria-label="Biometria"></button></div>` : ''}`
+        ${bio.ok ? `<div class="switch"><span><span class="t">Desbloquear com biometria</span><br><span class="d">${!s.bio ? 'Digital ou rosto do aparelho; o PIN continua valendo.' : cofre.chaves && cofre.chaves.bio ? 'Ativa: abre o app com a digital ou o rosto; o PIN continua valendo.' : 'Ativa só para destravar o app já aberto. Ao abrir o app, use o PIN: este aparelho não libera a biometria para a criptografia.'}</span></span><button class="tog ${s.bio ? 'on' : ''}" data-act="toggle-bio" aria-pressed="${!!s.bio}" aria-label="Biometria"></button></div>` : ''}`
         : `<button class="set-row" data-act="pin-set">Criar PIN de acesso<span class="v">desligado</span></button>`}
-      <p class="hint">O PIN protege o acesso ao app neste aparelho. Seus registros não incluem chaves nem seed.</p></div>
+      <p class="hint">${s.pin ? `Seus registros ficam criptografados neste aparelho e só abrem com o PIN${cofre.chaves && cofre.chaves.bio ? ' ou a biometria' : ''}.${IN_CLAUDE ? ' Nesta prévia, a cópia na sua conta do Claude fica pausada enquanto houver PIN.' : ''}` : 'Com um PIN, seus registros ficam criptografados neste aparelho.'} Os registros não incluem chaves nem seed.</p></div>
     <div class="set-group" id="set-con"><h3>Conexão</h3>
       <div class="switch"><span><span class="t">Modo 100% offline</span><br><span class="d">${s.offline ? 'Ligado: o app não se conecta à internet e a cotação é informada por você.' : 'Desligado: o app busca a cotação e as taxas da rede sozinho.'}</span></span><button class="tog ${s.offline ? 'on' : ''}" data-act="toggle-offline" aria-pressed="${!!s.offline}" aria-label="Modo 100% offline"></button></div>
       ${s.offline ? `<button class="set-row" data-act="price-sheet">Atualizar a cotação<span class="v">${esc(fmtV(priceNow(vcur()), 0))} · ${esc(priceAge())}</span></button>` : ''}</div>
@@ -2328,7 +2372,7 @@ function sheetExport() {
   ui.form = { kind: 'export', bkPin: false };   // PIN do backup (1.8.18): desligado por padrão, só a pessoa liga
   openSheet('export', () => `<h2>Exportar</h2><p class="sub">Os arquivos têm só os seus registros: nada de chaves ou seed.</p>
     <button class="tool" data-act="exp-csv"><b>Planilha das movimentações (.csv)</b><span>${movimentos().length ? 'Para ver e filtrar no Excel e no Google Planilhas: aportes, vendas, saques e transações, com a coluna tipo. Não restaura a carteira' : 'Ainda sem movimentações. A planilha traz o que está registrado no app (aportes, vendas, saques, entradas e transações). Endereços importados sem saldo só viram movimentação se você importar também o histórico, opção da revisão na importação pela chave pública'}</span><span class="chev" aria-hidden="true">›</span></button>
-    <div class="switch bk-sw"><span><span class="t">Proteger o backup com PIN</span><br><span class="d">${subtleOk() ? 'Criptografa o backup: sem o PIN, ninguém lê nem altera o arquivo. Se você esquecer o PIN, o backup não abre.' : 'Este navegador não permite criptografar o backup.'}</span></span><button class="tog${ui.form.bkPin ? ' on' : ''}" data-act="bk-pin-tog" aria-pressed="${!!ui.form.bkPin}" aria-label="Proteger o backup com PIN"${subtleOk() ? '' : ' disabled'}></button></div>
+    <div class="switch bk-sw"><span><span class="t">Proteger o backup com PIN</span><br><span class="d">${subtleOk() ? `Criptografa o backup: sem o PIN, ninguém lê nem altera o arquivo. Se você esquecer o PIN, o backup não abre.${S().pin ? ' Seus registros estão criptografados neste aparelho, mas o backup só sai criptografado com esta opção.' : ''}` : 'Este navegador não permite criptografar o backup.'}</span></span><button class="tog${ui.form.bkPin ? ' on' : ''}" data-act="bk-pin-tog" aria-pressed="${!!ui.form.bkPin}" aria-label="Proteger o backup com PIN"${subtleOk() ? '' : ' disabled'}></button></div>
     <div id="bk-pin-f"${ui.form.bkPin ? '' : ' hidden'}><div class="two"><div class="field"><label for="bk-p1">PIN do backup</label><input class="inp" id="bk-p1" name="bkpin" data-inp="bk-forca" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"></div><div class="field"><label for="bk-p2">Repita o PIN</label><input class="inp" id="bk-p2" name="bkpin2" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"></div></div>
       <div class="pin-forca" id="bk-forca" aria-live="polite"><i></i><i></i><i></i><span>Digite o PIN para ver a força dele.</span></div>
       <p class="hint">Pelo menos ${BK_PIN_MIN} caracteres, números ou letras. O PIN não fica guardado no app.</p></div>
@@ -2606,40 +2650,166 @@ function aportesFromSheet(sheet) {
 /* ======================= SEGURANÇA ======================= */
 const b64e = u8 => btoa(String.fromCharCode(...u8));
 const b64d = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+/* PIN de antes da 1.8.24: hash PBKDF2 de 150.000 rodadas guardado junto com os dados em claro. Serve só para conferir esse
+   PIN na primeira abertura depois da atualização, quando os dados passam para o cofre (cofreMigra). */
 async function hashPin(pin, salt) {
-  const sb = salt ? b64d(salt) : crypto.getRandomValues(new Uint8Array(16));
-  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(pin), 'PBKDF2', false, ['deriveBits']);
-  const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: sb, iterations: 150000 }, key, 256);
-  return { salt: b64e(sb), hash: b64e(new Uint8Array(bits)), len: pin.length };
+  const key = await crypto.subtle.importKey('raw', enc8(pin), 'PBKDF2', false, ['deriveBits']);
+  return b64e(new Uint8Array(await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: b64d(salt), iterations: 150000 }, key, 256)));
 }
+
+/* Cofre: os dados cifrados com o PIN de bloqueio (1.8.24; decisão do Nicolas, 21/11/2026: com PIN de qualquer tamanho).
+   - No IndexedDB (ou no localStorage) vai um envelope com o estado inteiro cifrado em AES-256-GCM por uma chave de dados
+     aleatória de 32 bytes (DEK). A DEK vai no próprio envelope, cifrada com a chave do PIN (PBKDF2-SHA256, 600.000
+     rodadas, sal de 16 bytes) e, quando a biometria do aparelho oferece a extensão PRF do WebAuthn, também com uma chave
+     tirada dela (HKDF-SHA256). Trocar o PIN só cifra a DEK de novo.
+   - Em claro ficam só o tema, o tamanho do PIN, o id da credencial da biometria e a hora da última gravação: o que a tela
+     de bloqueio usa antes do PIN.
+   - Antes de abrir, o app fica em espera: nada é desenhado, nada vai para a rede (o modo offline está dentro dos dados) e
+     nada é gravado por cima do envelope. Envelope danificado ou de versão mais nova não abre e não é apagado; só o
+     Esqueci, com APAGAR, recomeça.
+   - Aberto, o estado e a DEK ficam na memória, como antes ficava o estado. O bloqueio por tempo só cobre a tela, e a
+     biometria sem PRF vale só para ele.
+   - Um PIN de 4 números tem 10.000 combinações: afasta curiosos, mas quem copiar os arquivos do aparelho testa todas em
+     pouco tempo. Cada número a mais multiplica esse trabalho por 10. */
+const COFRE_V = 1, COFRE_ITER = 600000;
+const cofre = { raw: null, dek: null, chaves: null, selado: null, erro: '', depois: false };
+const AAD = t => enc8('holdbtc100/cofre/' + t);
+const sorteio = n => crypto.getRandomValues(new Uint8Array(n));
+const ehCofre = v => !!v && typeof v === 'object' && !Array.isArray(v) && v.app === 'holdbtc100' && v.cofre != null;
+const b64n = s => typeof s === 'string' && s.length % 4 === 0 && /^[A-Za-z0-9+/]+={0,2}$/.test(s) ? s.length / 4 * 3 - (s.endsWith('==') ? 2 : s.endsWith('=') ? 1 : 0) : -1;
+function cofreConfere(v) {   // o envelope lido do aparelho é dado de fora: só passa o formato que o app grava
+  if (!ehCofre(v)) return 'danificado';
+  if (v.cofre !== COFRE_V) return typeof v.cofre === 'number' && v.cofre > COFRE_V ? 'novo' : 'danificado';
+  const p = v.chaves && v.chaves.pin, bio = v.chaves && v.chaves.bio, nb = bio ? b64n(bio.cred) : 0;
+  return Number.isInteger(v.len) && v.len >= 4 && v.len <= 6 && v.alg === 'AES-256-GCM' && b64n(v.iv) === 12 && b64n(v.dados) >= 16
+    && !!p && p.kdf === 'PBKDF2-SHA256' && Number.isInteger(p.iter) && p.iter >= 100000 && p.iter <= 10000000 && b64n(p.sal) === 16 && b64n(p.iv) === 12 && b64n(p.dek) === 48
+    && (bio == null || (nb > 0 && nb <= 1023 && b64n(bio.sal) === 32 && b64n(bio.iv) === 12 && b64n(bio.dek) === 48)) ? 'ok' : 'danificado';
+}
+async function cofreEmbrulha(kek, tipo, raw) { const iv = sorteio(12); return { iv: b64e(iv), dek: b64e(new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: AAD(tipo) }, kek, raw))) }; }
+async function cofreDesembrulha(kek, tipo, e) { return new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64d(e.iv), additionalData: AAD(tipo) }, kek, b64d(e.dek))); }   // falha: não é o PIN (ou a biometria) certo
+async function cofrePin(pin, raw) { const sal = sorteio(16); return { kdf: 'PBKDF2-SHA256', iter: COFRE_ITER, sal: b64e(sal), ...(await cofreEmbrulha(await bkKey(pin, sal, COFRE_ITER), 'pin', raw)) }; }
+const chavePin = (pin, p) => bkKey(pin, b64d(p.sal), p.iter);
+async function chaveBio(prf) {
+  const base = await crypto.subtle.importKey('raw', prf, 'HKDF', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name: 'HKDF', hash: 'SHA-256', salt: new Uint8Array(32), info: AAD('bio') }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+const dekDe = raw => crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['encrypt', 'decrypt']);
+async function cofreCria(pin) { const raw = sorteio(32), chaves = { pin: await cofrePin(pin, raw) }, dek = await dekDe(raw); Object.assign(cofre, { raw, dek, chaves }); }
+function cofreLimpa() { Object.assign(cofre, { raw: null, dek: null, chaves: null, selado: null, erro: '' }); }
+async function cofreSelar() {   // o envelope que vai para o aparelho, com o estado de agora
+  const { dek, chaves } = cofre, s = S(), iv = sorteio(12), cab = { app: 'holdbtc100', cofre: COFRE_V, tema: s.theme, len: s.pin.len, em: state.updatedAt || 0, chaves };
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: AAD('dados') }, dek, enc8(JSON.stringify(state)));
+  return { ...cab, alg: 'AES-256-GCM', iv: b64e(iv), dados: b64big(new Uint8Array(ct)) };
+}
+function cofreEspera(v) {   // envelope lido na abertura: estado de espera até o PIN ou a biometria
+  const erro = cofreConfere(v); state = defaultState(); const s = S();
+  s.theme = ['light', 'dark'].includes(v.tema) ? v.tema : 'auto';
+  s.offline = true;                      // nada de rede antes de abrir: o modo de verdade está dentro dos dados
+  s.pin = { len: erro === 'ok' ? v.len : 4, cofre: true }; s.bio = erro === 'ok' && v.chaves.bio ? v.chaves.bio.cred : null;
+  Object.assign(cofre, { selado: v, erro: erro === 'ok' ? '' : erro, depois: true });
+  applyTheme();
+}
+async function cofreAbreCom(raw) {
+  const v = cofre.selado, dek = await dekDe(raw); let obj;
+  try { obj = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64d(v.iv), additionalData: AAD('dados') }, dek, b64d(v.dados)))); if (!obj || typeof obj !== 'object' || Array.isArray(obj)) throw new Error('estado'); }
+  catch (e) { if (cofre.selado === v) cofre.erro = 'danificado'; throw e; }   // a chave abriu e os dados não: arquivo danificado, nunca PIN errado
+  if (cofre.selado !== v) return;                // o PIN e a biometria abriram juntos: o outro caminho já pôs os dados
+  state = migrate(obj); S().pin = { len: v.len, cofre: true };   // o envelope manda: o estado que sai dele continua cifrado
+  Object.assign(cofre, { raw, dek, chaves: v.chaves, selado: null });
+}
+async function cofreAbrePin(pin) {
+  const v = cofre.selado, p = v.chaves.pin; let raw;
+  try { raw = await cofreDesembrulha(await chavePin(pin, p), 'pin', p); } catch (e) { return false; }
+  if (cofre.selado !== v) return true;    // a biometria abriu antes
+  await cofreAbreCom(raw);
+  if (p.iter < COFRE_ITER) { cofre.chaves = { ...cofre.chaves, pin: await cofrePin(pin, raw) }; persist(); }   // as rodadas subiram: a DEK é cifrada de novo
+  return true;
+}
+async function cofreAbreBio() {
+  const v = cofre.selado, e = v && v.chaves.bio; if (!e) return false;
+  const prf = await bioPrf(b64d(e.cred), b64d(e.sal));
+  if (!prf || cofre.selado !== v) return false;
+  let raw; try { raw = await cofreDesembrulha(await chaveBio(prf), 'bio', e); } catch (x) { return false; }
+  if (cofre.selado !== v) return false;   // o PIN abriu antes
+  await cofreAbreCom(raw); return true;
+}
+async function pinConfere(pin) {   // com o app aberto: bloqueio por tempo, trocar ou remover o PIN
+  const p = cofre.chaves && cofre.chaves.pin, s = S();
+  try {
+    if (p) { await cofreDesembrulha(await chavePin(pin, p), 'pin', p); return true; }
+    if (s.pin && s.pin.hash && s.pin.salt) return (await hashPin(pin, s.pin.salt)) === s.pin.hash;
+  } catch (e) { }
+  return false;
+}
+async function cofreMigra(pin) {   // PIN de antes da 1.8.24, digitado certo: os dados passam a ser cifrados com ele
+  const tinhaBio = !!S().bio;
+  await cofreCria(pin); S().pin = { len: pin.length, cofre: true }; S().bio = null; await gravaJa();
+  toast('Seus dados agora ficam criptografados com o PIN neste aparelho.' + (tinhaBio ? ' Para abrir com a biometria, ative-a de novo em Configurações.' : ''));
+}
+
 const bio = { ok: false };
 async function checkBio() { try { bio.ok = !!(window.PublicKeyCredential && PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()); } catch (e) { bio.ok = false; } }
-async function bioRegister() {
+/* Biometria (1.8.24): a credencial nasce pedindo a extensão PRF. Se o aparelho devolve a saída do PRF (na criação ou num
+   segundo toque), ela vira uma chave que também abre o cofre; senão, a biometria só destrava o app já aberto. */
+async function bioPrf(id, sal) {   // saída do PRF da credencial (32 bytes), ou null se o aparelho não oferece ou a pessoa cancelou
   try {
-    const cred = await navigator.credentials.create({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), rp: { name: 'Hold BTC 100' }, user: { id: crypto.getRandomValues(new Uint8Array(16)), name: 'holder', displayName: 'Holder' }, pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }], authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'discouraged' }, timeout: 60000, attestation: 'none' } });
-    S().bio = b64e(new Uint8Array(cred.rawId)); save(); refreshSheet(); toast('Biometria ativada');
+    const a = await navigator.credentials.get({ publicKey: { challenge: sorteio(32), allowCredentials: [{ type: 'public-key', id }], userVerification: 'required', timeout: 60000, extensions: { prf: { eval: { first: sal } } } } });
+    const r = a && a.getClientExtensionResults ? a.getClientExtensionResults() : {}, f = r.prf && r.prf.results && r.prf.results.first;
+    return f ? new Uint8Array(f) : null;
+  } catch (e) { return null; }
+}
+async function bioRegister() {
+  if (!cofre.raw) return toast('Crie o PIN antes de ativar a biometria.');
+  try {
+    const sal = sorteio(32);
+    const cred = await navigator.credentials.create({ publicKey: { challenge: sorteio(32), rp: { name: 'Hold BTC 100' }, user: { id: sorteio(16), name: 'holder', displayName: 'Holder' }, pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }], authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'discouraged' }, timeout: 60000, attestation: 'none', extensions: { prf: { eval: { first: sal } } } } });
+    const r = cred.getClientExtensionResults ? cred.getClientExtensionResults() : {}, f = r.prf && r.prf.results && r.prf.results.first;
+    let prf = f ? new Uint8Array(f) : null;
+    if (!prf && r.prf && r.prf.enabled) prf = await bioPrf(cred.rawId, sal);   // há aparelhos que só dão o PRF ao autenticar: pede o toque de novo
+    const id = b64e(new Uint8Array(cred.rawId)), raw = cofre.raw;
+    const daBio = prf && raw ? { cred: id, sal: b64e(sal), ...(await cofreEmbrulha(await chaveBio(prf), 'bio', raw)) } : null;
+    if (!cofre.raw || !cofre.chaves) return;                                    // o PIN saiu no meio do caminho
+    S().bio = id; cofre.chaves = daBio ? { ...cofre.chaves, bio: daBio } : { pin: cofre.chaves.pin };
+    save(); refreshSheet();
+    toast(prf ? 'Biometria ativada: ela também abre o app.' : 'Biometria ativada para destravar o app já aberto. Ao abrir o app, use o PIN: este aparelho não libera a biometria para a criptografia.');
   } catch (e) { toast('A biometria não está disponível aqui. O PIN continua funcionando.'); }
 }
 async function bioVerify() {
-  try { await navigator.credentials.get({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), allowCredentials: [{ type: 'public-key', id: b64d(S().bio) }], userVerification: 'required', timeout: 60000 } }); return true; } catch (e) { return false; }
+  try { await navigator.credentials.get({ publicKey: { challenge: sorteio(32), allowCredentials: [{ type: 'public-key', id: b64d(S().bio) }], userVerification: 'required', timeout: 60000 } }); return true; } catch (e) { return false; }
 }
 function sheetPin(mode) {
-  if (!(window.crypto && crypto.subtle)) return toast('Este ambiente não permite criar PIN.');
+  if (!subtleOk()) return toast('Este ambiente não permite criar PIN.');
   ui.form = { kind: 'pin', mode };
   const needOld = mode !== 'set';
-  openSheet('pin', () => `<h2>${mode === 'set' ? 'Criar PIN' : mode === 'change' ? 'Alterar PIN' : 'Remover PIN'}</h2><p class="sub">${mode === 'remove' ? 'Confirme o PIN atual.' : 'De 4 a 6 números. Se esquecer, só dá para apagar os dados do app e restaurar um backup.'}</p>
+  const sub = mode === 'remove' ? 'Confirme o PIN atual. Sem PIN, seus registros voltam a ficar guardados sem criptografia neste aparelho.'
+    : mode === 'change' ? 'De 4 a 6 números. Seus registros continuam criptografados, agora com o PIN novo.'
+    : `De 4 a 6 números. Com o PIN, seus registros ficam criptografados neste aparelho: sem ele, ninguém os abre, nem o app. Se esquecer o PIN, só dá para apagar os dados e restaurar um backup.${IN_CLAUDE ? ' Nesta prévia, a cópia dos dados na sua conta do Claude é apagada enquanto houver PIN.' : ''}`;
+  openSheet('pin', () => `<h2>${mode === 'set' ? 'Criar PIN' : mode === 'change' ? 'Alterar PIN' : 'Remover PIN'}</h2><p class="sub">${sub}</p>
     ${needOld ? `<div class="field"><label for="p-o">PIN atual</label><input class="inp" id="p-o" name="old" type="password" inputmode="numeric" maxlength="6" autocomplete="off"></div>` : ''}
-    ${mode !== 'remove' ? `<div class="field"><label for="p-n">Novo PIN</label><input class="inp" id="p-n" name="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="off"></div><div class="field"><label for="p-c">Repita o PIN</label><input class="inp" id="p-c" name="pin2" type="password" inputmode="numeric" maxlength="6" autocomplete="off"></div>` : ''}
+    ${mode !== 'remove' ? `<div class="field"><label for="p-n">Novo PIN</label><input class="inp" id="p-n" name="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="off"></div><div class="field"><label for="p-c">Repita o PIN</label><input class="inp" id="p-c" name="pin2" type="password" inputmode="numeric" maxlength="6" autocomplete="off"></div><p class="hint">Cada número a mais deixa o PIN 10 vezes mais difícil de adivinhar.</p>` : ''}
     <p class="err form" hidden></p><button class="btn ${mode === 'remove' ? 'btn-d' : 'btn-p'} block" data-act="save-pin">${mode === 'remove' ? 'Remover PIN' : 'Salvar PIN'}</button>`, { label: 'PIN', focus: needOld ? '#p-o' : '#p-n' });
 }
 async function savePin() {
-  const f = ui.form, s = S();
-  if (f.mode !== 'set') { const old = fv('old'); const h = await hashPin(old, s.pin.salt); if (h.hash !== s.pin.hash) return formErr('PIN atual incorreto.'); }
-  if (f.mode === 'remove') { s.pin = null; s.bio = null; save(); closeSheet(); if (!ui.sheet) sheetSettings(); toast('PIN removido'); return; }
-  const p = fv('pin'), p2 = fv('pin2');
-  if (!/^\d{4,6}$/.test(p)) return formErr('Use de 4 a 6 números.');
-  if (p !== p2) return formErr('Os dois PINs não são iguais.');
-  s.pin = await hashPin(p); save(); closeSheet(); if (!ui.sheet) sheetSettings(); toast('PIN salvo');
+  const f = ui.form, s = S(); if (f.ocupado) return;
+  const btn = $('#sheet-body [data-act="save-pin"]'), rotulo = btn ? btn.textContent : '';
+  const ocupa = on => { f.ocupado = on; if (btn) { btn.disabled = on; btn.textContent = on ? (f.mode === 'remove' ? 'Conferindo…' : 'Criptografando…') : rotulo; } };
+  ocupa(true);
+  try {
+    if (f.mode !== 'set' && !(await pinConfere(fv('old')))) return formErr('PIN atual incorreto.');
+    if (f.mode === 'remove') {
+      s.pin = null; s.bio = null; cofreLimpa(); await gravaJa(); closeSheet(); if (!ui.sheet) sheetSettings();
+      toast('PIN removido. Seus registros voltaram a ficar sem criptografia neste aparelho.'); return;
+    }
+    const p = fv('pin'), p2 = fv('pin2');
+    if (!/^\d{4,6}$/.test(p)) return formErr('Use de 4 a 6 números.');
+    if (p !== p2) return formErr('Os dois PINs não são iguais.');
+    try {
+      if (f.mode === 'change' && cofre.raw) cofre.chaves = { ...cofre.chaves, pin: await cofrePin(p, cofre.raw) };   // a mesma chave de dados, cifrada com o PIN novo
+      else await cofreCria(p);
+    } catch (e) { return formErr('Não deu para criptografar neste navegador.'); }
+    s.pin = { len: p.length, cofre: true }; await gravaJa(); closeSheet(); if (!ui.sheet) sheetSettings();
+    toast(f.mode === 'set' ? 'PIN salvo. Seus registros agora ficam criptografados neste aparelho.' : 'PIN salvo');
+  } finally { ocupa(false); }
 }
 /* Bloqueio (1.8.20, auditoria C1, C3 e C4):
    - enquanto o app está bloqueado ou há uma folha aberta, o resto da página fica inert (sem foco, sem toque e fora do
@@ -2647,71 +2817,100 @@ async function savePin() {
    - o bloqueio aparece antes da tela inicial (init) e o Esqueci abre dentro da própria tela de bloqueio: o app segue
      bloqueado por baixo até a pessoa digitar o PIN ou apagar os dados, o que pede digitar APAGAR;
    - as tentativas erradas e o prazo de espera ficam no aparelho (localStorage, fora do estado e do backup): a cada 5
-     erros, uma pausa de 30 s, 1 min, 5 min e depois 15 min. Reabrir o app não zera a contagem. */
+     erros, uma pausa de 30 s, 1 min, 5 min e depois 15 min. Reabrir o app não zera a contagem.
+   Com os dados no cofre (1.8.24), o PIN certo é o que abre a chave de dados; com o app já aberto, ele é conferido do
+   mesmo jeito. O PIN de antes da 1.8.24 é pedido uma vez, sem biometria, para os dados passarem para o cofre. */
 const PIN_KEY = 'holdbtc100:pin', PIN_WAITS = [30, 60, 300, 900];
 function pinLoad() {
   try { const v = JSON.parse(localStorage.getItem(PIN_KEY) || 'null'); if (v && typeof v === 'object') return { n: Math.max(0, +v.n || 0), ate: Math.max(0, +v.ate || 0), nivel: Math.max(0, +v.nivel || 0) }; } catch (e) { }
   return { n: 0, ate: 0, nivel: 0 };
 }
-let pinBuf = '', pinTimer = null, pinErr = pinLoad();
+let pinBuf = '', pinTimer = null, pinErr = pinLoad(), pinOcupado = false;
 function pinStore(v) { pinErr = v; try { localStorage.setItem(PIN_KEY, JSON.stringify(v)); } catch (e) { } }
 function syncInert() {
   const fundo = ui.locked || !!ui.sheet;
   for (const el of [$('#app'), $('nav.tabs')]) if (el) el.inert = fundo;
   const sr = $('#sheet-root'); if (sr) sr.inert = ui.locked;
 }
+const pinLegado = () => !!(S().pin && S().pin.hash);
+const pinAviso = () => cofre.erro === 'novo' ? 'Seus dados foram gravados por uma versão mais nova do app e não abrem nesta. Atualize o app para abri-los.'
+  : cofre.erro ? 'Os dados guardados neste aparelho estão danificados e não abrem, nem com o PIN certo. Para voltar a usar o app, apague e recomece; depois, restaure um backup (.json), se tiver um.'
+  : pinLegado() ? 'Digite o PIN para criptografar seus dados neste aparelho.' : '';
+const comBio = () => !!(S().bio && bio.ok && !cofre.erro && !pinLegado() && (!cofre.selado || cofre.selado.chaves.bio));
 function lock() {
   if (!S().pin) return; ui.locked = true; closeSheet(true); pinBuf = '';
   lockPad(); syncInert();
-  if (S().bio && bio.ok) setTimeout(tryBio, 250);
+  if (comBio()) setTimeout(tryBio, 250);
 }
 function lockPad() {
-  const r = $('#lock-root'); pinBuf = '';
-  r.innerHTML = `<div class="lock" role="dialog" aria-modal="true" aria-label="App bloqueado" tabindex="-1"><img src="${LOGO}" alt="Hold BTC 100"><h2>Digite seu PIN</h2><p class="small" id="lock-msg" aria-live="polite">&nbsp;</p><div class="pin-dots" id="pin-dots">${'<i></i>'.repeat(S().pin.len || 4)}</div>
-    <div class="keypad">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<button data-act="pin-key" data-k="${n}">${n}</button>`).join('')}${S().bio && bio.ok ? `<button class="ghost" data-act="pin-bio">Biometria</button>` : `<button class="ghost" data-act="pin-forgot">Esqueci</button>`}<button data-act="pin-key" data-k="0">0</button><button class="ghost" data-act="pin-del" aria-label="Apagar dígito">Apagar</button></div></div>`;
+  const r = $('#lock-root'), aviso = pinAviso(); pinBuf = '';
+  if (cofre.erro) {   // dados que não abrem (1.8.24): sem teclado; os danificados recomeçam pelo APAGAR, a versão mais nova pede atualizar
+    clearInterval(pinTimer);
+    r.innerHTML = `<div class="lock lock-erro" role="dialog" aria-modal="true" aria-label="Os dados não abrem" tabindex="-1"><img src="${LOGO}" alt="Hold BTC 100"><h2>${cofre.erro === 'novo' ? 'Atualize o app' : 'Dados danificados'}</h2><p class="lock-txt" id="lock-msg" aria-live="polite">${esc(aviso)}</p>${cofre.erro === 'novo' ? '' : '<button class="btn btn-back" data-act="pin-forgot">Apagar e recomeçar</button>'}</div>`;
+    const d = r.firstElementChild; if (d) d.focus({ preventScroll: true }); return;
+  }
+  r.innerHTML = `<div class="lock" role="dialog" aria-modal="true" aria-label="App bloqueado" tabindex="-1"><img src="${LOGO}" alt="Hold BTC 100"><h2>Digite seu PIN</h2><p class="small" id="lock-msg" aria-live="polite">${aviso ? esc(aviso) : '&nbsp;'}</p><div class="pin-dots" id="pin-dots">${'<i></i>'.repeat(S().pin.len || 4)}</div>
+    <div class="keypad">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<button data-act="pin-key" data-k="${n}">${n}</button>`).join('')}${comBio() ? `<button class="ghost" data-act="pin-bio">Biometria</button>` : `<button class="ghost" data-act="pin-forgot">Esqueci</button>`}<button data-act="pin-key" data-k="0">0</button><button class="ghost" data-act="pin-del" aria-label="Apagar dígito">Apagar</button></div></div>`;
   if (Date.now() < pinErr.ate) pinWaitMsg(); else clearInterval(pinTimer);
   const d = r.firstElementChild; if (d) d.focus({ preventScroll: true });
 }
 function lockForgot() {
   clearInterval(pinTimer); pinBuf = '';
-  $('#lock-root').innerHTML = `<div class="lock lock-forgot" role="dialog" aria-modal="true" aria-label="Esqueceu o PIN?"><img src="${LOGO}" alt="Hold BTC 100"><h2>Esqueceu o PIN?</h2>
-    <p class="lock-txt">Sem o PIN, a única saída é apagar os dados deste aparelho. Depois, você recupera tudo restaurando um backup (.json), se tiver um. Sem backup, os registros se perdem.</p>
+  const dano = cofre.erro === 'danificado', titulo = dano ? 'Apagar e recomeçar?' : 'Esqueceu o PIN?';
+  $('#lock-root').innerHTML = `<div class="lock lock-forgot" role="dialog" aria-modal="true" aria-label="${titulo}"><img src="${LOGO}" alt="Hold BTC 100"><h2>${titulo}</h2>
+    <p class="lock-txt">${dano ? 'Os dados deste aparelho estão danificados e não abrem. A única saída é apagá-los.' : 'Os registros estão criptografados com o PIN: sem ele, ninguém consegue abri-los, nem o app. A única saída é apagar os dados deste aparelho.'} Depois, você recupera tudo restaurando um backup (.json), se tiver um. Sem backup, os registros se perdem.</p>
     <div class="field"><label for="lk-apagar">Para confirmar, digite APAGAR</label><input class="inp" id="lk-apagar" data-inp="lk-apagar" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" enterkeyhint="done"></div>
     <button class="btn btn-wipe block" data-act="pin-wipe" disabled aria-disabled="true">Apagar dados e recomeçar</button>
-    <button class="btn btn-back block" data-act="pin-back">Voltar ao PIN</button></div>`;
+    <button class="btn btn-back block" data-act="pin-back">${dano ? 'Voltar' : 'Voltar ao PIN'}</button></div>`;
   setTimeout(() => { const i = $('#lk-apagar'); if (i) i.focus(); }, 30);
 }
 const apagarOk = () => { const i = $('#lk-apagar'); return !!i && i.value.trim().toUpperCase() === 'APAGAR'; };
 function lkApagar() { const b = $('[data-act="pin-wipe"]'), ok = apagarOk(); if (b) { b.disabled = !ok; b.setAttribute('aria-disabled', String(!ok)); } }
 function pinWipe() {
   if (!ui.locked || !apagarOk()) return;
-  state = defaultState(); state.updatedAt = Date.now(); persist(); pinStore({ n: 0, ate: 0, nivel: 0 });
-  render(); unlock(); toast('Dados apagados. Para recuperar seus registros, restaure um backup.');
+  cofreLimpa(); state = defaultState(); state.updatedAt = Date.now(); persist(); pinStore({ n: 0, ate: 0, nivel: 0 });
+  if (cofre.depois) desbloqueado(); else { render(); unlock(); }
+  toast('Dados apagados. Para recuperar seus registros, restaure um backup.');
 }
 function pinWaitMsg() {
   clearInterval(pinTimer);
   const tick = () => {
     const m = $('#lock-msg'), s = Math.ceil((pinErr.ate - Date.now()) / 1000);
-    if (!m || s <= 0) { clearInterval(pinTimer); if (m) m.innerHTML = '&nbsp;'; return; }
+    if (!m || s <= 0) { clearInterval(pinTimer); if (m) m.innerHTML = pinAviso() ? esc(pinAviso()) : '&nbsp;'; return; }
     m.textContent = `Muitas tentativas. Tente de novo em ${s >= 60 ? `${Math.floor(s / 60)}:${pad2(s % 60)} min` : `${s} s`}.`;
   };
   tick(); pinTimer = setInterval(tick, 1000);
 }
-async function tryBio() { if (await bioVerify()) unlock(); }
+async function tryBio() {
+  if (!comBio()) return;
+  if (!cofre.selado) { if (await bioVerify() && ui.locked) unlock(); return; }
+  let ok = false; try { ok = await cofreAbreBio(); } catch (e) { ok = false; }
+  if (ok) return desbloqueado();
+  if (cofre.erro) lockPad();
+}
 function unlock() { ui.locked = false; clearInterval(pinTimer); $('#lock-root').innerHTML = ''; pinStore({ n: 0, ate: 0, nivel: 0 }); syncInert(); if (!S().onboarded) sheetOnboarding(); }
+/* Dados abertos depois de uma abertura com o cofre fechado: o init parou no bloqueio, e o resto do início vem agora. */
+function desbloqueado() {
+  if (!cofre.depois) return unlock();
+  cofre.depois = false; render(); if (storageMode === 'memória') storeWarn(false); unlock(); iniciarResto();
+}
 async function pinKey(k) {
-  if (!$('#pin-dots')) return;                       // tela do Esqueci aberta: os dígitos não vão para o PIN
+  if (!$('#pin-dots') || pinOcupado || cofre.erro) return;   // Esqueci aberto, conferência em andamento ou dados que não abrem
   if (Date.now() < pinErr.ate) return pinWaitMsg();
   const len = S().pin.len || 4; if (pinBuf.length >= len) return;
   pinBuf += k; $$('#pin-dots i').forEach((d, i) => d.classList.toggle('f', i < pinBuf.length));
-  if (pinBuf.length === len) {
-    const h = await hashPin(pinBuf, S().pin.salt);
-    if (h.hash === S().pin.hash) return unlock();
-    pinBuf = ''; const dots = $('#pin-dots'); if (dots) { dots.classList.add('shake'); setTimeout(() => { dots.classList.remove('shake'); $$('#pin-dots i').forEach(d => d.classList.remove('f')); }, 380); }
-    const n = pinErr.n + 1, m = $('#lock-msg');
-    if (n >= 5) { pinStore({ n: 0, ate: Date.now() + PIN_WAITS[Math.min(pinErr.nivel, PIN_WAITS.length - 1)] * 1000, nivel: pinErr.nivel + 1 }); pinWaitMsg(); }
-    else { pinStore({ ...pinErr, n }); if (m) m.textContent = n >= 3 ? `PIN incorreto. Mais ${5 - n} ${5 - n === 1 ? 'erro' : 'erros'} e o app pede uma pausa.` : 'PIN incorreto.'; }
-  }
+  if (pinBuf.length < len) return;
+  const pin = pinBuf, m = $('#lock-msg'); pinOcupado = true; if (m) m.textContent = 'Conferindo o PIN…';
+  let certo = false;
+  try { certo = cofre.selado ? await cofreAbrePin(pin) : await pinConfere(pin); } catch (e) { certo = false; }
+  if (certo && pinLegado()) { if (m) m.textContent = 'Criptografando seus dados…'; try { await cofreMigra(pin); } catch (e) { } }
+  pinOcupado = false;
+  if (certo) return desbloqueado();
+  pinBuf = ''; const dots = $('#pin-dots'); if (dots) { dots.classList.add('shake'); setTimeout(() => { dots.classList.remove('shake'); $$('#pin-dots i').forEach(d => d.classList.remove('f')); }, 380); }
+  if (cofre.erro) return lockPad();   // o PIN abriu a chave, mas os dados não abrem: não conta como erro
+  const n = pinErr.n + 1;
+  if (n >= 5) { pinStore({ n: 0, ate: Date.now() + PIN_WAITS[Math.min(pinErr.nivel, PIN_WAITS.length - 1)] * 1000, nivel: pinErr.nivel + 1 }); pinWaitMsg(); }
+  else { pinStore({ ...pinErr, n }); if (m) m.textContent = n >= 3 ? `PIN incorreto. Mais ${5 - n} ${5 - n === 1 ? 'erro' : 'erros'} e o app pede uma pausa.` : 'PIN incorreto.'; }
 }
 
 /* ======================= ONBOARDING ======================= */
@@ -2799,7 +2998,7 @@ const ACT = {
   'bk-open': () => bkOpen(),
   'bk-force': () => { const b = ui.form && ui.form.bkForce; if (b) restoreBackupState(b.st, { ...b.info, forced: true }); },
   'copy-ir': () => copyText(ui.irText || ''),
-  'wipe': () => confirmSheet('Apagar todos os dados?', 'Aportes, carteira, lições e ajustes deste aparelho serão apagados. Exporte um backup antes se quiser guardar.', 'Apagar tudo', () => { state = defaultState(); state.updatedAt = Date.now(); persist(); cloudPush(); closeSheet(true); ui.tab = 'home'; ui.page = null; render(); sheetOnboarding(); }, true),
+  'wipe': () => confirmSheet('Apagar todos os dados?', 'Aportes, carteira, lições e ajustes deste aparelho serão apagados. Exporte um backup antes se quiser guardar.', 'Apagar tudo', () => { cofreLimpa(); state = defaultState(); state.updatedAt = Date.now(); persist(); cloudPush(); closeSheet(true); ui.tab = 'home'; ui.page = null; render(); sheetOnboarding(); }, true),
   'utxo-on': () => { S().utxo = true; addDemoUtxos(); save(); render(); toast('Gestão de UTXOs ativada'); },
   'toggle-utxo': () => { S().utxo = !S().utxo; if (S().utxo) addDemoUtxos(); ui.selMode = false; ui.sel.clear(); save(); if (ui.sheet && ui.sheet.kind === 'utxo-set') closeSheet(); render(); refreshSheet(); toast(S().utxo ? 'Gestão de UTXOs ativada' : 'Gestão de UTXOs desativada'); },
   'utxo-settings': () => sheetUtxoSettings(),
@@ -2829,7 +3028,7 @@ const ACT = {
   'open-ir': () => openPage('ir'),
   'sim-cur': el => { ui.sim.c = el.dataset.c; render(); },
   'pin-set': () => sheetPin('set'), 'pin-change': () => sheetPin('change'), 'pin-remove': () => sheetPin('remove'), 'save-pin': savePin,
-  'toggle-bio': () => { if (S().bio) { S().bio = null; save(); refreshSheet(); toast('Biometria desativada'); } else bioRegister(); },
+  'toggle-bio': () => { if (S().bio) { S().bio = null; if (cofre.chaves) cofre.chaves = { pin: cofre.chaves.pin }; save(); refreshSheet(); toast('Biometria desativada'); } else bioRegister(); },
   'pin-key': el => pinKey(el.dataset.k),
   'pin-del': () => { pinBuf = pinBuf.slice(0, -1); $$('#pin-dots i').forEach((d, i) => d.classList.toggle('f', i < pinBuf.length)); },
   'pin-bio': tryBio,
@@ -2903,12 +3102,20 @@ async function init() {
   mtipInit();
   $('#brand-logo').src = LOGO;
   for (const el of $$('[data-ic]')) el.innerHTML = I[el.dataset.ic] || '';
-  state = migrate(await loadLocal());
+  const salvo = await loadLocal();
+  if (ehCofre(salvo)) {                  // dados cifrados (1.8.24): só o bloqueio até o PIN; o resto do início vem em desbloqueado()
+    cofreEspera(salvo); lock(); await fxLoad(); await checkBio(); if (comBio()) lock(); return;
+  }
+  state = migrate(salvo);
+  if (S().pin && S().pin.cofre) { S().pin = null; S().bio = null; }   // estado aberto com a marca do cofre e sem envelope: não há chave para esse PIN
   if (S().pin) lock();                   // antes de desenhar a tela inicial (1.8.20, auditoria S6)
   await fxLoad();
   render(); if (storageMode === 'memória') storeWarn(false);
   await checkBio();
-  if (ui.locked && S().bio && bio.ok) lock(); else if (!S().pin && !S().onboarded) sheetOnboarding();
+  if (ui.locked && comBio()) lock(); else if (!S().pin && !S().onboarded) sheetOnboarding();
+  iniciarResto();
+}
+function iniciarResto() {   // depois dos dados abertos: capacidades da prévia, service worker e rede
   initCaps(); setSwOffline(S().offline);
   // Service worker: guarda o app no aparelho. No modo offline, registra só se ainda não houver um
   // (para o app abrir sem internet) e não pede atualização ao servidor.
