@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="App do Projeto Hold BTC 100: registre seus aportes mensais em bitcoin, acompanhe preço médio e resultado, gerencie UTXOs e aprenda autocustódia.">
 <title>Hold BTC 100</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-MNGOoJXSULUXbdcsYQkR9TYS+bhfoLIAaEfq/JzNm5I='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eE1/hbqQ8Nc7s07+kgoUavaivsxhxSX+RBbOhnZJiaQ='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -448,8 +448,19 @@ button.io:active{background:var(--surface-2)}
 .tools3 .btn{min-height:42px;font-size:14px;padding:0 8px}
 
 /* ---------- taxa do aporte (v1.8) ---------- */
-.fee-in{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+.fee-in{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
 .fee-in .seg{margin:0;min-width:110px}
+.fee-in .seg button{padding:0 10px}
+/* ---------- aporte e venda na moeda dos valores (1.8.31): valor em R$ e dólar, ligados ao valor em US$ ---------- */
+.fx-par{gap:10px;margin:-4px 0 0}
+.fx-par .field{margin:0;min-width:0}
+.fx-dica{margin:6px 0 16px}
+.fx-dica .link-btn{font-size:13.5px;padding:2px 0}
+.row-btn .alt{font-weight:500;color:var(--muted);white-space:nowrap}
+.yhead{gap:4px 12px}
+.yhead b{flex:none}
+.yhead span{text-align:right}
+.calc-line .ir{font-weight:700}
 /* ---------- importação pela chave pública (v1.8) ---------- */
 .xi-warn ul{margin:6px 0 0;padding-left:18px}
 .xi-warn li{margin:6px 0}
@@ -936,7 +947,7 @@ const KS_CARDS = {
    Claude, sem PIN, também espelha num documento privado.
    ========================================================= */
 
-const APP_VERSION = '1.8.30';
+const APP_VERSION = '1.8.31';
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const HIST = {"start":"2015-01","usd":[269,236,249,240,233,247,274,257,233,275,346,404,400,404,427,433,490,602,649,600,593,655,724,855,967,1075,1126,1210,1817,2384,2684,3787,4520,5404,8338,12178,12166,10318,8680,8122,8372,6952,7096,7394,6818,6489,5192,3887,3595,3654,3979,4704,6942,9680,10459,9914,9056,8766,8345,7372,8268,8948,7481,7512,9050,9296,10232,11509,11218,12286,16730,24328,31072,39024,51906,58338,47486,36155,38354,44318,45439,52582,59166,51586,42365,40791,44360,41879,35044,25823,21591,21674,19744,19962,18841,16851,19838,23126,25804,28897,28234,28846,29858,27587,26456,30805,36179,39982,42444,51946,66244,65986,64146,65194,63729,61864,61188,66861,83364,95022,97976,93433,83444,88373,99394,105848,111410,111996,111124,111840,99685,88638,83198,72854,67640,72356,75048,66150,60768,70714,81095,80570],"brl":[708,663,783,731,714,768,883,904,911,1067,1307,1564,1620,1603,1583,1542,1734,2062,2125,1926,1930,2088,2418,2866,3091,3338,3522,3795,5832,7858,8605,11932,14171,17247,27175,40087,39062,33444,28462,27676,30443,26233,27169,29059,28068,24388,19662,15101,13451,13608,15305,18328,27776,37353,39528,39856,37326,35825,34676,30296,34306,38845,36536,40003,51073,48305,54030,62853,60569,69121,90640,125185,166425,211371,293069,324482,251253,181928,197777,232745,239904,291307,328780,291530,234452,211975,220398,199260,173644,130385,115903,111476,103397,104809,99381,88340,103169,119603,134475,145054,140682,139952,143345,135273,130613,156021,177216,195797,208587,257883,329902,338449,329261,351333,353186,343509,339079,376033,484100,579349,589992,538697,479536,511123,563308,587149,615933,610031,596450,602314,532408,483352,444108,378882,353863,364172,374017,339193,310759,364403,417209,413273]}; // médias mensais estimadas: {start:'2015-01', usd:[…], brl:[…]}
 const REF_PRICE = { BRL: 416900, USD: 75800, EUR: 68000, at: Date.UTC(2026, 10, 7, 18, 0), src: 'ref' }; // US$ do CoinLore × PTAX de 06/11/2026 (R$ 5,50; € 6,13)
@@ -1062,10 +1073,10 @@ const priceNow = (c = cur()) => state.price[c] || REF_PRICE[c];
 const SAFE_ID = /^[A-Za-z0-9_-]{1,64}$/, SAFE_URL = /^(https:\/\/[^\s"'<>`\\]+|http:\/\/(localhost|127\.0\.0\.1)(:\d+)?(\/[^\s"'<>`\\]*)?)$/i;
 const SF = {
   ids: new Set(['id', 'wallet', 'address', 'utxoId', 'txId', 'spendId', 'spendId0', 'aporteId', 'saqueId', 'saleId', 'utxo', 'out', 'key']),
-  nums: new Set(['fiat', 'price', 'sats', 'fee', 'dolar', 'vsize', 'outSats', 'sent']),
+  nums: new Set(['fiat', 'price', 'sats', 'fee', 'feeSats', 'dolar', 'vsize', 'outSats', 'sent']),
   bools: new Set(['kyc', 'frozen', 'spent', 'rem', 'vsizeReal', 'sale', 'entrada']),
   texts: new Set(['note', 'ex', 'name', 'label', 'addr']),
-  opts: new Set(['type', 'kind', 'role', 'origin', 'dest', 'src']),
+  opts: new Set(['type', 'kind', 'role', 'origin', 'dest', 'src', 'moeda']),
   dates: new Set(['date', 'spentAt'])
 };
 /* Campos que o app não conhece (1.8.21, auditoria S8): a validação cuida só dos campos conhecidos e deixa os outros como
@@ -1093,7 +1104,7 @@ function sanitizeState(o) {
     for (const k of Object.keys(x)) {
       const v = x[k]; if (v === undefined || v === null) continue;
       if (SF.ids.has(k)) { if (v === '') continue; if (typeof v === 'string' || isNum(v)) { const t = newId(v); if (t !== v) x[k] = t; } else { delete x[k]; n++; } }
-      else if (SF.nums.has(k)) { const f = toNum(v); if (!isNum(f)) { if (k === 'dolar' || k === 'vsize') delete x[k]; else x[k] = 0; n++; } else if (f !== v) { x[k] = f; n++; } }
+      else if (SF.nums.has(k)) { const f = toNum(v); if (!isNum(f)) { if (k === 'dolar' || k === 'vsize' || k === 'feeSats') delete x[k]; else x[k] = 0; n++; } else if (f !== v) { x[k] = f; n++; } }
       else if (SF.bools.has(k)) { if (typeof v !== 'boolean') { x[k] = !!v; n++; } }
       else if (SF.texts.has(k)) { if (typeof v !== 'string') { x[k] = isNum(v) ? String(v) : ''; n++; } }
       else if (SF.opts.has(k)) { if (typeof v !== 'string' || !/^[a-z0-9-]{1,24}$/i.test(v)) { delete x[k]; n++; } }
@@ -1384,9 +1395,11 @@ function ledger(list = state.aportes, events = ledgerEvents()) {
   }
   return { held, cost, bought, invested, sold, proceeds, realized, soldEx, info, errs, err: errs[0] || null, avg: held > 0 ? cost / (held / 1e8) : 0, outSats, outCost, feeSats, extSats, pend: pendE + pendT };
 }
-/* posição antes de uma venda na data: tudo antes dela e as entradas do mesmo dia (a ordem do livro) */
-function posBefore(date, excludeId) {
-  return ledger(state.aportes.filter(a => a.id !== excludeId && (a.date < date || (a.date === date && !isSale(a)))), ledgerEvents().filter(e => e.date < date || (e.date === date && e.ev === 'entrada')));
+/* posição antes de uma venda na data: tudo antes dela e as entradas do mesmo dia (a ordem do livro); conv (apV) passa
+   os registros para a moeda dos valores */
+function posBefore(date, excludeId, conv) {
+  const aps = state.aportes.filter(a => a.id !== excludeId && (a.date < date || (a.date === date && !isSale(a))));
+  return ledger(conv ? aps.map(conv) : aps, ledgerEvents().filter(e => e.date < date || (e.date === date && e.ev === 'entrada')));
 }
 /* Venda que passa do saldo e que a mudança criou (1.8.29). Com taxas e envios no livro, registros antigos fora de ordem
    podem ter uma venda descoberta; ela não trava o que não mexe com ela. */
@@ -1731,7 +1744,7 @@ function viewAportes() {
   const partes = [`Não realizado ${sg(unreal)}`].concat(c.sales ? [`realizado nas vendas ${sg(c.realized)}`] : [], semVenda ? [`saiu sem venda ${sg(-c.outCost)}`] : []);
   let h = `<section class="sec"><h1 class="sec-t" style="font-size:28px">Aportes</h1>
   <div class="stats">
-    <div><span class="k">Aporte total</span><div class="v">${MV(c.invested)}</div>${Math.abs(c.invested - c.cost) > 0.005 && c.invested > 0 ? `<span class="k">${MV(c.cost)} ainda aplicados</span>` : ''}</div>
+    <div><span class="k">Aporte total</span><div class="v">${MV(c.invested)}</div>${fxOn() ? `<span class="k">Em ${cur() === 'BRL' ? 'reais' : 'dólares'}: ${priv(fmtMoney(state.aportes.reduce((t, a) => t + (isSale(a) ? 0 : a.fiat), 0), cur()))}</span>` : ''}${Math.abs(c.invested - c.cost) > 0.005 && c.invested > 0 ? `<span class="k">${MV(c.cost)} ainda aplicados</span>` : ''}</div>
     <div><span class="k">Custo médio</span><div class="v">${c.held ? MV(c.avg, 0) : '—'}</div></div>
     <div><span class="k">Em carteira</span><div class="v">${AMT(c.held)}</div>${conta ? '<button class="link-btn small" data-act="ver-conta" style="display:block;margin-top:6px">Ver a conta</button>' : ''}</div>
     <div><span class="k">Valor atual</span><div class="v">${MV(val)}</div></div>
@@ -1741,18 +1754,20 @@ function viewAportes() {
   if (aps.length >= 2) h += `<section class="sec"><h2 class="sec-t">${c.sales ? 'Cotação de cada compra e venda' : 'Cotação de cada compra'}</h2>${chartAportes([...aps].reverse().map(apV), c.avg, c.P)}<div class="chart-legend"><span><i></i>cotação paga</span>${c.avg > 0 ? '<span><i class="d"></i>preço médio</span>' : ''}<span><i class="o"></i>hoje</span>${c.sales ? '<span><i class="s"></i>venda</span>' : ''}</div></section>`;
   h += `<section class="sec">`;
   let year = null; const ys = {};
-  for (const a of aps) { const y = a.date.slice(0, 4); const o = ys[y] || (ys[y] = { n: 0, f: 0, s: 0, v: 0 }); if (isSale(a)) o.v++; else { o.n++; o.f += toVa(a, a.fiat); o.s += a.sats; } }
+  for (const a of aps) { const y = a.date.slice(0, 4); const o = ys[y] || (ys[y] = { n: 0, f: 0, fb: 0, s: 0, v: 0 }); if (isSale(a)) o.v++; else { o.n++; o.f += toVa(a, a.fiat); o.fb += a.fiat; o.s += a.sats; } }
+  // com os valores na outra moeda (1.8.31), cada linha mostra também o valor na moeda dos aportes; taxa em sats, em sats
+  const taxa = a => a.feeSats > 0 ? ' · taxa ' + priv(fmtSats(a.feeSats) + ' sats') : a.fee ? ' · taxa ' + MV(a.fee) : '';
   for (const a0 of aps) {
     const a = apV(a0), fxt = a.fx ? ' · ' + esc(fxShort(a.fx)) : '';
     const y = a.date.slice(0, 4);
-    if (y !== year) { year = y; const o = ys[y]; h += `<div class="yhead"><b>${y}</b><span>${o.n} ${o.n === 1 ? 'aporte' : 'aportes'} · ${MV(o.f, 0)} · ${AMT(o.s)}${o.v ? ` · ${o.v} ${o.v === 1 ? 'venda' : 'vendas'}` : ''}</span></div>`; }
+    if (y !== year) { year = y; const o = ys[y]; h += `<div class="yhead"><b>${y}</b><span>${o.n} ${o.n === 1 ? 'aporte' : 'aportes'} · ${MV(o.f, 0)}${fxOn() ? ` (${priv(fmtMoney(o.fb, cur(), 0))})` : ''} · ${AMT(o.s)}${o.v ? ` · ${o.v} ${o.v === 1 ? 'venda' : 'vendas'}` : ''}</span></div>`; }
     if (isSale(a)) {
       const now = a.sats / 1e8 * c.P, d = now / a.fiat - 1;
-      h += `<button class="row-btn sale" data-act="edit-aporte" data-id="${a.id}"><span class="a">${fmtDate(a.date)} · ${MV(a.fiat)}</span><span class="r"><b>${AMT(-a.sats)}</b></span><span class="b"><span class="tag s">venda</span> ${esc(fmtV(a.price, 0))}${a.ex && !isDefEx(a.ex) ? ' · ' + esc(a.ex) : ''}${a.fee ? ' · taxa ' + MV(a.fee) : ''}${S().utxo && a.src === 'self' ? ' · ◈ ' + (a.wallet ? esc(walletName(a.wallet)) : 'saiu da carteira') : ''}${fxt}</span><span class="r b">hoje valeriam ${MV(now)} <span class="${d > 0 ? 'neg' : 'pos'}">${esc(fmtPct(d))}</span></span></button>`;
+      h += `<button class="row-btn sale" data-act="edit-aporte" data-id="${a.id}"><span class="a">${fmtDate(a.date)} · ${MV(a.fiat)}${altV(a0)}</span><span class="r"><b>${AMT(-a.sats)}</b></span><span class="b"><span class="tag s">venda</span> ${esc(fmtV(a.price, 0))}${a.ex && !isDefEx(a.ex) ? ' · ' + esc(a.ex) : ''}${taxa(a)}${S().utxo && a.src === 'self' ? ' · ◈ ' + (a.wallet ? esc(walletName(a.wallet)) : 'saiu da carteira') : ''}${fxt}</span><span class="r b">hoje valeriam ${MV(now)} <span class="${d > 0 ? 'neg' : 'pos'}">${esc(fmtPct(d))}</span></span></button>`;
       continue;
     }
     const v = c.P / a.price - 1;
-    h += `<button class="row-btn" data-act="edit-aporte" data-id="${a.id}"><span class="a">${fmtDate(a.date)} · ${MV(a.fiat)}</span><span class="r"><b>${AMT(a.sats)}</b></span><span class="b">${esc(fmtV(a.price, 0))}${a.ex ? ' · ' + esc(a.ex) : ''}${a.fee ? ' · taxa ' + MV(a.fee) : ''}${S().utxo && a.dest === 'self' ? (a.entrada ? ' · ◈ compra de terceiros' : ' · ◈ direto na carteira') : ''}${fxt}</span><span class="r b ${v >= 0 ? 'pos' : 'neg'}">${esc(fmtPct(v))}</span></button>`;
+    h += `<button class="row-btn" data-act="edit-aporte" data-id="${a.id}"><span class="a">${fmtDate(a.date)} · ${MV(a.fiat)}${altV(a0)}</span><span class="r"><b>${AMT(a.sats)}</b></span><span class="b">${esc(fmtV(a.price, 0))}${a.ex ? ' · ' + esc(a.ex) : ''}${taxa(a)}${S().utxo && a.dest === 'self' ? (a.entrada ? ' · ◈ compra de terceiros' : ' · ◈ direto na carteira') : ''}${fxt}</span><span class="r b ${v >= 0 ? 'pos' : 'neg'}">${esc(fmtPct(v))}</span></button>`;
   }
   return h + `</section>` + (c.sales ? vendasSecao(c) : '') + (S().utxo && (c.feeSats || c.outSats || c.extSats) ? contaSecao(c) : '');
 }
@@ -2118,16 +2133,25 @@ function sheetAporte(id, presetDate, presetAddr, presetType, presetSrc) {
   // venda nova: a origem pedida (Registrar venda na corretora ou na carteira, na aba Carteira); sem pedido, da carteira
   // quando a corretora está zerada e há moedas na carteira, e da corretora nos outros casos
   const src = a ? (a.src || 'ex') : set.utxo && (presetSrc === 'ex' || presetSrc === 'self') ? presetSrc : (set.utxo && calc().ex <= 0 && state.utxos.some(x => !x.spent) ? 'self' : 'ex');
-  ui.form = { kind: 'aporte', id, type, mode: a ? 'sats' : 'price', touched: !!a, dest: a ? (a.dest || 'ex') : (presetAddr ? 'self' : 'ex'), src, exLimpo: !a && type === 'venda' && src === 'self', kyc: u ? !!u.kyc : true, warned: false, presetAddr: presetAddr || null,
-    d: { date, fiat: a ? fmtInput(a.fiat) : type === 'venda' ? '' : fmtInput(set.monthly), price: fmtInput(a ? a.price : (histPrice(date.slice(0, 7)) || priceNow()), 0), sats: a ? amtIn(a.sats) : '', ex: a ? a.ex : type === 'venda' && src === 'self' ? '' : exLembrada(), note: a ? a.note : '', afee: a && a.fee ? fmtInput(a.fee) : '', dolar: a && a.dolar > 0 ? fmtInput(a.dolar, 4) : '' }, feeU: 'fiat' };
+  // com os valores na outra moeda (1.8.31), os valores do formulário vêm na moeda dos valores (q: da moeda do formulário
+  // para a dos aportes, pelo dólar do registro ou do dia) e o valor em R$ e o dólar ficam ao lado
+  const fx = fxOn() ? apFxIni(a, date) : null, q = fx ? fxToB(1, fx.d) : 1, fc = apFc(), b0 = a ? a.fiat : type === 'venda' ? 0 : set.monthly;
+  ui.form = { kind: 'aporte', id, type, mode: a ? 'sats' : 'price', touched: !!a, dest: a ? (a.dest || 'ex') : (presetAddr ? 'self' : 'ex'), src, exLimpo: !a && type === 'venda' && src === 'self', kyc: u ? !!u.kyc : true, warned: false, presetAddr: presetAddr || null, fx,
+    d: { date, fiat: b0 > 0 ? fmtInput(b0 / q) : '', fbase: fx && b0 > 0 ? fmtInput(b0) : '', dolar: fx ? fmtInput(fx.d, 4) : '', price: fmtInput(a ? a.price / q : (histPrice(date.slice(0, 7), fc) || priceNow(fc)), 0), sats: a ? amtIn(a.sats) : '', ex: a ? a.ex : type === 'venda' && src === 'self' ? '' : exLembrada(), note: a ? a.note : '', afee: a && a.feeSats > 0 ? fmtSats(a.feeSats) : a && a.fee ? fmtInput(a.fee / q) : '' }, feeU: a && a.feeSats > 0 ? 'sats' : 'fiat' };
   openSheet('aporte', apHTML, { label: type === 'venda' ? 'Venda' : 'Aporte', onOpen: updateApCalc });
+  if (fx) fxSync(false, true);   // o dólar do dia, que chega com o formulário aberto (apFxData)
 }
 /* Venda: de onde saíram os sats. Da corretora, sai do saldo dela; da carteira (P2P), sai dos UTXOs, com a transação junto. */
 const exLembrada = () => S().exchange || [...new Set(state.aportes.filter(x => !(isSale(x) && x.src === 'self')).map(x => x.ex).filter(x => x && !isDefEx(x)))].slice(-1)[0] || '';   // nome de venda da carteira (P2P) não conta
 const srcHint = s => s === 'self' ? 'Venda direta (P2P): os sats saem da sua carteira para a do comprador, sem passar pela corretora. Mais abaixo, escolha a carteira e os UTXOs: o app registra a transação junto com a venda.' : `Venda na corretora: os sats saem do saldo da corretora${S().utxo ? ` (${amtTxt(Math.max(0, calc().ex))} registrados hoje)` : ''}.`;
 const exPlaceholder = s => s === 'self' ? 'P2P, app ou nome do comprador' : 'Corretora, app ou P2P';
+/* taxa da operação em dinheiro, em % ou em sats (1.8.31): em sats, a corretora tira a taxa dos próprios sats */
+function apFeeDica(sale, u) {
+  if (u === 'sats') return sale ? 'Taxa cobrada em sats: sai junto com os sats vendidos, e o valor recebido vem do resto.' : 'Taxa cobrada em sats: os sats recebidos já vêm sem ela. O valor pago inteiro entra no custo de aquisição.';
+  return sale ? 'Corretagem, spread ou taxa do P2P, já descontada do valor recebido.' : 'Corretagem, spread ou taxa do P2P, já incluída no valor pago. Ela entra no custo de aquisição.';
+}
 function apHTML() {
-  const f = ui.form, set = S(), a = f.id ? byId(state.aportes, f.id) : null, u = a && a.utxoId ? byId(state.utxos, a.utxoId) : null, d = f.d, sale = f.type === 'venda', pa = f.presetAddr, pm = f.mode === 'price';
+  const f = ui.form, set = S(), a = f.id ? byId(state.aportes, f.id) : null, u = a && a.utxoId ? byId(state.utxos, a.utxoId) : null, d = f.d, sale = f.type === 'venda', pa = f.presetAddr, pm = f.mode === 'price', fc = apFc();
   const exList = exNames();
   const dest = `<div class="field"><span class="lbl">Para onde foram os sats</span><div class="seg"><button class="${f.dest === 'ex' ? 'on' : ''}" data-act="ap-dest" data-dest="ex"${a && a.entrada ? ' disabled' : ''}>Ficaram na corretora</button><button class="${f.dest === 'self' ? 'on' : ''}" data-act="ap-dest" data-dest="self">Direto na carteira</button></div>${a && a.entrada ? '<p class="hint">Compra de terceiros (valor pago): os sats já estão na carteira. Aqui você corrige o valor pago, a data e onde comprou.</p>' : ''}</div>
     <div id="dest-self" ${f.dest === 'self' ? '' : 'hidden'}>
@@ -2144,12 +2168,12 @@ function apHTML() {
     ${a ? '' : `<div class="field"><div class="seg" role="group" aria-label="Tipo de registro"><button class="${sale ? '' : 'on'}" data-act="ap-type" data-t="compra" aria-pressed="${!sale}">Compra</button><button class="${sale ? 'on' : ''}" data-act="ap-type" data-t="venda" aria-pressed="${sale}">Venda</button></div></div>`}
     ${set.utxo && sale ? src : ''}
     <div class="field"><label for="f-date">Data da ${sale ? 'venda' : 'compra'}</label><input class="inp" id="f-date" name="date" type="date" value="${esc(d.date)}" max="${todayISO()}" data-inp="ap-date"></div>
-    <div class="field"><label for="f-fiat">Valor ${sale ? 'recebido' : 'pago'} (${curSym()})</label><input class="inp big" id="f-fiat" name="fiat" inputmode="decimal" autocomplete="off" data-num="money" data-neg="1" placeholder="0,00" value="${esc(d.fiat)}" data-inp="ap-calc"></div>
+    <div class="field"><label for="f-fiat">Valor ${sale ? 'recebido' : 'pago'} (${curSym(fc)})</label><input class="inp big" id="f-fiat" name="fiat" inputmode="decimal" autocomplete="off" data-num="money" data-neg="1" placeholder="0,00" value="${esc(d.fiat)}" data-inp="${f.fx ? 'ap-v' : 'ap-calc'}"></div>
+    ${f.fx ? apFxHTML(d) : ''}
     <div class="field"${a && a.entrada ? ' hidden' : ''}><span class="lbl">Você vai informar</span><div class="seg" role="group" aria-label="Forma de informar"><button class="${pm ? 'on' : ''}" data-act="ap-mode" data-mode="price" aria-pressed="${pm}">A cotação</button><button class="${pm ? '' : 'on'}" data-act="ap-mode" data-mode="sats" aria-pressed="${!pm}">Os ${isBTCu() ? 'BTC' : 'sats'} ${sale ? 'vendidos' : 'recebidos'}</button></div></div>
-    <div class="field" id="fld-price" ${pm ? '' : 'hidden'}><label for="f-price">Cotação do bitcoin na ${sale ? 'venda' : 'compra'} (${curSym()})</label><input class="inp" id="f-price" name="price" inputmode="decimal" autocomplete="off" data-num="int" value="${esc(d.price)}" data-inp="ap-price"><p class="hint" id="price-hint">${a ? '' : priceHint(d.date)}</p></div>
+    <div class="field" id="fld-price" ${pm ? '' : 'hidden'}><label for="f-price">Cotação do bitcoin na ${sale ? 'venda' : 'compra'} (${curSym(fc)})</label><input class="inp" id="f-price" name="price" inputmode="decimal" autocomplete="off" data-num="int" value="${esc(d.price)}" data-inp="ap-price"><p class="hint" id="price-hint">${a ? '' : priceHint(d.date)}</p></div>
     <div class="field" id="fld-sats" ${pm ? 'hidden' : ''}><label for="f-sats">${isBTCu() ? 'BTC' : 'Sats'} ${sale ? 'vendidos' : 'recebidos'}</label><input class="inp" id="f-sats" name="sats" ${amtAttrs()} autocomplete="off" value="${esc(d.sats)}" data-inp="ap-calc"${a && a.entrada ? ' readonly' : ''}><p class="hint">${a && a.entrada ? 'Os sats desta entrada são os do UTXO na carteira e não mudam aqui.' : 'Confira no comprovante. 1 BTC = 100.000.000 sats.'}</p></div>
-    <div class="field"><label for="f-afee">Taxa da operação (opcional)</label><div class="fee-in"><input class="inp" id="f-afee" name="afee" inputmode="decimal" data-num="${f.feeU === 'pct' ? 'dec' : 'money'}" autocomplete="off" placeholder="${f.feeU === 'pct' ? '0' : '0,00'}" value="${esc(d.afee || '')}" data-inp="ap-calc"><div class="seg" role="group" aria-label="Unidade da taxa"><button class="${f.feeU === 'pct' ? '' : 'on'}" data-act="ap-feeu" data-u="fiat">${curSym()}</button><button class="${f.feeU === 'pct' ? 'on' : ''}" data-act="ap-feeu" data-u="pct">%</button></div></div><p class="hint">${sale ? 'Corretagem, spread ou taxa do P2P, já descontada do valor recebido.' : 'Corretagem, spread ou taxa do P2P, já incluída no valor pago. Ela entra no custo de aquisição.'}</p></div>
-    ${apDolField(d, sale)}
+    <div class="field"><label for="f-afee">Taxa da operação (opcional)</label><div class="fee-in"><input class="inp" id="f-afee" name="afee" inputmode="${f.feeU === 'sats' ? 'numeric' : 'decimal'}" data-num="${f.feeU === 'pct' ? 'dec' : f.feeU === 'sats' ? 'int' : 'money'}" autocomplete="off" placeholder="${f.feeU === 'fiat' ? '0,00' : '0'}" value="${esc(d.afee || '')}" data-inp="ap-calc"><div class="seg" role="group" aria-label="Unidade da taxa">${[['fiat', curSym(fc)], ['pct', '%'], ['sats', 'sats']].map(([k, t]) => `<button class="${f.feeU === k ? 'on' : ''}" data-act="ap-feeu" data-u="${k}" aria-pressed="${f.feeU === k}">${t}</button>`).join('')}</div></div><p class="hint" id="fee-hint">${apFeeDica(sale, f.feeU)}</p></div>
     <div class="calc-line" id="ap-calc" aria-live="polite"></div>
     <div class="field"><label for="f-ex">Onde ${sale ? 'vendeu' : 'comprou'}</label><input class="inp" id="f-ex" name="ex" list="ex-list" autocomplete="off" placeholder="${sale ? exPlaceholder(f.src) : 'Corretora, app ou P2P'}" value="${esc(d.ex)}"><datalist id="ex-list">${exList.map(e => `<option value="${esc(e)}">`).join('')}</datalist><p class="hint">Em branco, fica como “${sale ? 'Venda' : 'Aporte'}”.</p></div>
     ${set.utxo ? (sale ? selfBox : dest) : ''}
@@ -2159,11 +2183,11 @@ function apHTML() {
     ${a ? `<button class="btn btn-d block" style="margin-top:10px" data-act="del-aporte" data-id="${a.id}">${sale ? 'Excluir venda' : 'Excluir aporte'}</button>` : ''}`;
 }
 function apCapture() {
-  const f = ui.form; f.d = { date: fv('date'), fiat: fv('fiat'), price: fv('price'), sats: fv('sats'), ex: fv('ex'), note: fv('note'), afee: fv('afee'), dolar: fv('dolar') };
+  const f = ui.form; f.d = { date: fv('date'), fiat: fv('fiat'), fbase: fv('fbase'), dolar: fv('dolar'), price: fv('price'), sats: fv('sats'), ex: fv('ex'), note: fv('note'), afee: fv('afee') };
   if ($('#s-r')) { f.sx = fv('sx'); f.srate = fv('srate'); f.sfee = fv('sfee'); f.stxid = fv('stxid'); }
 }
 /* ---- venda pela carteira ---- */
-function apSats() { const f = ui.form, fiat = Math.abs(parseNum(fv('fiat'))), base = apBase(fiat, apFee(fiat), f.type === 'venda'); if (f.mode === 'price') { const p = parseNum(fv('price')); return base > 0 && p > 0 ? Math.round(base / p * 1e8) : NaN; } return parseAmt(fv('sats')); }
+function apSats() { const n = apNums(); return n.err ? NaN : n.sats; }
 function saleSelfHTML() {
   const f = ui.form, a = f.id ? byId(state.aportes, f.id) : null, linked = a && a.txId ? byId(state.spends, a.txId) : null;
   if (linked) return `<p class="note" style="margin:0 0 14px">Ligada à transação de ${fmtDate(linked.date)}: ${linked.inputs.length} ${linked.inputs.length === 1 ? 'entrada' : 'entradas'}, taxa ${esc(fmtSats(linked.fee))} sats. Para mudar a quantidade, a data, os UTXOs ou a taxa, edite a transação.<br><button class="btn btn-q btn-s" style="margin-top:8px" data-act="sale-edit-tx" data-id="${linked.id}">Editar a transação</button></p>`;
@@ -2217,7 +2241,10 @@ function updateSaleTx() {
 }
 function apSwitch(type, over = {}) {
   const f = ui.form; apCapture();
-  if (type === 'venda' && f.type !== 'venda' && f.d.fiat === fmtInput(S().monthly)) f.d.fiat = '';
+  if (type === 'venda' && f.type !== 'venda') {   // o aporte mensal sugerido não vale para a venda
+    if (!f.fx) { if (f.d.fiat === fmtInput(S().monthly)) f.d.fiat = ''; }
+    else if (!f.fx.ord.some(k => k === 'v' || k === 'b') && f.d.fbase === fmtInput(S().monthly)) { f.d.fbase = ''; f.d.fiat = ''; }
+  }
   // venda da carteira não sugere a corretora lembrada; a compra volta a sugerir
   if (type === 'venda' && S().utxo && f.src === 'self' && f.d.ex && f.d.ex === exLembrada()) { f.d.ex = ''; f.exLimpo = true; }
   else if (type !== 'venda' && f.exLimpo && !(f.d.ex || '').trim()) { f.d.ex = exLembrada(); f.exLimpo = false; }
@@ -2225,26 +2252,47 @@ function apSwitch(type, over = {}) {
   const sh = $('.sheet'), top = sh ? sh.scrollTop : 0; $('#sheet-body').innerHTML = apHTML(); if (sh) sh.scrollTop = top; updateApCalc();
 }
 function priceHint(date) { return date.slice(0, 7) >= nowYM() ? `Cotação de hoje (${esc(priceAge())}). Troque pela do seu comprovante.` : 'Estimativa média do mês. Use a cotação do seu comprovante.'; }
-/* taxa opcional da operação, em dinheiro: a compra paga o valor total (com a taxa) e a venda recebe o valor já sem a taxa */
-function apFee(fiat) { const v = parseNum(fv('afee')); if (!(v > 0)) return 0; return ui.form.feeU === 'pct' ? Math.abs(fiat) * v / 100 : v; }
+/* Números do formulário de aporte e venda, na moeda do formulário (apFc: a moeda dos valores com o par na outra moeda,
+   1.8.31). A compra paga o valor total (com a taxa) e a venda recebe o valor já sem a taxa. Taxa em dinheiro, em % ou em
+   sats (1.8.31): em sats, a corretora tira a taxa dos sats (a compra recebe os sats sem ela; a venda entrega os sats
+   vendidos e recebe pelo resto), e ela vale em dinheiro pela cotação da operação. */
 const apBase = (fiat, fee, sale) => sale ? fiat + fee : fiat - fee;
-function apFeeLine(fiat, fee, sats, sale) {
+function apNums() {
+  const f = ui.form, sale = f.type === 'venda', fiatIn = parseNum(fv('fiat')), V = Math.abs(fiatIn), t = parseNum(fv('afee'));
+  let fee = 0, feeS = 0, sats = NaN, price = NaN, err = '';
+  if (f.feeU === 'sats') feeS = t > 0 ? Math.round(t) : 0;
+  else if (t > 0) fee = f.feeU === 'pct' ? V * t / 100 : t;
+  if (f.mode === 'price') {
+    price = parseNum(fv('price'));
+    if (V > 0 && price > 0) {
+      if (!feeS) sats = Math.round(apBase(V, fee, sale) / price * 1e8);
+      else { const g = Math.round(V / price * 1e8); sats = sale ? g + feeS : g - feeS; fee = feeS * price / 1e8; if (sats < 1) err = 'A taxa em sats não pode ser igual ou maior que os sats comprados.'; }
+    }
+  } else {
+    sats = parseAmt(fv('sats'));
+    if (V > 0 && sats > 0) {
+      if (!feeS) price = apBase(V, fee, sale) / (sats / 1e8);
+      else { const liq = sale ? sats - feeS : sats + feeS; if (liq > 0) { price = V / (liq / 1e8); fee = feeS * price / 1e8; } else err = 'A taxa em sats não pode ser igual ou maior que os sats vendidos.'; }
+    }
+  }
+  if (!err && !sale && !feeS && fee > 0 && fee >= V) err = 'A taxa não pode ser igual ou maior que o valor pago.';
+  return { sale, fiatIn, V, fee, feeS, sats, price, err, c: apFc() };
+}
+function apFeeLine(fiat, fee, sats, sale, c = cur(), feeS = 0) {
   if (!(fee > 0)) return '';
   const pct = (fee / Math.abs(fiat) * 100).toLocaleString('pt-BR', { maximumFractionDigits: 2 });
-  return `<br>Taxa ${esc(fmtMoney(fee))} (${pct}%)${sats > 0 ? ` · ${sale ? 'valor líquido por BTC' : 'custo por BTC, com a taxa'} ${esc(fmtMoney(Math.abs(fiat) / (sats / 1e8), cur(), 0))}` : ''}`;
+  return `<br>Taxa ${feeS > 0 ? `${esc(fmtSats(feeS))} sats (${esc(fmtMoney(fee, c))} · ${pct}%)` : `${esc(fmtMoney(fee, c))} (${pct}%)`}${sats > 0 ? ` · ${sale ? 'valor líquido por BTC' : 'custo por BTC, com a taxa'} ${esc(fmtMoney(Math.abs(fiat) / (sats / 1e8), c, 0))}` : ''}`;
 }
 function updateApCalc() {
-  const el = $('#ap-calc'); if (!el) return; apDolSync();
-  const f = ui.form, fiat = parseNum(fv('fiat')), sale = f.type === 'venda', fee = apFee(fiat), base = apBase(Math.abs(fiat), fee, sale);
-  let sats = NaN, price = NaN;
-  if (f.mode === 'price') { price = parseNum(fv('price')); if (base > 0 && price > 0) sats = Math.round(base / price * 1e8); }
-  else { sats = parseAmt(fv('sats')); if (base > 0 && sats > 0) price = base / (sats / 1e8); }
+  const el = $('#ap-calc'); if (!el) return;
+  const f = ui.form, n = apNums(), { sale, fiatIn, V, fee, feeS, sats, price, c } = n;
   if (!sale) {
-    if (fiat < 0) { el.innerHTML = 'Valor negativo é registrado como <b>venda</b> quando você salvar.'; return; }
-    if (fee > 0 && fee >= fiat) { el.innerHTML = '<span class="neg">A taxa não pode ser igual ou maior que o valor pago.</span>'; return; }
-    el.innerHTML = (!(sats > 0) ? (f.mode === 'price' ? 'Preencha valor e cotação.' : 'Preencha valor e sats recebidos.') : f.mode === 'price' ? `= <b>${esc(fmtSats(sats))}</b> sats · ${esc(fmtBTC(sats))} BTC` : `Cotação ${fee > 0 ? 'sem a taxa' : 'efetiva'}: <b>${esc(fmtMoney(price, cur(), 0))}</b>`) + apFeeLine(fiat, fee, sats, false) + apFxLine(fiat, fv('date'));
+    if (fiatIn < 0) { el.innerHTML = 'Valor negativo é registrado como <b>venda</b> quando você salvar.'; return; }
+    if (n.err) { el.innerHTML = `<span class="neg">${esc(n.err)}</span>`; return; }
+    el.innerHTML = (!(sats > 0) ? (f.mode === 'price' ? 'Preencha valor e cotação.' : 'Preencha valor e sats recebidos.') : f.mode === 'price' ? `= <b>${esc(fmtSats(sats))}</b> sats · ${esc(fmtBTC(sats))} BTC` : `Cotação ${fee > 0 ? 'sem a taxa' : 'efetiva'}: <b>${esc(fmtMoney(price, c, 0))}</b>`) + apFeeLine(V, fee, sats, false, c, feeS);
     return;
   }
+  if (n.err) { el.innerHTML = `<span class="neg">${esc(n.err)}</span>`; updateSaleTx(); return; }
   if (!(sats > 0)) { el.innerHTML = f.mode === 'price' ? 'Preencha o valor recebido e a cotação.' : 'Preencha o valor recebido e os sats vendidos.'; return; }
   const date = /^\d{4}-\d{2}-\d{2}$/.test(fv('date')) ? fv('date') : todayISO(), daCarteira = S().utxo && f.src === 'self';
   // venda da corretora maior que o saldo registrado nela na data: os sats provavelmente já estavam na carteira
@@ -2253,17 +2301,27 @@ function updateApCalc() {
     const prev = f.id ? byId(state.aportes, f.id) : null, exAt = holdAt(date).ex + (prev && isSale(prev) && prev.src !== 'self' && prev.date <= date ? prev.sats : 0);
     if (sats > exAt) exAviso = `<br><span class="warn">Pelos registros, a corretora tinha ${esc(amtTxt(Math.max(0, exAt)))} nessa data. Se os sats saíram da sua carteira, escolha “Da minha carteira”.</span>`;
   }
-  el.innerHTML = `${f.mode === 'price' ? `= <b>${esc(fmtSats(sats))}</b> sats vendidos` : `Cotação efetiva: <b>${esc(fmtMoney(price, cur(), 0))}</b>`}${exAviso}${vendaConta(sats, Math.abs(fiat), fee, date, f.id, daCarteira)}${apFxLine(fiat, date)}`;
+  const B = parseNum(fv('fbase')), q = f.fx ? (V > 0 && B > 0 ? B / V : fxToB(1, f.fx.d)) : 1;   // da moeda do formulário para a dos aportes
+  el.innerHTML = `${f.mode === 'price' ? `= <b>${esc(fmtSats(sats))}</b> sats vendidos` : `Cotação efetiva: <b>${esc(fmtMoney(price, c, 0))}</b>`}${exAviso}${vendaConta(sats, V * q, fee * q, date, f.id, daCarteira, { feeS, dual: !!f.fx, v: V, fee })}`;
   updateSaleTx();
 }
 /* Conta da venda, a mesma no formulário de venda e na venda feita pela transação: custo pelo custo médio da data, lucro
-   realizado, quanto os sats valeriam hoje, a taxa e, na venda da carteira, o aviso do informe mensal à Receita. */
-function vendaConta(sats, fiat, fee, date, excludeId, daCarteira) {
+   realizado, quanto os sats valeriam hoje, a taxa e, na venda da carteira, o aviso do informe mensal à Receita. fiat e
+   fee vêm na moeda dos aportes. Com o formulário na moeda dos valores (o.dual, 1.8.31), a conta sai nela, como na aba
+   Aportes (cada registro pelo dólar dele), e o lucro em reais, o do IR, vem numa linha à parte. */
+function vendaConta(sats, fiat, fee, date, excludeId, daCarteira, o = {}) {
   const pos = posBefore(date, excludeId), per = pos.held > 0 ? pos.cost / pos.held : 0;
-  const cost = per * Math.min(sats, pos.held), gain = fiat - cost, now = sats / 1e8 * priceNow();
-  return `${sats > pos.held ? `<br><span class="neg">Pelos registros, nessa data você tinha ${esc(fmtSats(pos.held))} sats.</span>` : ''}
-    <br>Custo médio ${esc(fmtMoney(per * 1e8, cur(), 0))} · lucro realizado <b class="${gain >= 0 ? 'pos' : 'neg'}">${esc((gain >= 0 ? '+' : '−') + fmtMoney(Math.abs(gain)))}</b>
-    <br>Hoje esses sats valeriam ${esc(fmtMoney(now))}${apFeeLine(fiat, fee, sats, true)}${daCarteira ? decriptoLinha(date, fiat, excludeId) : ''}`;
+  const cost = per * Math.min(sats, pos.held), gain = fiat - cost, sg = (v, c) => esc((v >= 0 ? '+' : '−') + fmtMoney(Math.abs(v), c));
+  const falta = sats > pos.held ? `<br><span class="neg">Pelos registros, nessa data você tinha ${esc(fmtSats(pos.held))} sats.</span>` : '';
+  const dc = daCarteira ? decriptoLinha(date, fiat, excludeId) : '';
+  if (!o.dual) return `${falta}
+    <br>Custo médio ${esc(fmtMoney(per * 1e8, cur(), 0))} · lucro realizado <b class="${gain >= 0 ? 'pos' : 'neg'}">${sg(gain)}</b>
+    <br>Hoje esses sats valeriam ${esc(fmtMoney(sats / 1e8 * priceNow()))}${apFeeLine(fiat, fee, sats, true, cur(), o.feeS)}${dc}`;
+  const c = vcur(), pv = posBefore(date, excludeId, apV), perV = pv.held > 0 ? pv.cost / pv.held : 0, gainV = o.v - perV * Math.min(sats, pv.held);
+  return `${falta}
+    <br>Custo médio ${esc(fmtMoney(perV * 1e8, c, 0))} · lucro realizado <b class="${gainV >= 0 ? 'pos' : 'neg'}">${sg(gainV, c)}</b>
+    ${cur() === 'BRL' ? `<br>Em reais, para o IR: custo ${esc(fmtMoney(cost, 'BRL'))} · lucro realizado <span class="ir ${gain >= 0 ? 'pos' : 'neg'}">${sg(gain, 'BRL')}</span>` : ''}
+    <br>Hoje esses sats valeriam ${esc(fmtMoney(sats / 1e8 * priceNow(c), c))}${apFeeLine(o.v, o.fee, sats, true, c, o.feeS)}${dc}`;
 }
 /* Informe mensal das operações sem corretora no Brasil (venda direta, P2P): a DeCripto (IN RFB 2.291/2025), desde julho
    de 2026, quando as operações do mês passam de R$ 35 mil; antes, a declaração da IN RFB 1.888/2019, acima de R$ 30 mil.
@@ -2283,29 +2341,32 @@ function ensureWallet(sel, newName) {
 }
 function saveAporte() {
   const set = S(), f = ui.form, prev = f.id ? byId(state.aportes, f.id) : null, sale = f.type === 'venda';
-  const date = fv('date'), fiatIn = parseNum(fv('fiat'));
-  let price = parseNum(fv('price')), sats = parseAmt(fv('sats'));
+  const date = fv('date'), n = apNums(), fiatIn = n.fiatIn;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return formErr(sale ? 'Informe a data da venda.' : 'Informe a data da compra.');
   if (date > todayISO()) return formErr('A data não pode estar no futuro.');
   if (!sale && fiatIn < 0 && !prev) { apSwitch('venda', { fiat: fmtInput(-fiatIn) }); return formErr('Valor negativo vira venda. Confira os dados e salve de novo.'); }
-  const fiat = sale ? Math.abs(fiatIn) : fiatIn;
-  if (!(fiat > 0)) return formErr(sale ? 'Informe o valor recebido.' : 'Informe o valor pago.');
-  const feeV = apFee(fiat); if (!sale && feeV >= fiat) return formErr('A taxa não pode ser igual ou maior que o valor pago.');
-  const base0 = apBase(fiat, feeV, sale);
-  if (f.mode === 'price') { if (!(price > 0)) return formErr(`Informe a cotação do bitcoin na ${sale ? 'venda' : 'compra'}.`); sats = Math.round(base0 / price * 1e8); }
-  else { if (!(sats > 0)) return formErr(sale ? 'Informe os sats vendidos.' : 'Informe os sats recebidos.'); price = base0 / (sats / 1e8); }
-  if (prev && prev.entrada) { sats = prev.sats; price = base0 / (sats / 1e8); }   // compra de terceiros com valor pago (1.8.19): os sats são os do UTXO
-  if (sats < 1) return formErr('O valor resulta em menos de 1 sat. Confira os números.');
+  if (!(sale ? n.V > 0 : fiatIn > 0)) return formErr(sale ? 'Informe o valor recebido.' : 'Informe o valor pago.');
+  if (f.mode === 'price' && !(n.price > 0)) return formErr(`Informe a cotação do bitcoin na ${sale ? 'venda' : 'compra'}.`);
+  if (f.mode !== 'price' && !(parseAmt(fv('sats')) > 0)) return formErr(sale ? 'Informe os sats vendidos.' : 'Informe os sats recebidos.');
+  if (n.err) return formErr(n.err);
+  // na moeda dos aportes; com o par (1.8.31), pelo valor em R$ e o dólar, que o registro guarda quando é preciso
+  let fiat = round2(n.V), q = 1, dolar = prev ? prev.dolar : undefined, moeda = prev ? prev.moeda : undefined;
+  if (f.fx) { const r = apFxFinal(n.V, sale); if (r.err) return formErr(r.err); fiat = r.B; q = r.q; dolar = r.dolar; moeda = r.moeda; }
+  const feeV = n.fee * q, base0 = apBase(fiat, feeV, sale);
+  let sats = n.sats, price = n.price * q;
+  if (prev && prev.entrada) { sats = prev.sats; if (!n.feeS) price = base0 / (sats / 1e8); }   // compra de terceiros com valor pago (1.8.19): os sats são os do UTXO
+  if (!(sats >= 1)) return formErr('O valor resulta em menos de 1 sat. Confira os números.');
   const est = histPrice(date.slice(0, 7));
-  if (est && !f.warned && (price > est * 2.5 || price < est / 2.5)) { f.warned = true; const b = $('[data-act="save-aporte"]'); if (b) b.textContent = 'Salvar mesmo assim'; return formErr(`A cotação ficou bem diferente da média do mês (${fmtMoney(est, cur(), 0)}). Confira se não faltou ou sobrou um zero.`); }
-  const dEl = $('#f-dol'), dTxt = dEl ? dEl.value.trim() : '', dv = parseNum(dTxt);   // dólar do dia informado à mão (modo offline, 1.8.8)
-  if (dTxt && !(dv >= 1 && dv <= 20)) return formErr(`Confira o dólar: quanto custava US$ 1 em reais no dia da ${sale ? 'venda' : 'compra'} (exemplo: 4,97).`);
-  const dolar = dEl ? (dTxt ? Math.round(dv * 1e4) / 1e4 : undefined) : (prev ? prev.dolar : undefined);
-  const base = { id: prev ? prev.id : uid(), date, fiat: round2(fiat), price: round2(price), sats, ex: (fv('ex').trim() || DEF_EX(sale ? 'venda' : 'compra')).slice(0, 60), note: fv('note').trim().slice(0, 140), fee: feeV > 0 ? round2(feeV) : 0, dolar };
+  if (est && !f.warned && (price > est * 2.5 || price < est / 2.5)) { f.warned = true; const b = $('[data-act="save-aporte"]'); if (b) b.textContent = 'Salvar mesmo assim'; return formErr(`A cotação ficou bem diferente da média do mês (${fmtMoney(histPrice(date.slice(0, 7), apFc()), apFc(), 0)}). Confira se não faltou ou sobrou um zero.`); }
+  const base = { id: prev ? prev.id : uid(), date, fiat, price: round2(price), sats, ex: (fv('ex').trim() || DEF_EX(sale ? 'venda' : 'compra')).slice(0, 60), note: fv('note').trim().slice(0, 140), fee: feeV > 0 ? round2(feeV) : 0, feeSats: n.feeS > 0 ? n.feeS : undefined, dolar, moeda };
   if (sale) {
     const ap = { ...base, type: 'venda', src: set.utxo ? (f.src || 'ex') : (prev ? prev.src || 'ex' : 'ex') };
-    // venda já ligada a uma transação: quantidade e data vêm da transação
-    if (prev && prev.txId && byId(state.spends, prev.txId)) { Object.assign(ap, { sats: prev.sats, date: prev.date, src: 'self', txId: prev.txId, wallet: prev.wallet }); ap.price = round2((ap.fiat + (ap.fee || 0)) / (ap.sats / 1e8)); }
+    // venda já ligada a uma transação: quantidade e data vêm da transação; a cotação sai do recebido e da taxa
+    if (prev && prev.txId && byId(state.spends, prev.txId)) {
+      Object.assign(ap, { sats: prev.sats, date: prev.date, src: 'self', txId: prev.txId, wallet: prev.wallet });
+      if (ap.feeSats > 0 && ap.sats > ap.feeSats) { ap.price = round2(ap.fiat / ((ap.sats - ap.feeSats) / 1e8)); ap.fee = round2(ap.feeSats * ap.price / 1e8); }
+      else ap.price = round2((ap.fiat + (ap.fee || 0)) / (ap.sats / 1e8));
+    }
     const eL = ledgerErrNovo(ledger(state.aportes.filter(x => x.id !== ap.id).concat([ap]))); if (eL) return formErr(ledgerErrText(eL));
     if (set.utxo && ap.src === 'self' && !ap.txId && !(prev && prev.src === 'self')) {
       const n = saleTxCalc(ap.sats), sx = (fv('sx') || '').trim(), txid = (fv('stxid') || '').trim();
@@ -2393,7 +2454,7 @@ function sheetMonth(k) {
   const [y, m] = k.split('-').map(Number);
   const pre = k === nowYM() ? todayISO() : `${k}-${pad2(Math.min(S().day, lastDay(k)))}`;
   openSheet('month', () => `<h2>${Cap(MONTHS_FULL[m - 1])} de ${y}</h2><p class="sub">${aps.length ? `${aps.length} ${aps.length === 1 ? 'aporte' : 'aportes'} · ${MV(aps.reduce((t, a) => t + toVa(a, a.fiat), 0))} · ${AMT(aps.reduce((t, a) => t + a.sats, 0))}` : 'Nenhum aporte registrado neste mês.'}${sales ? ` · ${sales} ${sales === 1 ? 'venda' : 'vendas'}` : ''}</p>
-    ${all.map(apV).map(a => `<button class="row-btn ${isSale(a) ? 'sale' : ''}" data-act="edit-aporte" data-id="${a.id}"><span class="a">${isSale(a) ? '<span class="tag s">venda</span> ' : ''}${fmtDate(a.date)} · ${MV(a.fiat)}</span><span class="r"><b>${AMT(isSale(a) ? -a.sats : a.sats)}</b></span><span class="b">${esc(fmtV(a.price, 0))}${a.ex ? ' · ' + esc(a.ex) : ''}${a.fx ? ' · ' + esc(fxShort(a.fx)) : ''}</span><span></span></button>`).join('')}
+    ${all.map(a0 => [apV(a0), a0]).map(([a, a0]) => `<button class="row-btn ${isSale(a) ? 'sale' : ''}" data-act="edit-aporte" data-id="${a.id}"><span class="a">${isSale(a) ? '<span class="tag s">venda</span> ' : ''}${fmtDate(a.date)} · ${MV(a.fiat)}${altV(a0)}</span><span class="r"><b>${AMT(isSale(a) ? -a.sats : a.sats)}</b></span><span class="b">${esc(fmtV(a.price, 0))}${a.ex ? ' · ' + esc(a.ex) : ''}${a.fx ? ' · ' + esc(fxShort(a.fx)) : ''}</span><span></span></button>`).join('')}
     <button class="btn ${aps.length ? 'btn-q' : 'btn-p'} block" style="margin-top:14px" data-act="new-aporte" data-date="${pre}">Registrar aporte em ${fmtYM(k)}</button>`, { label: 'Mês' });
 }
 /* ---------------- preço ---------------- */
@@ -3454,7 +3515,7 @@ document.addEventListener('input', e => {
   const k = e.target.dataset && e.target.dataset.inp; if (!k) return;
   if (k === 'ap-calc') updateApCalc();
   else if (k === 'ap-price') { ui.form.touched = true; updateApCalc(); }
-  else if (k === 'ap-date') { const d = e.target.value; if (/^\d{4}-\d{2}-\d{2}$/.test(d) && !ui.form.touched) { const p = histPrice(d.slice(0, 7)); if (p) $('#f-price').value = fmtInput(p, 0); const h = $('#price-hint'); if (h) h.innerHTML = priceHint(d); } updateApCalc(); }
+  else if (k === 'ap-date') { const d = e.target.value; if (/^\d{4}-\d{2}-\d{2}$/.test(d) && !ui.form.touched) { const p = histPrice(d.slice(0, 7), apFc()); if (p) $('#f-price').value = fmtInput(p, 0); const h = $('#price-hint'); if (h) h.innerHTML = priceHint(d); } apFxData(); updateApCalc(); }
   else if (k === 'wd-calc') updateWdCalc();
   else if (k === 'fee-rate') { const v = +e.target.value; S().feeRate = v; $('#fr-val').textContent = v; $('#utxo-list').innerHTML = utxoRows(v); $('#utxo-sum').innerHTML = utxoSummary(v); $$('[data-act="fee-preset"]').forEach(b => b.classList.toggle('on', +b.dataset.v === v)); }
   else if (k === 'sim') { const amt = parseNum($('#sim-amt').value); ui.sim.amount = amt; ui.sim.start = `${$('#sim-y').value}-${pad2(+$('#sim-m').value)}`; $('#sim-out').innerHTML = simOut(); }
@@ -4513,9 +4574,17 @@ Object.assign(ACT, {
     ui.sel = new Set(live.filter(u => u.wallet === w).map(u => u.id)); render();
   },
   'sel-none': () => { ui.sel.clear(); render(); },
+  // unidade da taxa: em dinheiro, % ou sats (1.8.31). Trocar a unidade lê de novo o que foi digitado: em sats, os dígitos
   'ap-feeu': el => {
-    const u = el.dataset.u; ui.form.feeU = u; $$('[data-act="ap-feeu"]').forEach(b => b.classList.toggle('on', b === el));
-    const fe = $('#f-afee'); if (fe) { const n = parseNum(fe.value); fe.dataset.num = u === 'pct' ? 'dec' : 'money'; fe.placeholder = u === 'pct' ? '0' : '0,00'; if (fe.value.trim() && isFinite(n)) fe.value = u === 'pct' ? String(round2(n)).replace('.', ',') : fmtInput(n); fe.dataset.prev = fe.value; }
+    const u = el.dataset.u, antes = ui.form.feeU; ui.form.feeU = u; $$('[data-act="ap-feeu"]').forEach(b => { b.classList.toggle('on', b === el); b.setAttribute('aria-pressed', b === el); });
+    const fe = $('#f-afee');
+    if (fe) {
+      const n = antes === 'sats' ? parseIntSafe(fe.value) : parseNum(fe.value), dig = parseIntSafe(fe.value);
+      fe.dataset.num = u === 'pct' ? 'dec' : u === 'sats' ? 'int' : 'money'; fe.inputMode = u === 'sats' ? 'numeric' : 'decimal'; fe.placeholder = u === 'fiat' ? '0,00' : '0';
+      if (fe.value.trim() && isFinite(n)) fe.value = u === 'sats' ? (dig > 0 ? fmtSats(dig) : '') : u === 'pct' ? String(round2(n)).replace('.', ',') : fmtInput(n);
+      fe.dataset.prev = fe.value;
+    }
+    const h = $('#fee-hint'); if (h) h.textContent = apFeeDica(ui.form.type === 'venda', u);
     updateApCalc();
   },
   'sale-pick': el => { const f = ui.form; if (!f.pick) f.pick = new Set(); f.pick.has(el.dataset.id) ? f.pick.delete(el.dataset.id) : f.pick.add(el.dataset.id); f.pickTouched = true; f.dustOk = false; const box = $('#sale-utxos'); if (box) box.innerHTML = saleUtxoRows(); updateSaleTx(); },
@@ -5495,7 +5564,8 @@ ACT['mp-refresh'] = () => mpManual();
    feriado usam o último dia útil antes), com o BCE (Frankfurter) de reserva. O app busca sozinho quando está online e
    guarda no aparelho, fora do backup (é dado público). Sem o dólar do dia (modo offline, prévia ou falha na rede), vale a
    PTAX média do mês, já embutida no hist.json (brl ÷ usd); no mês corrente, o dólar mais recente conhecido.
-   O app nunca pede a cotação do dólar. O relatório do IR fica sempre em reais. */
+   O registro que guarda o próprio dólar (dolar: informado na moeda dos valores, ajustado ou digitado, 1.8.31) usa sempre
+   esse dólar, online e offline. O app nunca exige a cotação do dólar. O relatório do IR fica sempre em reais. */
 const FX_KEY = 'fx', FX_LS = 'holdbtc100:fx', FX_PAIR = ['BRL', 'USD'];
 const fxEmpty = () => ({ v: 1, src: '', d: {}, from: '', to: '', chk: 0, bcbTry: 0 });
 let fx = fxEmpty();                       // d: { 'AAAA-MM-DD': reais por dólar }
@@ -5540,8 +5610,24 @@ function fxAt(date) {
   if (ym < HIST.start) return { r: fxMonth(HIST.start) || fxToday().r, ref: HIST.start, kind: 'est' };
   const t = fxToday(); return { r: t.r, ref: t.ref, kind: t.kind === 'man' ? 'man' : 'est' };
 }
-/* dólar de um registro: no modo 100% offline, o informado à mão no próprio aporte ou venda (1.8.8); senão, o da data */
-function fxOf(a) { return S().offline && a.dolar > 0 ? { r: a.dolar, ref: a.date, kind: 'apm' } : fxAt(a.date); }
+/* dólar de um registro: o guardado nele (1.8.31; vale online e offline) ou o do dia da operação */
+function fxOf(a) { return a.dolar > 0 ? fxReg(a) : fxAt(a.date); }
+/* conversões do par: valor na moeda do formulário (a dos valores) e na dos aportes, e o dólar (R$ por US$) pelos dois */
+const fxToB = (v, d) => cur() === 'BRL' ? v * d : v / d;
+const fxToF = (b, d) => cur() === 'BRL' ? b / d : b * d;
+const fxDe = (v, b) => cur() === 'BRL' ? b / v : v / b;
+/* De onde veio o dólar guardado num registro, para a etiqueta: a PTAX (ou o BCE) de um dia útil até 10 dias antes da
+   operação (o que o formulário propôs, mesmo com a PTAX do dia ainda por sair), a média do mês (estimativa de quando o
+   app não tinha o dólar do dia) ou informado pela pessoa. Confere pelo valor: os dois dólares dão os mesmos centavos. */
+function fxReg(a) {
+  const r = a.dolar, v = fxToF(a.fiat, r);   // v: o valor na moeda dos valores, o que o dólar guardado preserva
+  const igual = c => c > 0 && (Math.abs(c - r) < 1e-9 || (Math.abs(c / r - 1) < 0.002 && (round2(fxToB(v, c)) === round2(a.fiat) || round2(fxToF(a.fiat, c)) === round2(v))));
+  let k = a.date;
+  for (let i = 0; i < 10; i++, k = isoAdd(k, -1)) { const v = fx.d[k]; if (v > 0 && igual(v)) return { r, ref: k, kind: fx.src === 'BCE' ? 'bce' : 'ptax', reg: true }; }
+  const ym = a.date.slice(0, 7), m = fxMonth(ym);
+  if (m && igual(m)) return { r, ref: ym, kind: 'mes', reg: true };
+  return { r, ref: a.date, kind: 'apm', reg: true };
+}
 function fxLabel(x) {
   if (x.kind === 'ptax') return `PTAX de ${fmtDate(x.ref)}`;
   if (x.kind === 'bce') return `BCE de ${fmtDate(x.ref)}`;
@@ -5565,10 +5651,10 @@ function apV(a) { if (!fxOn()) return a; const x = fxOf(a), k = fxK(x); return {
 const MV = (v, dec = 2) => priv(fmtMoney(v, vcur(), dec));
 const fmtV = (v, dec = 2) => fmtMoney(v, vcur(), dec);
 
-/* quantos registros usam o dólar do dia, a média do mês ou uma estimativa */
+/* quantos registros usam o dólar do dia, a média do mês ou uma estimativa (reg: a média do mês guardada no registro) */
 function fxStats() {
-  const s = { day: 0, mes: 0, man: 0, est: 0, n: state.aportes.length };
-  for (const a of state.aportes) { const k = fxOf(a).kind; if (k === 'ptax' || k === 'bce') s.day++; else if (k === 'mes') s.mes++; else if (k === 'man' || k === 'apm') s.man++; else s.est++; }
+  const s = { day: 0, mes: 0, man: 0, est: 0, reg: 0, n: state.aportes.length };
+  for (const a of state.aportes) { const x = fxOf(a), k = x.kind; if (k === 'ptax' || k === 'bce') s.day++; else if (k === 'mes') { if (x.reg) s.reg++; else s.mes++; } else if (k === 'man' || k === 'apm') s.man++; else s.est++; }
   return s;
 }
 function fxWhy() {
@@ -5577,21 +5663,24 @@ function fxWhy() {
   if (fxSt.p) return 'Buscando o dólar do dia…';
   return fxSt.err || 'O app busca o dólar do dia quando estiver online.';
 }
-/* o que ainda não usa o dólar do dia, e por quê (vazio quando todos usam) */
+/* O que não usa o dólar do dia, e por quê (vazio quando todos usam). O que espera o dólar do dia vem "por enquanto"; o
+   dólar guardado no registro (1.8.31) fica até a pessoa trocar, e o texto diz isso. */
 function fxPending() {
   const s = fxStats(); if (!s.n || s.day === s.n) return '';
-  const p = [];
+  const p = [], q = [], n = (k, um, varios) => `${k} ${k === 1 ? um : varios}`;
   if (s.mes) p.push(`${s.mes} pela média do mês`);
-  if (s.man) p.push(`${s.man} pelo dólar que você informou`);
   if (s.est) p.push(`${s.est} por estimativa`);
-  return `${s.day ? `Por enquanto, ${s.day} com o dólar do dia e ` : 'Por enquanto, '}${p.join(' e ')}. ${fxWhy()}`;
+  if (s.man) q.push(`${n(s.man, 'registro usa', 'registros usam')} o dólar que você informou`);
+  if (s.reg) q.push(`${n(s.reg, 'registro guarda', 'registros guardam')} a média do mês como dólar${NET() && !IN_CLAUDE ? ' (abra o registro para usar a PTAX do dia)' : ''}`);
+  const espera = p.length ? `${s.day ? `Por enquanto, ${s.day} com o dólar do dia e ` : 'Por enquanto, '}${p.join(' e ')}. ${fxWhy()}` : '';
+  return [espera, q.length ? q.join('; ') + '.' : ''].filter(Boolean).join(' ');
 }
 const fxSrcName = () => fx.src === 'BCE' ? 'BCE, o Banco Central Europeu' : 'PTAX do Banco Central';
 /* nota do Início e dos Aportes */
 function fxNote() {
   if (!fxOn() || !state.aportes.length) return '';
   const pend = fxPending();
-  return `<p class="hint fx-note">Valores em ${vcur() === 'USD' ? 'US$' : 'R$'}: cada aporte e venda convertido pelo dólar do dia da operação (${esc(fxSrcName())}), sem você informar nada.${pend ? ' ' + esc(pend) : ''}</p>`;
+  return `<p class="hint fx-note">Valores em ${vcur() === 'USD' ? 'US$' : 'R$'}: cada aporte e venda convertido pelo dólar do dia da operação (${esc(fxSrcName())}), que o app busca sozinho.${pend ? ' ' + esc(pend) : ''}</p>`;
 }
 
 /* ---------- busca do dólar (só online, fora da prévia e com a exibição na outra moeda) ---------- */
@@ -5625,8 +5714,8 @@ async function fxECB(a, b) {
    (1.8.9): o pedido não depende dos registros, e quem responde não fica sabendo desde quando a pessoa compra.
    Se o Banco Central falhar, usa o BCE; tenta o Banco Central de novo depois de 12 h. */
 const FX_FROM = '2009-12-20';
-function fxSync(force = false) {
-  if (!fxOn() || IN_CLAUDE || !NET() || !state.aportes.length) return Promise.resolve(false);
+function fxSync(force = false, form = false) {   // form: o formulário de aporte na moeda dos valores pede o dólar mesmo sem registros (1.8.31)
+  if (!fxOn() || IN_CLAUDE || !NET() || (!state.aportes.length && !form)) return Promise.resolve(false);
   if (fxSt.p) return fxSt.p;
   const now = Date.now();
   if (!force && now - fxSt.failAt < 10 * 60000) return Promise.resolve(false);
@@ -5652,7 +5741,7 @@ function fxSync(force = false) {
     fxSt.failAt = now; fxSt.err = 'Não deu para buscar o dólar do dia agora. O app tenta de novo daqui a pouco.';
     return false;
   })().catch(() => false);
-  return fxSt.p.finally(() => { fxSt.p = null; render(); refreshSheet(); });
+  return fxSt.p.finally(() => { fxSt.p = null; render(); refreshSheet(); if (ui.sheet && ui.sheet.kind === 'aporte') { apFxData(); updateApCalc(); } });
 }
 async function fxLoad() {
   const ok = v => v && typeof v === 'object' && v.d && typeof v.d === 'object';
@@ -5670,8 +5759,8 @@ async function fxSave() {
 function viewCurField() {
   if (!fxPairOk()) return `<div class="field"><span class="lbl">Moeda dos valores</span><p class="small muted" style="margin:0">Com registros em €, os valores aparecem em €. A troca entre R$ e US$ vale para registros em reais ou em dólar.</p></div>`;
   const v = vcur(), base = cur(), sym = c => c === 'USD' ? 'US$' : 'R$', pend = fxPending();
-  const hint = fxOn() ? `Seus aportes continuam registrados em ${sym(base)}. Em ${sym(v)}, cada valor é convertido pelo dólar do dia da operação (${esc(fxSrcName())}), que o app busca sozinho.${pend ? ' ' + esc(pend) : ''}`
-    : `Em ${sym(base === 'BRL' ? 'USD' : 'BRL')}, a cotação, a pilha, o total aportado e cada aporte aparecem convertidos pelo dólar do dia de cada operação. Você não precisa informar o dólar.`;
+  const hint = fxOn() ? `Seus aportes continuam registrados em ${sym(base)}. Em ${sym(v)}, cada valor é convertido pelo dólar do dia da operação (${esc(fxSrcName())}), que o app busca sozinho. No aporte e na venda, você informa o valor em ${sym(v)} e vê o valor em ${sym(base)} e o dólar, que pode ajustar.${pend ? ' ' + esc(pend) : ''}`
+    : `Em ${sym(base === 'BRL' ? 'USD' : 'BRL')}, a cotação, a pilha, o total aportado e cada aporte aparecem convertidos pelo dólar do dia de cada operação, e os aportes podem ser informados em ${sym(base === 'BRL' ? 'USD' : 'BRL')}. Você não precisa informar o dólar.`;
   return `<div class="field"><span class="lbl">Moeda dos valores</span><div class="seg" role="group" aria-label="Moeda dos valores">${[['BRL', 'R$ (real)'], ['USD', 'US$ (dólar)']].map(([c, l]) => `<button class="${v === c ? 'on' : ''}" data-act="set-view" data-v="${c}" aria-pressed="${v === c}">${l}</button>`).join('')}</div><p class="hint" id="fx-hint">${hint}</p></div>`;
 }
 /* linha "Dólar hoje" (Início e cotação) */
@@ -5679,12 +5768,6 @@ function fxTodayRow() {
   if (!fxOn()) return '';
   const t = fxToday();
   return `<li><span class="k">Dólar hoje</span><span class="dots"></span><button class="v" data-act="price-sheet">${esc(fmtFx(t.r))}<small>${esc(fxLabel(t))}</small></button></li>`;
-}
-/* linha extra no formulário de aporte e venda: quanto fica na moeda de exibição */
-function apFxLine(fiat, date) {
-  if (!fxOn() || !(Math.abs(fiat) > 0)) return '';
-  const dv = apDolTyped(), x = dv ? { r: dv, ref: '', kind: 'apm' } : fxAt(/^\d{4}-\d{2}-\d{2}$/.test(date || '') ? date : todayISO());
-  return `<br><span class="small muted">Equivale a ${fxApprox(x) ? '≈ ' : ''}${esc(fmtV(Math.abs(fiat) * fxK(x)))} (dólar a ${esc(fmtFx(x.r))}, ${esc(fxLabel(x))})</span>`;
 }
 /* modo offline: campo opcional "Dólar de hoje" na cotação, só com os valores na outra moeda (1.8.7) */
 function fxManField() {
@@ -5700,19 +5783,115 @@ function fxManSet(r) {
   if (cur() === 'BRL') { const u = Math.round(p.BRL / state.fxm.r); if (p.USD > 0) p.EUR = Math.round(p.EUR * u / p.USD); p.USD = u; }
   else if (cur() === 'USD') p.BRL = Math.round(p.USD * state.fxm.r);
 }
-/* formulário de aporte e venda, no modo offline com os valores na outra moeda: dólar daquele dia, opcional (1.8.8) */
-const apDolTyped = () => { const el = $('#f-dol'), v = el ? parseNum(el.value) : NaN; return v >= 1 && v <= 20 ? v : 0; };
-function apDolHint(date) {
-  const x = fxAt(/^\d{4}-\d{2}-\d{2}$/.test(date || '') ? date : todayISO());
-  return { ph: fmtInput(x.r, 4), txt: `Quanto custava US$ 1 nesse dia, se você souber (comprovante ou extrato). Em branco, o app usa ${fmtFx(x.r, 4)} (${fxLabel(x)}). Vale no modo offline; online, vale a PTAX do dia.` };
+/* ---------- aporte e venda na moeda dos valores (1.8.31, pedido do Nicolas) ----------
+   Com os valores na outra moeda (fxOn), o formulário pede o valor na moeda dos valores (ex.: US$) e mostra, ligados, o
+   valor na moeda dos aportes (R$) e o dólar. O dólar vem sozinho: a PTAX de venda do dia, a conversão que a Receita usa
+   nas operações com criptoativos (IN RFB 2.291/2025, art. 11), ou, sem ela, a média do mês ou a estimativa, sempre com
+   a origem. Os dois campos digitados por último ficam e o terceiro é calculado: digitar os dois valores ajusta o dólar;
+   digitar o dólar recalcula o outro valor; sem nada digitado, o valor em R$ fica e o em US$ segue o dólar.
+   O registro continua na moeda dos aportes (custo médio e IR) e guarda o dólar quando o valor foi informado na moeda dos
+   valores ou o dólar foi ajustado: o valor digitado volta igual depois. Só com o valor em R$ e o dólar automático, nada
+   é guardado e o registro segue o dólar do dia, como os outros. */
+const apFc = () => fxOn() ? vcur() : cur();   // moeda do formulário de aporte e venda
+const apIso = d => /^\d{4}-\d{2}-\d{2}$/.test(d || '') ? d : todayISO();
+/* estado do par (ui.form.fx): ord, os campos digitados, o mais recente primeiro (v: valor na moeda dos valores, b: na
+   dos aportes, d: dólar); how, de onde vem o dólar (auto, rec: o guardado no registro, dig: digitado, val: pelos dois
+   valores); d, o dólar em uso, exato; moeda, o registro foi informado na moeda dos valores (a.moeda) */
+function apFxIni(a, date) { const moeda = !!a && a.moeda === vcur(); return a && a.dolar > 0 ? { ord: [], how: 'rec', d: a.dolar, moeda } : { ord: [], how: 'auto', d: fxAt(date).r, moeda }; }
+function apFxHTML(d) {
+  return `<div class="two fx-par"><div class="field"><label for="f-base">Valor em ${curSym(cur())}</label><input class="inp" id="f-base" name="fbase" inputmode="decimal" autocomplete="off" data-num="money" placeholder="0,00" value="${esc(d.fbase || '')}" data-inp="ap-b"></div>
+    <div class="field"><label for="f-dol">Dólar (R$ por US$)</label><input class="inp" id="f-dol" name="dolar" inputmode="decimal" autocomplete="off" data-num="dec" data-dec="4" value="${esc(d.dolar || '')}" data-inp="ap-d"></div></div>
+    <p class="hint fx-dica" id="dol-hint">${apFxDica()}</p>`;
 }
-function apDolField(d, sale) {
-  if (!S().offline || !fxOn()) return '';
-  const h = apDolHint(d.date);
-  return `<div class="field"><label for="f-dol">Dólar no dia da ${sale ? 'venda' : 'compra'}, em reais (opcional)</label><input class="inp" id="f-dol" name="dolar" inputmode="decimal" data-num="dec" data-dec="4" autocomplete="off" placeholder="${esc(h.ph)}" value="${esc(d.dolar || '')}" data-inp="ap-calc"><p class="hint" id="dol-hint">${esc(h.txt)}</p></div>`;
+/* a dica do dólar: de onde ele vem e, quando é outro, o dólar automático com o botão para voltar a ele */
+function apFxDica() {
+  const f = ui.form, x = f.fx; if (!x) return '';
+  const au = fxAt(apIso(fv('date') || f.d.date)), k = au.kind;
+  const nome = k === 'ptax' ? 'a PTAX do dia' : k === 'bce' ? 'o dólar do BCE' : k === 'mes' ? 'a média do mês' : k === 'man' ? 'o dólar de hoje que você informou' : 'a estimativa do app';
+  const liga = 'Digitou os dois valores? O dólar se ajusta.', sabe = `Se souber o dólar do dia ou o valor em ${curSym(cur())}, digite.`;
+  const orig = k === 'ptax' ? `PTAX de ${fmtDate(au.ref)}: a cotação de venda do Banco Central, que a Receita usa nas operações com criptoativos. ${liga}`
+    : k === 'bce' ? `BCE de ${fmtDate(au.ref)}: o Banco Central não respondeu, e o app tenta de novo depois. ${liga}`
+    : k === 'mes' ? `Média de ${fmtYM(au.ref)}: uma estimativa, sem o dólar do dia. ${sabe}`
+    : k === 'man' ? `Dólar de hoje que você informou em ${fmtDate(au.ref)}. ${liga}` : `Estimativa (${fxLabel(au)}), sem o dólar do dia. ${sabe}`;
+  if (x.how === 'auto') return esc(orig);
+  const volta = Math.abs(au.r - x.d) >= 5e-5 ? ` ${esc(`${Cap(nome)} é ${fmtFx(au.r, 4)}.`)} <button class="link-btn small" data-act="ap-fx-auto">${esc('Usar ' + nome)}</button>` : '';
+  if (x.how === 'val') {
+    const V = Math.abs(parseNum(fv('fiat'))), B = parseNum(fv('fbase')), r = cur() === 'BRL' ? [B, V] : [V, B];
+    return esc(`Ajustado pelos valores: ${fmtMoney(r[0], 'BRL')} ÷ ${fmtMoney(r[1], 'USD')}.`) + volta;
+  }
+  if (x.how === 'dig') return esc('Dólar informado por você.') + volta;
+  const a = f.id ? byId(state.aportes, f.id) : null, g = a ? fxReg({ ...a, dolar: x.d }) : { kind: 'apm' };
+  return esc(`Dólar guardado neste registro (${g.kind === 'apm' ? 'informado por você' : fxLabel(g)}).`) + volta;
 }
-function apDolSync() { const el = $('#f-dol'), hi = $('#dol-hint'); if (!el || !hi) return; const h = apDolHint(fv('date')); el.placeholder = h.ph; hi.textContent = h.txt; }
+/* escreve um valor calculado (nunca no campo em que a pessoa está digitando) */
+function apFxPut(name, v, dec = 2) {
+  const el = $(`#sheet-body [name="${name}"]`); if (!el || el === document.activeElement) return;
+  const neg = name === 'fiat' && /^\s*-/.test(el.value);
+  el.value = isFinite(v) && v > 0 ? (neg ? '-' : '') + fmtInput(v, dec) : ''; el.dataset.prev = el.value;
+}
+/* calcula o campo que não está entre os dois digitados por último */
+function apFxCalc() {
+  const x = ui.form.fx; if (!x) return;
+  const top = x.ord.slice(0, 2), V = Math.abs(parseNum(fv('fiat'))), B = parseNum(fv('fbase'));
+  if (top.includes('v') && top.includes('b')) { if (V > 0 && B > 0) { x.d = fxDe(V, B); x.how = 'val'; apFxPut('dolar', x.d, 4); } }
+  else if (top.includes('v')) apFxPut('fbase', V > 0 ? round2(fxToB(V, x.d)) : NaN);
+  else apFxPut('fiat', B > 0 ? round2(fxToF(B, x.d)) : NaN);
+  const h = $('#dol-hint'); if (h) h.innerHTML = apFxDica();
+}
+function apFxEdit(k) {
+  const x = ui.form.fx; if (!x) return;
+  x.ord = [k, ...x.ord.filter(y => y !== k)];
+  if (k === 'd') { const d = parseNum(fv('dolar')); if (!(d > 0)) return; x.d = d; x.how = 'dig'; }   // apagado: espera (ao sair do campo, volta ao automático)
+  apFxCalc();
+}
+/* volta ao dólar automático da data; com os dois valores digitados, fica o mais recente e o outro segue o dólar. Sem
+   nada digitado, fica o valor em que o registro foi informado: o da moeda dos valores (a.moeda) ou o da moeda dos aportes
+   (o dólar informado à mão, como no modo offline da 1.8.8). */
+function apFxAuto() {
+  const x = ui.form.fx; if (!x) return;
+  x.how = 'auto'; x.d = fxAt(apIso(fv('date'))).r;
+  x.ord = x.ord.filter(k => k !== 'd'); if (x.ord.length > 1) x.ord = [x.ord[0]]; else if (!x.ord.length && x.moeda) x.ord = ['v'];
+  const el = $('#f-dol'); if (el) { el.value = fmtInput(x.d, 4); el.dataset.prev = el.value; }
+  apFxCalc();
+}
+/* data trocada ou dólar do dia que chegou da rede: o dólar automático acompanha */
+function apFxData() {
+  const x = ui.form && ui.form.fx; if (!x || !$('#f-dol')) return;
+  if (x.how !== 'auto') { const h = $('#dol-hint'); if (h) h.innerHTML = apFxDica(); return; }
+  const d = fxAt(apIso(fv('date'))).r; if (Math.abs(d - x.d) < 1e-9) { const h = $('#dol-hint'); if (h) h.innerHTML = apFxDica(); return; }
+  x.d = d; const el = $('#f-dol'); if (el && el !== document.activeElement) { el.value = fmtInput(d, 4); el.dataset.prev = el.value; }
+  apFxCalc();
+}
+/* Na hora de salvar: o valor na moeda dos aportes, o fator da moeda do formulário para ela e o dólar a guardar. O dólar
+   guardado devolve o valor digitado com os mesmos centavos; quando o dólar de 4 casas não devolve, vale a razão exata. */
+function apFxFinal(V, sale) {
+  const x = ui.form.fx, dt = (fv('dolar') || '').trim();
+  if (!(parseNum(dt) > 0)) apFxAuto();   // dólar apagado: volta ao automático
+  const Vr = round2(V); let B = round2(parseNum(fv('fbase')));
+  if (!(B > 0)) B = round2(fxToB(Vr, x.d));
+  const d0 = fxDe(Vr, B);
+  if (!(d0 >= 1 && d0 <= 20)) return { err: x.how === 'val' || x.ord.includes('b') ? `Confira os valores: com ${fmtMoney(cur() === 'BRL' ? B : Vr, 'BRL')} e ${fmtMoney(cur() === 'BRL' ? Vr : B, 'USD')}, o dólar ficaria em ${fmtFx(d0, 4)}.` : `Confira o dólar: quanto custava US$ 1 em reais no dia da ${sale ? 'venda' : 'compra'} (exemplo: 4,97).` };
+  const guarda = x.ord.includes('v') || x.how !== 'auto';
+  let dolar;
+  if (guarda) {
+    const volta = d => round2(fxToF(B, d)) === Vr, d8 = Math.round(d0 * 1e8) / 1e8;
+    dolar = volta(x.d) && Math.abs(x.d / d0 - 1) < 0.002 ? x.d : volta(d8) ? d8 : d0;
+  }
+  // em que moeda o valor foi informado: o último valor digitado; sem nenhum, o do registro
+  const ult = x.ord.find(k => k === 'v' || k === 'b'), moeda = dolar && (ult ? ult === 'v' : x.moeda) ? vcur() : undefined;
+  return { B, q: B / Vr, dolar, moeda };
+}
+/* valor de um registro na moeda dos aportes, ao lado do valor na moeda dos valores (lista dos aportes e do mês) */
+const altV = a0 => fxOn() ? ` <span class="alt">(${priv(fmtMoney(a0.fiat, cur()))})</span>` : '';
+/* dólar apagado e o campo deixado: volta ao automático */
+document.addEventListener('change', e => { const t = e.target; if (t && t.id === 'f-dol' && ui.form && ui.form.fx && !(parseNum(t.value) > 0)) { apFxAuto(); updateApCalc(); } });
+Object.assign(INP, {
+  'ap-v': () => { apFxEdit('v'); updateApCalc(); },
+  'ap-b': () => { apFxEdit('b'); updateApCalc(); },
+  'ap-d': () => { apFxEdit('d'); updateApCalc(); }
+});
 Object.assign(ACT, {
+  'ap-fx-auto': () => { apFxAuto(); updateApCalc(); },
   'set-view': el => {
     const v = el.dataset.v; if (!FX_PAIR.includes(v) || !fxPairOk()) return;
     S().viewCur = v; ui.sim = null; save(); render(); refreshSheet();
