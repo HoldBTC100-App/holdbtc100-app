@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="App do Projeto Hold BTC 100: registre seus aportes mensais em bitcoin, acompanhe preço médio e resultado, gerencie UTXOs e aprenda autocustódia.">
 <title>Hold BTC 100</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eKvohYRkM2+2psc9UM1Q9XP4yrZ+aTEv3p2v8Wkzy4w='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-t90MJa9dHYNUR55Tj0i5AhfjpDldn3ZaWquOLd6WL2g='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -141,7 +141,7 @@ p{margin:0 0 12px}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden}
 .stats>div{background:var(--surface);padding:12px 14px}
 .stats .k{font-size:13px;color:var(--muted)}
-.stats .v+.k{display:block;line-height:1.35;margin-top:3px}
+.stats .k~.k{display:block;line-height:1.35;margin-top:4px}
 .stats .v{font-family:var(--fc);font-weight:700;font-size:23px;line-height:1.15;font-variant-numeric:tabular-nums}
 .stats .wide{grid-column:1/-1}
 
@@ -904,7 +904,7 @@ const KS_CARDS = {
    Claude, sem PIN, também espelha num documento privado.
    ========================================================= */
 
-const APP_VERSION = '1.8.28';
+const APP_VERSION = '1.8.29';
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const HIST = {"start":"2015-01","usd":[269,236,249,240,233,247,274,257,233,275,346,404,400,404,427,433,490,602,649,600,593,655,724,855,967,1075,1126,1210,1817,2384,2684,3787,4520,5404,8338,12178,12166,10318,8680,8122,8372,6952,7096,7394,6818,6489,5192,3887,3595,3654,3979,4704,6942,9680,10459,9914,9056,8766,8345,7372,8268,8948,7481,7512,9050,9296,10232,11509,11218,12286,16730,24328,31072,39024,51906,58338,47486,36155,38354,44318,45439,52582,59166,51586,42365,40791,44360,41879,35044,25823,21591,21674,19744,19962,18841,16851,19838,23126,25804,28897,28234,28846,29858,27587,26456,30805,36179,39982,42444,51946,66244,65986,64146,65194,63729,61864,61188,66861,83364,95022,97976,93433,83444,88373,99394,105848,111410,111996,111124,111840,99685,88638,83198,72854,67640,72356,75048,66150,60768,70714,81095,80570],"brl":[708,663,783,731,714,768,883,904,911,1067,1307,1564,1620,1603,1583,1542,1734,2062,2125,1926,1930,2088,2418,2866,3091,3338,3522,3795,5832,7858,8605,11932,14171,17247,27175,40087,39062,33444,28462,27676,30443,26233,27169,29059,28068,24388,19662,15101,13451,13608,15305,18328,27776,37353,39528,39856,37326,35825,34676,30296,34306,38845,36536,40003,51073,48305,54030,62853,60569,69121,90640,125185,166425,211371,293069,324482,251253,181928,197777,232745,239904,291307,328780,291530,234452,211975,220398,199260,173644,130385,115903,111476,103397,104809,99381,88340,103169,119603,134475,145054,140682,139952,143345,135273,130613,156021,177216,195797,208587,257883,329902,338449,329261,351333,353186,343509,339079,376033,484100,579349,589992,538697,479536,511123,563308,587149,615933,610031,596450,602314,532408,483352,444108,378882,353863,364172,374017,339193,310759,364403,417209,413273]}; // médias mensais estimadas: {start:'2015-01', usd:[…], brl:[…]}
 const REF_PRICE = { BRL: 416900, USD: 75800, EUR: 68000, at: Date.UTC(2026, 10, 7, 18, 0), src: 'ref' }; // US$ do CoinLore × PTAX de 06/11/2026 (R$ 5,50; € 6,13)
@@ -1290,31 +1290,78 @@ function calc() {
     fees = s.saques.reduce((t, w) => t + (w.fee || 0), 0) + s.spends.reduce((t, x) => t + (x.fee || 0), 0);
   }
   const hold = set.utxo ? ex + self : L.held, value = hold / 1e8 * P, result = value + L.proceeds - L.invested;
-  return { P, Pr, L, invested: L.invested, bought: L.bought, held: L.held, cost: L.cost, avg: L.avg, sold: L.sold, proceeds: L.proceeds, realized: L.realized, soldNow: L.sold / 1e8 * P, sales: s.aportes.filter(isSale).length, ex, self, fees, hold, value, result, pct: L.invested > 0 ? result / L.invested : 0 };
+  return { P, Pr, L, invested: L.invested, bought: L.bought, held: L.held, cost: L.cost, avg: L.avg, sold: L.sold, proceeds: L.proceeds, realized: L.realized, soldNow: L.sold / 1e8 * P, sales: s.aportes.filter(isSale).length, ex, self, fees, hold, value, result, pct: L.invested > 0 ? result / L.invested : 0,
+    outSats: L.outSats, outCost: L.outCost, feeSats: L.feeSats, extSats: L.extSats };
 }
 /* Livro de compras e vendas pelo custo médio ponderado (o método da Receita para criptoativos).
-   Cada venda baixa o custo proporcional: sats vendidos × custo médio do momento. */
+   Cada venda baixa o custo proporcional: sats vendidos × custo médio do momento.
+   1.8.29: com a gestão de UTXOs, o livro leva também os movimentos da carteira (ledgerEvents) e a pilha dele é a mesma
+   da aba Carteira e do Início. */
 const isSale = a => a && a.type === 'venda';
+/* Movimentos da carteira que mudam a pilha sem ser compra nem venda (1.8.29, só com a gestão de UTXOs):
+   - taxa: a de saque (cobrada em sats pela corretora) e a de rede de cada transação. Os sats saem e o custo fica: a taxa
+     entra no custo de aquisição do que sobra, e o custo médio sobe;
+   - envio: o que saiu para terceiros sem venda (presente, doação, pagamento não marcado como venda, envio importado com o
+     histórico). Sai pelo custo médio, sem valor recebido: a doação pelo valor da declaração, sem ganho de capital;
+   - entrada: o que veio de terceiros sem valor pago. Entra com custo zero (informado o valor, vira compra, 1.8.19). */
+function ledgerEvents() {
+  if (!S().utxo) return [];
+  const ev = [];
+  for (const w of state.saques) if (w.fee > 0) ev.push({ id: 'w:' + w.id, date: w.date, ev: 'taxa', sats: w.fee });
+  for (const sp of state.spends) {
+    if (sp.fee > 0) ev.push({ id: 't:' + sp.id, date: sp.date, ev: 'taxa', sats: sp.fee });
+    const sv = saidaVenda(sp), env = txSent(sp) - (sv ? sv.sats : 0);
+    if (env > 0) ev.push({ id: 'e:' + sp.id, date: sp.date, ev: 'envio', sats: env, tx: sp.id });
+  }
+  for (const u of state.utxos) if (u.origin === 'externo' && u.sats > 0) ev.push({ id: 'x:' + u.id, date: u.date, ev: 'entrada', sats: u.sats, utxo: u.id });
+  return ev;
+}
 /* Sem nome de corretora: compra fica "Aporte" e venda fica "Venda". Esses nomes padrão não entram nas sugestões nem no IR. */
 const DEF_EX = t => t === 'venda' ? 'Venda' : 'Aporte';
 const isDefEx = x => x === 'Aporte' || x === 'Venda';
 const exNames = () => [...new Set(state.aportes.map(x => x.ex).filter(x => x && !isDefEx(x)))];
 const Cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
-function ledger(list = state.aportes) {
-  const rows = [...list].sort((a, b) => a.date.localeCompare(b.date) || (isSale(a) - isSale(b)) || String(a.id).localeCompare(String(b.id)));
-  let held = 0, cost = 0, bought = 0, invested = 0, sold = 0, proceeds = 0, realized = 0, soldEx = 0, err = null; const info = {};
+/* No mesmo dia: primeiro as entradas (compras e de terceiros), depois as vendas, depois envios e taxas. Saída maior que a
+   pilha do momento (registros fora de ordem, como um histórico importado antes dos aportes) fica pendente e sai das
+   entradas seguintes, pelo custo delas: no fim, a pilha do livro bate com a da carteira. Custo que fica sem sats (taxa que
+   esvazia a pilha) sai junto com os envios (outCost): é dinheiro que saiu sem venda. */
+function ledger(list = state.aportes, events = ledgerEvents()) {
+  const rank = a => a.ev ? (a.ev === 'entrada' ? 0 : 2) : isSale(a) ? 1 : 0;
+  const rows = [...list, ...events].sort((a, b) => a.date.localeCompare(b.date) || rank(a) - rank(b) || String(a.id).localeCompare(String(b.id)));
+  let held = 0, cost = 0, bought = 0, invested = 0, sold = 0, proceeds = 0, realized = 0, soldEx = 0;
+  let outSats = 0, outCost = 0, feeSats = 0, extSats = 0, pendE = 0, pendT = 0; const info = {}, errs = [];
+  const entra = (sats, fiat) => {
+    let s = sats, f = fiat; const u = sats > 0 ? fiat / sats : 0;
+    if (pendE > 0 && s > 0) { const k = Math.min(s, pendE); pendE -= k; s -= k; f -= u * k; outCost += u * k; }
+    if (pendT > 0 && s > 0) { const k = Math.min(s, pendT); pendT -= k; s -= k; }   // taxa pendente: os sats saem, o custo fica
+    held += s; cost += f;
+  };
   for (const a of rows) {
-    if (isSale(a)) {
-      if (a.sats > held && !err) err = { id: a.id, date: a.date, held, need: a.sats };
+    if (a.ev === 'entrada') { entra(a.sats, 0); extSats += a.sats; }
+    else if (a.ev === 'taxa') { const k = Math.min(a.sats, held); held -= k; pendT += a.sats - k; feeSats += a.sats; }
+    else if (a.ev === 'envio') {
+      const k = Math.min(a.sats, held), c = held > 0 ? cost * k / held : 0;
+      held -= k; cost -= c; outCost += c; pendE += a.sats - k; outSats += a.sats; info[a.id] = { cost: c, pend: a.sats - k };
+    } else if (isSale(a)) {
+      if (a.sats > held) errs.push({ id: a.id, date: a.date, held, need: a.sats });
       const take = Math.min(a.sats, held), c = held > 0 ? cost * take / held : 0;
       info[a.id] = { cost: c, gain: a.fiat - c, avg: held > 0 ? cost / held * 1e8 : 0, heldBefore: held };
       held -= take; cost -= c; sold += a.sats; proceeds += a.fiat; realized += a.fiat - c; if (a.src !== 'self') soldEx += a.sats;
-    } else { held += a.sats; cost += a.fiat; bought += a.sats; invested += a.fiat; }
+    } else { entra(a.sats, a.fiat); bought += a.sats; invested += a.fiat; }
+    if (held <= 0) { held = 0; if (cost > 0.000001) outCost += cost; cost = 0; }
   }
-  if (held === 0) cost = 0;
-  return { held, cost, bought, invested, sold, proceeds, realized, soldEx, info, err, avg: held > 0 ? cost / (held / 1e8) : 0 };
+  return { held, cost, bought, invested, sold, proceeds, realized, soldEx, info, errs, err: errs[0] || null, avg: held > 0 ? cost / (held / 1e8) : 0, outSats, outCost, feeSats, extSats, pend: pendE + pendT };
 }
-function posBefore(date, excludeId) { return ledger(state.aportes.filter(a => a.id !== excludeId && (a.date < date || (a.date === date && !isSale(a))))); }
+/* posição antes de uma venda na data: tudo antes dela e as entradas do mesmo dia (a ordem do livro) */
+function posBefore(date, excludeId) {
+  return ledger(state.aportes.filter(a => a.id !== excludeId && (a.date < date || (a.date === date && !isSale(a)))), ledgerEvents().filter(e => e.date < date || (e.date === date && e.ev === 'entrada')));
+}
+/* Venda que passa do saldo e que a mudança criou (1.8.29). Com taxas e envios no livro, registros antigos fora de ordem
+   podem ter uma venda descoberta; ela não trava o que não mexe com ela. */
+function ledgerErrNovo(L, antes = ledger()) {
+  const a = new Map(antes.errs.map(e => [e.id, e.need - e.held]));
+  return L.errs.find(e => !a.has(e.id) || e.need - e.held > a.get(e.id) + 0.5) || null;
+}
 function ledgerErrText(e) { return `Pelos seus registros, em ${fmtDate(e.date)} você tinha ${amtTxt(e.held)}, menos do que os ${amtTxt(e.need)} vendidos nesse dia. Registre antes os aportes que faltam.`; }
 function monthsMap() { const m = {}; for (const a of state.aportes) { if (isSale(a)) continue; const k = a.date.slice(0, 7); const o = m[k] || (m[k] = { n: 0, fiat: 0, sats: 0 }); o.n++; o.fiat += a.fiat; o.sats += a.sats; } return m; }
 function streak(map) { let k = nowYM(); if (!map[k]) k = monthAdd(k, -1); let n = 0; while (map[k]) { n++; k = monthAdd(k, -1); } return n; }
@@ -1640,14 +1687,17 @@ function viewAportes() {
   const tools = `<div class="btn-row" style="margin-top:14px"><button class="btn btn-q btn-s" data-act="new-sale">Registrar venda</button><button class="btn btn-q btn-s" data-act="import">Importar</button><button class="btn btn-q btn-s" data-act="export">Exportar</button><button class="btn btn-q btn-s" data-act="page" data-page="ir">IR</button><button class="btn btn-q btn-s" data-act="page" data-page="sim">Simular</button></div>`;
   if (!aps.length) return `<div class="empty"><h2>Nenhum aporte ainda</h2><p class="muted">Registre sua primeira compra de bitcoin ou traga os aportes da planilha do Hold BTC 100.</p><div class="btn-row"><button class="btn btn-p" data-act="new-aporte">Registrar aporte</button><button class="btn btn-o" data-act="import">Importar planilha</button></div><p style="margin-top:14px"><button class="link-btn" data-act="demo">Explorar com dados de exemplo</button></p></div>`;
   const hide = S().hide, sg = v => hide ? OCULTO : esc((v >= 0 ? '+' : '−') + fmtV(Math.abs(v)));
+  // 1.8.29: o livro tem as taxas, os envios sem venda e as entradas de terceiros; "Em carteira" é a pilha da aba Carteira
   const val = c.held / 1e8 * c.P, res = val + c.proceeds - c.invested, pct = c.invested ? res / c.invested : 0, unreal = val - c.cost;
+  const semVenda = c.outCost > 0.005, conta = S().utxo && (c.feeSats || c.outSats || c.extSats);
+  const partes = [`Não realizado ${sg(unreal)}`].concat(c.sales ? [`realizado nas vendas ${sg(c.realized)}`] : [], semVenda ? [`saiu sem venda ${sg(-c.outCost)}`] : []);
   let h = `<section class="sec"><h1 class="sec-t" style="font-size:28px">Aportes</h1>
   <div class="stats">
-    <div><span class="k">Aporte total</span><div class="v">${MV(c.invested)}</div>${c.sales ? `<span class="k">${MV(c.cost)} ainda aplicados</span>` : ''}</div>
+    <div><span class="k">Aporte total</span><div class="v">${MV(c.invested)}</div>${Math.abs(c.invested - c.cost) > 0.005 && c.invested > 0 ? `<span class="k">${MV(c.cost)} ainda aplicados</span>` : ''}</div>
     <div><span class="k">Custo médio</span><div class="v">${c.held ? MV(c.avg, 0) : '—'}</div></div>
-    <div><span class="k">Em carteira</span><div class="v">${AMT(c.held)}</div></div>
+    <div><span class="k">Em carteira</span><div class="v">${AMT(c.held)}</div>${conta ? '<button class="link-btn small" data-act="ver-conta" style="display:block;margin-top:6px">Ver a conta</button>' : ''}</div>
     <div><span class="k">Valor atual</span><div class="v">${MV(val)}</div></div>
-    <div class="wide"><span class="k">${c.sales ? 'Lucro total, com as vendas' : 'Lucro'}</span><div class="v ${res >= 0 ? 'pos' : 'neg'}">${esc(fmtPct(pct))} · ${sg(res)}</div>${c.sales ? `<span class="k">Não realizado ${sg(unreal)} · realizado nas vendas ${sg(c.realized)}</span><button class="link-btn small" data-act="ver-vendas" style="display:block;margin-top:6px">Ver as vendas</button>` : ''}${S().utxo && c.fees ? `<span class="k">Sem descontar ${esc(amtTxt(c.fees))} de taxas de saque e de rede.</span>` : ''}</div>
+    <div class="wide"><span class="k">${c.sales ? 'Lucro total, com as vendas' : semVenda ? 'Lucro total' : 'Lucro'}</span><div class="v ${res >= 0 ? 'pos' : 'neg'}">${esc(fmtPct(pct))} · ${sg(res)}</div>${c.sales || semVenda ? `<span class="k">${partes.join(' · ')}</span>` : ''}${c.sales ? '<button class="link-btn small" data-act="ver-vendas" style="display:block;margin-top:6px">Ver as vendas</button>' : ''}${S().utxo && c.feeSats ? `<span class="k">Com ${esc(amtTxt(c.feeSats))} de taxas de saque e de rede já descontados.</span>` : ''}</div>
   </div>`;
   h += fxNote() + tools + `</section>`;
   if (aps.length >= 2) h += `<section class="sec"><h2 class="sec-t">${c.sales ? 'Cotação de cada compra e venda' : 'Cotação de cada compra'}</h2>${chartAportes([...aps].reverse().map(apV), c.avg, c.P)}<div class="chart-legend"><span><i></i>cotação paga</span>${c.avg > 0 ? '<span><i class="d"></i>preço médio</span>' : ''}<span><i class="o"></i>hoje</span>${c.sales ? '<span><i class="s"></i>venda</span>' : ''}</div></section>`;
@@ -1666,7 +1716,7 @@ function viewAportes() {
     const v = c.P / a.price - 1;
     h += `<button class="row-btn" data-act="edit-aporte" data-id="${a.id}"><span class="a">${fmtDate(a.date)} · ${MV(a.fiat)}</span><span class="r"><b>${AMT(a.sats)}</b></span><span class="b">${esc(fmtV(a.price, 0))}${a.ex ? ' · ' + esc(a.ex) : ''}${a.fee ? ' · taxa ' + MV(a.fee) : ''}${S().utxo && a.dest === 'self' ? (a.entrada ? ' · ◈ compra de terceiros' : ' · ◈ direto na carteira') : ''}${fxt}</span><span class="r b ${v >= 0 ? 'pos' : 'neg'}">${esc(fmtPct(v))}</span></button>`;
   }
-  return h + `</section>` + (c.sales ? vendasSecao(c) : '');
+  return h + `</section>` + (c.sales ? vendasSecao(c) : '') + (S().utxo && (c.feeSats || c.outSats || c.extSats) ? contaSecao(c) : '');
 }
 /* Vendas, no fim da aba Aportes (1.8.28, pedido do Nicolas). O total aportado continua bruto: soma tudo o que a pessoa já
    pôs e não muda com a venda. O que a venda muda é o "ainda aplicado" (c.cost, o custo do que ficou, que vai na ficha Bens e
@@ -1688,6 +1738,33 @@ function vendasSecao(c) {
       <li><span class="k">Diferença</span><span class="dots"></span><span class="v ${lado > 0 ? 'neg' : lado < 0 ? 'pos' : ''}">${MV(Math.abs(diff))}<small>${lado > 0 ? 'contra a venda' : lado < 0 ? 'a favor da venda' : 'igual ao recebido'}</small></span></li>
     </ul>
     <p class="hint">${lado > 0 ? `O bitcoin subiu desde as vendas: se tivesse guardado, hoje você teria ${MV(diff)} a mais.` : lado < 0 ? `O bitcoin caiu desde as vendas: vendendo, você deixou de perder ${MV(-diff)}.` : 'Hoje os sats vendidos valem o mesmo que você recebeu.'} Não é lucro nem prejuízo e não vai para o IR: só compara o que você recebeu com o que os mesmos sats valem hoje.</p></section>`;
+}
+/* Conta da pilha (1.8.29): do que foi comprado ao "Em carteira", igual à aba Carteira. Cada envio sem venda abre a
+   transação (para virar venda ou Para mim); cada entrada de terceiros sem valor abre o UTXO (para informar o valor pago). */
+function contaSecao(c) {
+  const L = c.L, ev = ledgerEvents(), env = ev.filter(e => e.ev === 'envio').sort((a, b) => b.date.localeCompare(a.date));
+  const ent = state.utxos.filter(u => u.origin === 'externo' && u.sats > 0).sort((a, b) => b.date.localeCompare(a.date));
+  const fecha = c.bought + c.extSats - c.sold - c.outSats - c.feeSats, li = (k, v, sub, cls = '') => `<li><span class="k">${k}</span><span class="dots"></span><span class="v ${cls}">${v}${sub ? `<small>${sub}</small>` : ''}</span></li>`;
+  const sinal = s => S().hide ? AMT(s) : `${s >= 0 ? '+' : '−'}${esc(amtTxt(Math.abs(s)))}`;
+  const rotulo = sp => { const o = sp.outputs.find(x => x.kind === 'ext' && !x.sale && x.label); return o ? o.label : sp.note || ''; };
+  const linhaEnv = e => { const sp = byId(state.spends, e.tx), inf = L.info[e.id] || { cost: 0 }; return `<button class="row-btn" data-act="open-tx" data-id="${e.tx}"><span class="a">${fmtDate(e.date)} · envio</span><span class="r"><b>${sinal(-e.sats)}</b></span><span class="b">${esc(sp ? rotulo(sp) : '') || 'para terceiros'}</span><span class="r b">custo ${MV(inf.cost)}</span></button>`; };
+  const linhaEnt = u => `<button class="row-btn" data-act="edit-utxo" data-id="${u.id}"><span class="a">${fmtDate(u.date)} · de terceiros</span><span class="r"><b>${sinal(u.sats)}</b></span><span class="b">${esc(u.label || '')}</span><span class="r b">sem valor pago</span></button>`;
+  const lista = (arr, f, nome) => arr.length > 8 ? `${arr.slice(0, 8).map(f).join('')}<details class="xi-more"><summary>Ver ${nome} (mais ${arr.length - 8})</summary>${arr.slice(8).map(f).join('')}</details>` : arr.map(f).join('');
+  return `<section class="sec" id="conta-sec"><div class="sec-head"><h2 class="sec-t">Conta da pilha</h2><span class="small muted">do comprado ao que está em carteira</span></div>
+    <ul class="receipt">
+      ${li('Comprado', sinal(c.bought), `${MV(c.invested)} aportados`)}
+      ${c.extSats ? li('De terceiros, sem valor', sinal(c.extSats), 'custo zero') : ''}
+      ${c.sold ? li('Vendido', sinal(-c.sold), `${c.sales} ${c.sales === 1 ? 'venda' : 'vendas'}`) : ''}
+      ${c.outSats ? li('Enviado sem venda', sinal(-c.outSats), `custo de ${MV(c.outCost)}`) : ''}
+      ${c.feeSats ? li('Taxas de saque e de rede', sinal(-c.feeSats), '') : ''}
+      ${li('<b>Em carteira</b>', `<b>${AMT(c.held)}</b>`, c.held === c.hold ? 'igual à aba Carteira' : '')}
+    </ul>
+    ${fecha !== c.held ? `<p class="note warn" style="margin-top:10px">A conta não fecha em ${esc(amtTxt(Math.abs(fecha - c.held)))}: há saídas registradas antes das compras que as cobririam. Confira as datas dos aportes.</p>` : ''}
+    ${c.held !== c.hold && fecha === c.held ? `<p class="note warn" style="margin-top:10px">A aba Carteira mostra ${esc(amtTxt(c.hold))}. Confira os registros antigos, como vendas da carteira sem transação.</p>` : ''}
+    <p class="hint">Envio sem venda (presente, doação ou pagamento) tira os sats da pilha, e o custo deles sai pelo custo médio, sem lucro nem prejuízo. Se foi um pagamento, é venda para a Receita: abra o envio e toque em “Foi uma venda? Registrar”. Se foi para outra carteira sua, edite a transação e marque a saída como Para mim. As taxas tiram sats, e o custo delas fica no que sobrou. O que veio de terceiros sem valor pago entra com custo zero: se você pagou, informe o valor no UTXO.</p>
+    ${env.length ? `<h3 class="mini">Envios sem venda · ${env.length}</h3>${lista(env, linhaEnv, 'todos os envios')}` : ''}
+    ${ent.length ? `<h3 class="mini">De terceiros, sem valor pago · ${ent.length}</h3>${lista(ent, linhaEnt, 'todas as entradas')}` : ''}
+  </section>`;
 }
 function chartAportes(asc, avg, P) {
   const W = 340, H = 150, pl = 2, pr = 2, pt = 12, pb = 20;
@@ -1819,13 +1896,18 @@ function pageIR() {
   const fy = +aps[0].date.slice(0, 4), cy = new Date().getFullYear();
   if (!ui.irYear) ui.irYear = Math.max(fy, cy - 1);
   const y = ui.irYear, end = `${y}-12-31`, endP = `${y - 1}-12-31`;
-  const Ly = ledger(aps.filter(a => a.date <= end)), Lp = ledger(aps.filter(a => a.date <= endP)), Lall = ledger(aps);
+  const ev = ledgerEvents(), Ly = ledger(aps.filter(a => a.date <= end), ev.filter(e => e.date <= end)), Lp = ledger(aps.filter(a => a.date <= endP), ev.filter(e => e.date <= endP)), Lall = ledger(aps, ev);
   const inY = a => a.date > endP && a.date <= end, buysY = aps.filter(a => !isSale(a) && inY(a)), salesY = aps.filter(a => isSale(a) && inY(a));
   const at = holdAt(end), buysUpTo = aps.filter(a => !isSale(a) && a.date <= end);
   // custódia: só onde os bitcoins ficaram (compras na corretora e vendas feitas nela); nome de venda da carteira (P2P) não é corretora
   const exs = [...new Set(aps.filter(a => a.date <= end && (isSale(a) ? a.src !== 'self' : a.dest !== 'self')).map(a => a.ex).filter(x => x && !isDefEx(x)))];
   const custody = S().utxo ? `${fmtBTC(Math.max(0, at.ex))} BTC em ${exs.length ? exs.join(', ') : 'corretora'} [informe o CNPJ] e ${fmtBTC(Math.max(0, at.self))} BTC em carteira própria (autocustódia)` : `${exs.length ? exs.join(', ') : '[corretora]'} [informe o CNPJ] e/ou carteira própria (autocustódia). Ajuste conforme onde os bitcoins estavam em 31/12/${y}`;
-  const disc = buysUpTo.length ? `${fmtBTC(at.hold)} BTC (bitcoin) adquiridos em ${buysUpTo.length} compras entre ${fmtYM(buysUpTo[0].date.slice(0, 7))} e ${fmtYM(buysUpTo[buysUpTo.length - 1].date.slice(0, 7))}${Ly.sold ? `, já descontados ${fmtBTC(Ly.sold)} BTC vendidos` : ''}. Custo de aquisição de ${fmtMoney(Ly.cost, 'BRL')} pelo custo médio (${fmtMoney(Ly.avg, 'BRL', 0)} por BTC). Custódia em 31/12/${y}: ${custody}.` : '';
+  // 1.8.29: o que saiu sem venda e as taxas pagas em bitcoin também entram na discriminação
+  const desc = [Ly.sold ? `${fmtBTC(Ly.sold)} BTC vendidos` : '', Ly.outSats ? `${fmtBTC(Ly.outSats)} BTC enviados sem venda (pelo custo médio)` : '', Ly.feeSats ? `${fmtBTC(Ly.feeSats)} BTC de taxas de saque e de rede` : ''].filter(Boolean);
+  const descTxt = desc.length ? `, já descontados ${desc.length > 1 ? desc.slice(0, -1).join(', ') + ' e ' + desc[desc.length - 1] : desc[0]}` : '';
+  const disc = buysUpTo.length ? `${fmtBTC(at.hold)} BTC (bitcoin) adquiridos em ${buysUpTo.length} compras entre ${fmtYM(buysUpTo[0].date.slice(0, 7))} e ${fmtYM(buysUpTo[buysUpTo.length - 1].date.slice(0, 7))}${Ly.extSats ? `, mais ${fmtBTC(Ly.extSats)} BTC recebidos de terceiros sem custo informado` : ''}${descTxt}. Custo de aquisição de ${fmtMoney(Ly.cost, 'BRL')} pelo custo médio (${fmtMoney(Ly.avg, 'BRL', 0)} por BTC)${Ly.feeSats ? ', com as taxas pagas em bitcoin somadas ao custo' : ''}. Custódia em 31/12/${y}: ${custody}.` : '';
+  const envY = ev.filter(e => e.ev === 'envio' && inY(e)), envS = envY.reduce((t, e) => t + e.sats, 0), envC = envY.reduce((t, e) => t + ((Lall.info[e.id] || {}).cost || 0), 0);
+  const taxY = ev.filter(e => e.ev === 'taxa' && inY(e)).reduce((t, e) => t + e.sats, 0);
   ui.irText = disc;
   // por mês: total vendido (para a isenção de R$ 35 mil) e, à parte, o que saiu da carteira (venda direta, P2P), que acima do
   // limite do mês vai para o informe mensal da Receita (DeCripto desde julho de 2026; antes, IN 1.888)
@@ -1841,10 +1923,14 @@ function pageIR() {
     <li><span class="k">Situação em 31/12/${y}</span><span class="dots"></span><span class="v">${M(Ly.cost)}</span></li>
     <li><span class="k">Comprado em ${y}</span><span class="dots"></span><span class="v">${M(buysY.reduce((t, a) => t + a.fiat, 0))}<small>${buysY.length} ${buysY.length === 1 ? 'aporte' : 'aportes'}</small></span></li>
     ${salesY.length ? `<li><span class="k">Vendido em ${y}</span><span class="dots"></span><span class="v">${M(salesY.reduce((t, a) => t + a.fiat, 0))}<small>${salesY.length} ${salesY.length === 1 ? 'venda' : 'vendas'}</small></span></li>` : ''}
+    ${envY.length ? `<li><span class="k">Enviado sem venda em ${y}</span><span class="dots"></span><span class="v">${M(envC)}<small>custo de ${BTCx(envS)} BTC</small></span></li>` : ''}
+    ${taxY ? `<li><span class="k">Taxas em bitcoin em ${y}</span><span class="dots"></span><span class="v">${BTCx(taxY)} BTC<small>somadas ao custo</small></span></li>` : ''}
     <li><span class="k">Quantidade em 31/12/${y}</span><span class="dots"></span><span class="v">${BTCx(at.hold)} BTC</span></li></ul>
+    ${Ly.pend > 0 ? `<p class="note warn" style="margin:8px 0 0">Em 31/12/${y}, ${esc(amtTxt(Ly.pend))} tinham saído da carteira sem aportes registrados antes que os cobrissem. Registre os aportes que faltam ou confira as datas.</p>` : ''}
     <p class="small ${Ly.cost >= 5000 ? 'warn' : 'muted'}" style="margin:8px 0 0;font-weight:600">${Ly.cost >= 5000 ? 'Declaração obrigatória: o custo de aquisição passou de R$ 5 mil.' : 'Custo abaixo de R$ 5 mil: este item não é de declaração obrigatória.'}</p></div>
     ${disc ? `<div class="field" style="margin-top:16px"><label for="ir-d">Discriminação sugerida</label><textarea class="inp" id="ir-d" rows="6" readonly>${esc(disc)}</textarea></div><button class="btn btn-q btn-s" data-act="copy-ir">Copiar discriminação</button>` : ''}
     ${sales ? `<h3>Vendas em ${y}</h3>${sales}<p class="hint">Custo pelo custo médio. Vendas de até R$ 35 mil no mês em plataformas no Brasil têm o ganho isento. Acima disso, o ganho paga de 15% a 22,5%, com DARF (código 4600) até o último dia útil do mês seguinte. No exterior não há isenção: 15% na declaração anual.${temP2P ? ' Venda direta da carteira (P2P), sem corretora no Brasil: quando as operações assim passam de R$ 35 mil no mês, você mesmo informa a Receita na DeCripto, pelo e-CAC (desde julho de 2026; antes, a IN 1.888 pedia acima de R$ 30 mil). É obrigação de informar, não imposto.' : ''}</p>` : ''}
+    ${envY.length || taxY ? `<p class="hint">Envio sem venda (presente, doação) sai pelo custo médio, sem ganho: é a doação pelo valor da sua declaração; por um valor maior, a diferença é ganho de capital. Pagamento com bitcoin é venda: marque a saída como Venda. As taxas de saque e de rede, pagas em bitcoin, tiram sats e ficam no custo de aquisição do que sobrou.</p>` : ''}
     <div class="tip">Informe sempre o <b>custo de aquisição</b>, não o valor de mercado. Ele já inclui as taxas informadas nos aportes; nas vendas, o valor recebido é líquido da taxa. O app calcula o custo das vendas pelo custo médio. Trocas por outra criptomoeda e gastos também contam como venda. Isto não é aconselhamento tributário: confirme com um contador.</div>
     <button class="link-btn" data-act="lesson" data-id="ir">Ler a lição sobre Imposto de Renda</button></div>`;
 }
@@ -2175,7 +2261,7 @@ function saveAporte() {
     const ap = { ...base, type: 'venda', src: set.utxo ? (f.src || 'ex') : (prev ? prev.src || 'ex' : 'ex') };
     // venda já ligada a uma transação: quantidade e data vêm da transação
     if (prev && prev.txId && byId(state.spends, prev.txId)) { Object.assign(ap, { sats: prev.sats, date: prev.date, src: 'self', txId: prev.txId, wallet: prev.wallet }); ap.price = round2((ap.fiat + (ap.fee || 0)) / (ap.sats / 1e8)); }
-    const L = ledger(state.aportes.filter(x => x.id !== ap.id).concat([ap])); if (L.err) return formErr(ledgerErrText(L.err));
+    const eL = ledgerErrNovo(ledger(state.aportes.filter(x => x.id !== ap.id).concat([ap]))); if (eL) return formErr(ledgerErrText(eL));
     if (set.utxo && ap.src === 'self' && !ap.txId && !(prev && prev.src === 'self')) {
       const n = saleTxCalc(ap.sats), sx = (fv('sx') || '').trim(), txid = (fv('stxid') || '').trim();
       if (!f.sw || !byId(state.wallets, f.sw)) return formErr('Escolha a carteira de onde saíram os sats.');
@@ -2213,7 +2299,7 @@ function saveAporte() {
   }
   const ap = { ...base, type: 'compra', dest: set.utxo ? f.dest : (prev ? prev.dest || 'ex' : 'ex'), utxoId: prev ? prev.utxoId : undefined };
   if (prev && prev.entrada && ap.dest !== 'self') return formErr('Os sats desta entrada já estão na carteira: o destino continua Direto na carteira.');   // 1.8.19
-  const L = ledger(state.aportes.filter(x => x.id !== ap.id).concat([ap])); if (L.err) return formErr(ledgerErrText(L.err));
+  const eL = ledgerErrNovo(ledger(state.aportes.filter(x => x.id !== ap.id).concat([ap]))); if (eL) return formErr(ledgerErrText(eL));
   if (set.utxo) {
     const old = ap.utxoId ? byId(state.utxos, ap.utxoId) : null;
     if (ap.dest === 'self') {
@@ -2240,7 +2326,7 @@ function delAporte(id) {
   const a = byId(state.aportes, id); if (!a) return;
   const sale = isSale(a), u = a.utxoId ? byId(state.utxos, a.utxoId) : null;
   if (u && u.spent && !a.entrada) { toast('O UTXO deste aporte já foi gasto. Desfaça a transação primeiro.'); return; }
-  if (!sale && ledger(state.aportes.filter(x => x.id !== id)).err) { toast('Não dá para excluir: uma venda depois dele ficaria maior que o saldo registrado.'); return; }
+  if (!sale && ledgerErrNovo(ledger(state.aportes.filter(x => x.id !== id)))) { toast('Não dá para excluir: uma venda depois dele ficaria maior que o saldo registrado.'); return; }
   const sp = sale && a.txId ? byId(state.spends, a.txId) : null;
   if (sp) { const used = sp.outputs.filter(o => o.kind === 'own').map(o => byId(state.utxos, o.utxo)).find(x => x && x.spent); if (used) { toast(`O troco desta venda foi gasto em ${fmtDate(used.spentAt)}. Desfaça antes aquela transação.`); return; } }
   confirmSheet(sale ? 'Excluir venda?' : 'Excluir aporte?', `${esc(fmtDate(a.date))} · ${esc(fmtMoney(a.fiat))} · ${esc(amtTxt(a.sats))}.${sp ? ' A transação ligada também é desfeita: os UTXOs usados voltam a ficar disponíveis.' : ''}${a.entrada ? ' O valor pago sai do total aportado; o UTXO continua na carteira, como recebido de terceiros.' : ''} Logo depois, dá para desfazer por alguns segundos.`, sale ? 'Excluir venda' : 'Excluir aporte', () => {
@@ -2574,7 +2660,7 @@ function previewList(r, currency, from) {
   const key = a => a.date + '|' + a.fiat + '|' + Math.round(a.price) + '|' + (a.type || 'compra');
   const base = state.demo ? [] : state.aportes, keys = new Set(base.map(key));
   const fresh = list.filter(a => !keys.has(key(a))), buys = fresh.filter(a => !isSale(a)), sales = fresh.filter(isSale);
-  const L = ledger(base.concat(fresh.map((a, i) => ({ ...a, id: 'imp' + String(i).padStart(6, '0') }))));
+  const evI = state.demo ? [] : ledgerEvents(), L = ledger(base.concat(fresh.map((a, i) => ({ ...a, id: 'imp' + String(i).padStart(6, '0') }))), evI), eI = ledgerErrNovo(L, ledger(base, evI));   // o exemplo sai na importação
   const sorted = [...fresh].sort((a, b) => a.date.localeCompare(b.date)), money = v => esc(fmtMoney(v, currency));
   ui.form.pending = { list: fresh, currency };
   const nw = fresh.filter(a => a.wal).length;   // 1.8.13: aportes e vendas feitos na carteira entram como da corretora
@@ -2585,9 +2671,9 @@ function previewList(r, currency, from) {
     ${wallet || nw ? `<p class="note" style="margin-top:12px">Pela planilha entram só aportes e vendas${nw ? ` (${nw === 1 ? 'o feito na carteira entra' : `os ${nw} feitos na carteira entram`} como da corretora)` : ''}. Saques, UTXOs e transações só voltam pelo backup (.json), que traz tudo e substitui os dados atuais.</p>
     <button class="btn btn-q block" style="margin-top:10px" data-act="pick-file" data-accept=".json,application/json">Escolher backup (.json)</button><input type="file" id="file-in" hidden data-file="1">` : ''}
     ${r.datas === 'mdy' && !r.forcado ? '<p class="note" style="margin-top:12px">As datas estão no formato mês/dia (o americano): algumas passam de 12 no segundo número.</p>' : ''}${r.ambigua || r.forcado ? `<p class="note" style="margin-top:12px">${r.forcado ? 'Datas lidas como mês/dia (o formato americano), como você pediu.' : 'As datas foram lidas como dia/mês, o formato do Brasil. Se a planilha usa mês/dia (o formato americano), leia de novo.'}</p><button class="btn btn-q block" style="margin-top:10px" data-act="csv-${r.forcado ? 'dmy' : 'mdy'}">${r.forcado ? 'Ler como dia/mês' : 'Ler como mês/dia'}</button>` : ''}
-    ${L.err ? `<p class="err" style="margin-top:12px">${esc(ledgerErrText(L.err))}</p>` : ''}
+    ${eI ? `<p class="err" style="margin-top:12px">${esc(ledgerErrText(eI))}</p>` : ''}
     ${state.demo ? '<p class="note" style="margin-top:12px">Os dados de exemplo serão apagados.</p>' : ''}${!state.aportes.length && currency !== cur() ? `<p class="note" style="margin-top:12px">A moeda do app passa a ser ${currency}.</p>` : ''}
-    <p class="err form" hidden></p><button class="btn btn-p block" style="margin-top:14px" data-act="import-apply" ${fresh.length && !L.err ? '' : 'disabled'}>Importar ${fresh.length} ${fresh.length === 1 ? 'registro' : 'registros'}</button>`;
+    <p class="err form" hidden></p><button class="btn btn-p block" style="margin-top:14px" data-act="import-apply" ${fresh.length && !eI ? '' : 'disabled'}>Importar ${fresh.length} ${fresh.length === 1 ? 'registro' : 'registros'}</button>`;
 }
 function applyImport() {
   const p = ui.form.pending; if (!p) return;
@@ -3150,16 +3236,19 @@ function obCommit() {
 }
 /* ======================= AÇÕES ======================= */
 let deferredInstall = null;
+/* leva a uma seção do fim da aba Aportes (Vendas, Conta da pilha), abaixo do topo fixo; de outra aba, abre a Aportes antes */
+function irSecao(sel) {
+  const ir = () => { const s = $(sel); if (!s) return; const hd = $('.top'), off = hd ? hd.getBoundingClientRect().height + 8 : 0; window.scrollTo({ top: Math.max(0, s.getBoundingClientRect().top + window.scrollY - off), behavior: 'smooth' }); };
+  if (ui.tab !== 'aportes' || ui.page) { ACT.tab({ dataset: { tab: 'aportes' } }); setTimeout(ir, 60); } else ir();
+}
 const ACT = {
   // tab, page e lesson zeram a pilha de páginas e o destaque (ui.stack, ui.hl); o Voltar das páginas fica no utxo_glue.js
   'tab': el => { guardaTopo(); ui.stack = []; ui.hl = null; ui.tab = el.dataset.tab; ui.page = null; ui.selMode = false; ui.sel.clear(); render(); window.scrollTo(0, 0); },
   'page': el => { guardaTopo(); ui.stack = []; ui.hl = null; ui.page = el.dataset.page; ui.arg = el.dataset.id || null; closeSheet(true); render(); window.scrollTo(0, 0); },
   'goto-carteira': () => ACT.tab({ dataset: { tab: 'carteira' } }),   // como o toque na aba: zera a pilha das páginas
   // seção Vendas, no fim da aba Aportes (1.8.28): do resumo ou do Início, abaixo do topo fixo
-  'ver-vendas': () => {
-    const ir = () => { const s = $('#vendas-sec'); if (!s) return; const hd = $('.top'), off = hd ? hd.getBoundingClientRect().height + 8 : 0; window.scrollTo({ top: Math.max(0, s.getBoundingClientRect().top + window.scrollY - off), behavior: 'smooth' }); };
-    if (ui.tab !== 'aportes' || ui.page) { ACT.tab({ dataset: { tab: 'aportes' } }); setTimeout(ir, 60); } else ir();
-  },
+  'ver-vendas': () => irSecao('#vendas-sec'),
+  'ver-conta': () => irSecao('#conta-sec'),   // 1.8.29
   'lesson': el => { guardaTopo(); ui.stack = []; ui.hl = null; ui.page = 'lesson'; ui.arg = el.dataset.id; closeSheet(true); render(); window.scrollTo(0, 0); },
   'quiz': el => { const id = el.dataset.id; if (state.learn.quiz[id] != null) return; state.learn.quiz[id] = +el.dataset.k; save(); render(); const q = $('.quiz'); if (q) q.scrollIntoView({ block: 'nearest' }); },
   'lesson-done': el => { state.learn.done[el.dataset.id] = Date.now(); save(); render(); toast('Lição concluída'); },
@@ -3632,7 +3721,8 @@ function sheetEditUtxo(id) {
   openSheet('utxo-edit', () => `<h2>◈ ${AMT(u.sats)}</h2><p class="sub">${esc(src.t)} · recebido em ${fmtDate(u.date)}${u.spent ? ` · gasto em ${fmtDate(u.spentAt || u.date)}` : ''}</p>
     <div class="btn-row" style="margin-bottom:14px">${sp ? `<button class="btn btn-q btn-s" data-act="open-tx" data-id="${sp.id}">Transação que gastou</button>` : ''}${!u.spent ? `<button class="btn btn-q btn-s" data-act="tx-from-utxo" data-id="${u.id}" data-k="move">Transferir</button><button class="btn btn-q btn-s" data-act="tx-from-utxo" data-id="${u.id}" data-k="send">Enviar</button><button class="btn btn-q btn-s" data-act="tx-from-utxo" data-id="${u.id}" data-k="sale">Vender</button>` : ''}${onAddr ? '' : `<button class="btn btn-q btn-s" data-act="open-addr" data-id="${u.address}" data-hl="${u.id}">Ver o endereço</button>`}</div>
     <div class="field"><label for="e-l">Etiqueta</label><input class="inp" id="e-l" name="label" autocomplete="off" value="${esc(u.label)}" placeholder="${esc(a ? a.label : '')}"></div>
-    ${u.origin === 'externo' ? `<div class="field"><label for="e-s">Valor (${unitName()})</label><input class="inp" id="e-s" name="sats" ${amtAttrs()} value="${amtIn(u.sats)}"></div>` : ''}
+    ${u.origin === 'externo' ? `<div class="field"><label for="e-s">Valor (${unitName()})</label><input class="inp" id="e-s" name="sats" ${amtAttrs()} value="${amtIn(u.sats)}"></div>
+    <div class="field"><label for="e-c">Valor pago (${curSym()}, opcional)</label><input class="inp" id="e-c" name="cost" inputmode="decimal" data-num="money" placeholder="0,00" autocomplete="off"><p class="hint">Se você pagou por estes sats (numa compra P2P, por exemplo), informe quanto: o valor entra no total aportado e no custo médio. Sem valor, eles ficam na pilha com custo zero.</p></div>` : ''}
     ${addrPicker('e_', u.wallet, u.address, { addrLabel: 'Endereço', exclude: u.id })}
     <div class="two"><div class="field"><label for="e-t">TXID</label><input class="inp mono" id="e-t" name="txid" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(u.txid || '')}"></div><div class="field"><label for="e-v">vout</label><input class="inp" id="e-v" name="vout" inputmode="numeric" value="${esc(u.vout || '')}"></div></div>
     <div class="switch"><span><span class="t">Origem com cadastro (KYC)</span></span><button class="tog ${u.kyc ? 'on' : ''}" data-act="form-kyc" aria-pressed="${!!u.kyc}" aria-label="KYC"></button></div>
@@ -3648,6 +3738,10 @@ function saveEditUtxo() {
   if (vout && !/^\d+$/.test(vout)) return formErr('O vout é um número inteiro, como 0 ou 1.');
   if (pickerBad('e_')) return formErr('O endereço informado não é válido.');
   let s = u.sats; if (u.origin === 'externo') { s = parseAmt(fv('sats')); if (!(s > 0)) return formErr('Informe o valor do UTXO.'); }
+  // valor pago informado depois (1.8.29): o UTXO de terceiros vira compra ligada a ele, como ao adicionar (1.8.19)
+  const cTxt = u.origin === 'externo' ? (fv('cost') || '').trim() : '', cost = cTxt ? parseNum(cTxt) : 0;
+  if (cTxt && !(cost >= 0)) return formErr('Confira o valor pago: use só números, como 1.500,00. Ou deixe o campo vazio.');
+  if (cost > 0 && !f.warned) { const est = histPrice(u.date.slice(0, 7)), pr = cost / (s / 1e8); if (est && (pr > est * 2.5 || pr < est / 2.5)) { f.warned = true; const b = $('[data-act="save-edit-utxo"]'); if (b) b.textContent = 'Salvar mesmo assim'; return formErr(`O valor pago dá ${fmtMoney(pr, cur(), 0)} por bitcoin, bem diferente da média do mês (${fmtMoney(est, cur(), 0)}). Confira se não faltou ou sobrou um zero.`); } }
   const ok = attempt(() => {
     const r = resolvePicker('e_', u.label || 'Endereço'); if (r.err) throw new Error(r.err);
     const a = addrById(r.aid), moved = u.address !== a.id, uu = byId(state.utxos, f.id);
@@ -3655,9 +3749,10 @@ function saveEditUtxo() {
     if (!uu.spent) uu.frozen = f.frozen;
     if (moved) reestimateSpends();
     cascadeFrom(uu);
+    if (cost > 0) entradaPaga(uu, cost, 'Valor pago informado no UTXO');
   });
   if (!ok) return false;
-  save(); closeSheet(); render(); toast('UTXO atualizado');
+  save(); closeSheet(); render(); toast(cost > 0 ? 'UTXO atualizado e valor pago somado ao total aportado' : 'UTXO atualizado'); if (cost > 0) fxSync();
 }
 function delUtxo(id) { const u = byId(state.utxos, id); if (!u || u.spent || u.origin !== 'externo') return; confirmSheet('Excluir UTXO?', `${esc(amtTxt(u.sats))} · ${esc(u.label)}. Logo depois, dá para desfazer por alguns segundos.`, 'Excluir UTXO', () => { const snap = fotoDados(); state.utxos = state.utxos.filter(x => x.id !== id); save(); closeSheet(); render(); toastDesfazer('UTXO excluído', snap); }, true); }
 
@@ -4012,6 +4107,7 @@ function txSave() {
     t.saleDelOk = true; if (saveBtn) saveBtn.textContent = 'Salvar e apagar a venda';
     return formErr(`Nenhuma saída está marcada como venda. Ao salvar, a venda de ${fmtDate(sale0.date)} (${fmtMoney(sale0.fiat)}) sai dos registros, e o lucro dela também. Toque de novo em salvar para confirmar.`);
   }
+  const L0 = ledger();   // para só travar uma venda descoberta que esta transação criar (1.8.29)
   const ok = attempt(() => {
     const sid = edit ? sp0.id : uid(), kyc = n.ins.some(u => u.kyc), outs = [], ym = fmtYM(t.date.slice(0, 7)), made = {};
     for (const o of t.outputs) if (o.kind === 'own' && o.wallet === '__new' && !(o.newAddr && findAddrByString(o.newAddr))) made[o.key] = ensureWallet('__new', o.newWallet);
@@ -4044,7 +4140,7 @@ function txSave() {
       Object.assign(ap, { date: t.date, fiat: round2(sv.fiat), fee: sv.fee > 0 ? round2(sv.fee) : 0, sats: so.sats, price: round2((sv.fiat + sv.fee) / (so.sats / 1e8)), ex: (sv.ex || DEF_EX('venda')).slice(0, 60), type: 'venda', src: 'self', wallet: src, txId: sid });
       if (!sale0) state.aportes.push(ap);
       sp.saleId = ap.id;
-      const L = ledger(); if (L.err) throw new Error(ledgerErrText(L.err));
+      const eL = ledgerErrNovo(ledger(), L0); if (eL) throw new Error(ledgerErrText(eL));
     } else {
       if (sale0) state.aportes = state.aportes.filter(x => x.id !== sale0.id);
       delete sp.saleId;
@@ -4126,6 +4222,7 @@ function pageTx() {
     ${sp.txid ? `<p class="addr-str">${esc(sp.txid)}</p><div class="btn-row" style="margin:10px 0 4px"><button class="btn btn-q btn-s" data-act="copy" data-v="${esc(sp.txid)}">Copiar TXID</button>${extLink('https://mempool.space/tx/' + sp.txid, 'Ver no mempool.space', 'btn btn-q btn-s')}</div>` : ''}
     <h3>Entradas · ${AMT(tin)}</h3>${ins.map(inRow).join('')}
     <h3>Saídas · ${AMT(tout)}</h3>${sp.outputs.map(outRow).join('')}
+    ${envioHint(sp)}
     <h3>Taxa</h3><ul class="receipt">
       <li><span class="k">Taxa total</span><span class="dots"></span><span class="v">${esc(fmtSats(sp.fee))} sats</span></li>
       <li><span class="k">Tamanho</span><span class="dots"></span><span class="v">${esc(fmtSats(sp.vsize))} vB<small>${sp.vsizeReal ? 'informado' : 'estimado'}</small></span></li>
@@ -4133,6 +4230,12 @@ function pageTx() {
       <li><span class="k">Sobre o valor movido</span><span class="dots"></span><span class="v">${esc((sp.fee / tin * 100).toLocaleString('pt-BR', { maximumFractionDigits: 2 }))}%</span></li></ul>
     <div class="btn-row" style="margin-top:16px"><button class="btn btn-p" data-act="tx-edit" data-id="${sp.id}">Editar transação</button><button class="btn btn-d" data-act="tx-undo" data-id="${sp.id}">Desfazer</button></div>
     <p class="hint">Descobriu a taxa real? Edite e informe em sats ou o vsize: o sat/vB, os UTXOs criados e as transações seguintes são recalculados.</p></div>`;
+}
+/* o custo do envio sem venda desta transação, como entrou no livro (1.8.29) */
+function envioHint(sp) {
+  const e = ledgerEvents().find(x => x.ev === 'envio' && x.tx === sp.id); if (!e) return '';
+  const inf = (fxOn() ? ledger(state.aportes.map(apV)) : ledger()).info[e.id] || { cost: 0 };
+  return `<p class="hint">Sem venda, ${AMT(e.sats)} saíram da pilha pelo custo médio: ${MV(inf.cost)}, sem lucro nem prejuízo. Se foi um pagamento, toque em “Foi uma venda? Registrar”; se foi para outra carteira sua, edite e marque a saída como Para mim.</p>`;
 }
 function pageWallet() {
   const w = byId(state.wallets, ui.arg);
