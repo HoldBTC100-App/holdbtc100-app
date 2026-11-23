@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="App do Projeto Hold BTC 100: registre seus aportes mensais em bitcoin, acompanhe preço médio e resultado, gerencie UTXOs e aprenda autocustódia.">
 <title>Hold BTC 100</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-RXCmPEPnc1qwnnHtIPYPL05KodIjWwxLojKvZ7LV48Y='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-SuLD8f0OWNHb1wi92X7Hl2skad5E1YFBDCHERLYUegM='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -69,7 +69,10 @@ a{color:inherit}
 
 /* ---------- layout ---------- */
 #app{max-width:560px;margin:0 auto;min-height:100%}
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--hero);display:flex;align-items:center;justify-content:space-between;padding:10px 12px 10px 16px;min-height:58px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--hero);display:flex;align-items:center;justify-content:space-between;padding:10px 12px 10px 16px;min-height:58px;transition:border-radius .18s ease,box-shadow .18s ease}
+/* 1.8.36: o topo fecha com o canto das folhas quando o laranja de baixo passa por ele (ou não existe); sombra com conteúdo por baixo */
+.top.so{border-radius:0 0 24px 24px}
+.top.so.rolou{box-shadow:0 4px 14px rgba(0,0,0,.18)}
 .brand{display:flex;align-items:center;gap:10px;font-family:var(--fc);font-weight:800;font-size:21px;letter-spacing:.01em;text-decoration:none;border:0;background:none;padding:0}
 .brand img{width:36px;height:auto;display:block}
 .top-actions{display:flex;gap:4px}
@@ -91,7 +94,7 @@ main{padding-bottom:96px}
 p{margin:0 0 12px}
 
 /* ---------- hero ---------- */
-.hero{background:var(--hero);padding:6px 20px 22px}
+.hero{background:var(--hero);padding:6px 20px 22px;border-radius:0 0 24px 24px}   /* 1.8.35: o topo laranja fecha com o canto das folhas */
 .hero-label{font-size:15px;color:var(--muted);margin:0 0 2px;display:flex;align-items:center;gap:8px}
 .stack-num{font-family:var(--fc);font-weight:800;font-size:clamp(48px,15vw,68px);line-height:.92;letter-spacing:-.005em;margin:0;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;border:0;background:none;padding:0;text-align:left}
 .stack-num .u{font-size:.36em;font-weight:700;color:var(--muted);letter-spacing:.01em}
@@ -141,7 +144,10 @@ p{margin:0 0 12px}
 .panel + .panel{margin-top:12px}
 .note{background:var(--surface-2);border-radius:14px;padding:12px 14px;font-size:14.5px}
 .note b{font-weight:700}
-.demo-bar{background:var(--ink);color:var(--bg);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px}
+.demo-bar{background:var(--ink);color:var(--bg);padding:10px 12px 10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;border-radius:14px}
+/* 1.8.35: a faixa do exemplo vira um cartão dentro do laranja; sem o topo do Início embaixo, o laranja fecha com 24 px */
+.demo-wrap{background:var(--hero);padding:4px 14px 14px;border-radius:0 0 24px 24px}
+.demo-wrap:has(+ .hero){border-radius:0;padding-bottom:4px}
 .demo-bar button{background:var(--orange);color:#000;border:0;border-radius:10px;font-weight:700;padding:8px 12px;font-size:13.5px;white-space:nowrap;flex:none}
 
 /* stats grid (aportes header) */
@@ -311,7 +317,7 @@ select.inp{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 5
 .links a b{font-weight:600}
 .links a small{display:block;color:var(--muted);font-size:13px}
 .links a .ext{color:var(--muted);flex:none}
-.tool{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 14px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:0 0 10px}
+.tool{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 14px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px;margin:0 0 10px}
 .tool b{font-family:var(--fc);font-size:20px;font-weight:700}
 .tool span{font-size:14px;color:var(--muted);grid-column:1}
 .tool .chev{grid-row:1/3;grid-column:2;font-size:20px}
@@ -522,7 +528,7 @@ button.io:active{background:var(--surface-2)}
 .brand img{width:40px;height:40px;object-fit:contain;padding:4px;box-sizing:border-box;background:#000;border-radius:50%}
 
 /* histórico de meses: cartão abaixo do topo, estados claros e dica por mês */
-.months-card{margin:14px 14px 0;padding:14px 14px 12px;background:var(--surface);border:1px solid var(--line);border-radius:16px}
+.months-card{margin:14px 14px 0;padding:14px 14px 12px;background:var(--surface);border:1px solid var(--line);border-radius:18px}
 .mc-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .mc-head .sec-t{margin:0}
 .mc-sum{font-size:13px;color:var(--muted)}
@@ -634,11 +640,18 @@ h1,h2,h3,p,li,b,strong,small,label,.k,.v,.t,.d,.sub,.lead,.note,.hint,.tool b,.t
 .fundo-oculto #app,.fundo-oculto nav.tabs,.fundo-oculto #sheet-root,.fundo-oculto #toast-root{visibility:hidden}
 
 /* 1.8.23: lembrete de backup no Início */
-.bk-card{margin:14px 14px 0;padding:14px;background:var(--surface);border:1px solid var(--line);border-radius:16px}
+.bk-card{margin:14px 14px 0;padding:14px;background:var(--surface);border:1px solid var(--line);border-radius:18px}
+/* 1.8.36 (pedido do Nicolas, a alternativa mostrada na 1.8.35): no Início, as seções soltas também viram cartões, como os
+   meses e o lembrete de backup. As que já são um cartão (a ferramenta e o da KriptoBR, classe solo) só ganham a mesma margem */
+#view[data-tela="home"] > .sec:not(.months-card):not(.solo){margin:14px 14px 0;padding:14px;background:var(--surface);border:1px solid var(--line);border-radius:18px}
+#view[data-tela="home"] > .sec.solo{padding:14px 14px 0}
+#view[data-tela="home"] > .sec.solo > .tool,#view[data-tela="home"] > .sec.solo > .ks{margin:0}
+#view[data-tela="home"] > :last-child{margin-bottom:14px}
+#view[data-tela="home"] > .sec .lesson:last-child{border-bottom:0;padding-bottom:0}
 .bk-card h2{font-family:var(--fc);font-weight:700;font-size:20px;line-height:1.15;margin:0 0 4px}
 .bk-card p{margin:0 0 12px;font-size:14.5px;color:var(--muted)}
 /* Configurações em acordeão (1.8.30): Aporte e Meta abertos; as outras seis seções numa lista, uma aberta por vez, com o resumo */
-.set-accs{margin:2px 0 8px;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.set-accs{margin:2px 0 8px;background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden}
 .set-acc+.set-acc{border-top:1px solid var(--line)}
 .set-acc h3{margin:0;font:inherit}
 .set-acc-h{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:1px 12px;width:100%;min-height:62px;padding:10px 12px 10px 16px;border:0;border-radius:0;background:none;color:var(--ink);text-align:left;touch-action:manipulation}
@@ -664,7 +677,50 @@ h1,h2,h3,p,li,b,strong,small,label,.k,.v,.t,.d,.sub,.lead,.note,.hint,.tool b,.t
 .quiz-feito .t small{display:block;font-size:13.5px;color:var(--muted)}
 .quiz-feito .btn{flex:none}
 .refazer-testes{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px;margin:12px 0 0}
+/* trilha do Aprender (1.8.34): só as lições que faltam; as concluídas ficam na página Lições concluídas */
+.quiz-feito .ic.novo{background:var(--surface-2);color:var(--ink);font-size:19px;font-weight:800;line-height:1}
+.lesson .t .tag{margin-left:4px;vertical-align:1px;white-space:nowrap}
+.trilha-fim{margin:8px 0 0;padding:16px;border-radius:18px;background:var(--surface);border:1px solid var(--line)}
+.trilha-fim b{display:block;font-family:var(--fc);font-size:21px;font-weight:800}
+.trilha-fim p{margin:4px 0 12px}
 @media (max-width:359px){.quiz-feito{grid-template-columns:auto minmax(0,1fr)}.quiz-feito .btn{grid-column:1/-1}}
+/* valor de hoje de cada aporte (1.8.34): na terceira linha, com o % ao lado; a linha de baixo ocupa a largura toda */
+.ap-lista .row-btn .b:not(.r){grid-column:1/-1}
+.ap-lista .row-btn .hj{font-size:13.5px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;min-width:0;overflow-wrap:anywhere}
+.ap-hoje{margin:2px 0 4px}
+/* escala de cantos (1.8.35): 14 px nos controles (botões, campos, linhas), 18 px nos cartões, 24 px nas folhas e no
+   fechamento do topo laranja */
+/* relatório do IR (1.8.35): o que é seu, no topo do relatório, com "Rever o que é seu"; no menu, as linhas dos UTXOs e das vendas */
+.ir-seu{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;margin:0 0 14px;padding:12px 14px;border-radius:18px;background:var(--surface);border:1px solid var(--line);font-size:14.5px;line-height:1.4}
+.ir-seu .t{flex:1 1 190px;min-width:0}
+.ir-coin .a small .tag{vertical-align:1px}
+.ir-coin b{flex:none;font-variant-numeric:tabular-nums}
+/* 1.8.37: Mapa dos sats (bolhas com área proporcional aos sats; listrado = com KYC) e "De onde vieram" na folha do UTXO */
+.mapa-leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);margin:2px 0 12px}
+.mapa-leg .lg{display:inline-block;width:13px;height:13px;border-radius:50%;vertical-align:-2px;margin-right:6px}
+.mapa-leg .lg.ex{background:var(--muted)} .mapa-leg .lg.ut{background:var(--orange)} .mapa-leg .lg.sai{border:2px solid var(--muted)}
+.mapa-leg .lg.kyc{background:repeating-linear-gradient(45deg,rgba(0,0,0,.38) 0 2px,transparent 2px 5px),var(--orange)}
+.mapa-kyc{margin:0 0 12px} .article .mapa-kyc ul{margin:8px 0 12px;padding-left:18px;font-size:inherit;line-height:1.5} .article .mapa-mix{margin:0 0 10px;font-size:14.5px}
+.mapa-palco{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:4px 0;overflow:hidden;scroll-margin-top:calc(76px + env(safe-area-inset-top,0px))}
+.mapa-palco svg{display:block;width:100%;height:auto;-webkit-tap-highlight-color:transparent}
+.mapa .sep{stroke:var(--line);stroke-width:1}
+.mapa .fn{font:600 12px var(--f);fill:var(--muted)}
+.mapa .ft{font:700 13.5px var(--fc);fill:var(--ink);font-variant-numeric:tabular-nums}
+.mapa .sl{font:500 11.5px var(--f);fill:var(--muted)} .mapa .sv{font:700 12.5px var(--fc);fill:var(--ink)}
+.mapa .b{cursor:pointer} .mapa .b circle{transition:cx .4s ease,cy .4s ease,r .4s ease}
+.mapa .b .alvo{fill:transparent} .mapa .b .h{fill:url(#mapa-hach);pointer-events:none} .mapa .hb{fill:rgba(0,0,0,.36)}
+.mapa .b.ex .c{fill:var(--muted)} .mapa .b.ut .c{fill:var(--orange)}
+.mapa .b.sai .c{fill:none;stroke-width:2.5} .mapa .b.sai.v .c{stroke:var(--pos)} .mapa .b.sai.e .c{stroke:var(--muted)} .mapa .b.sai.t .c{stroke:var(--neg)}
+.mapa .b.sel .c,.mapa .b.sel .h{stroke:var(--ink);stroke-width:3} .mapa .b.sai.sel .c{stroke-width:4.5}
+.mapa-ctl{display:grid;grid-template-columns:48px 1fr 48px;align-items:center;gap:6px;margin:10px 0 0}
+.mapa-ctl .icon-btn{width:48px;height:48px;font:700 30px/1 var(--f);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding-bottom:4px}
+.mapa-ctl .icon-btn:disabled{opacity:.35}
+.mapa-datas{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin:0 56px 8px}
+.mapa-n{font-size:13px;color:var(--muted);margin:10px 0 2px} .mapa-tt{font-family:var(--fc);font-size:23px;margin:0 0 6px}
+.mapa-l{margin:0 0 10px;padding-left:18px} .mapa-l li{margin:2px 0}
+.mapa-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px 14px;margin:6px 0 10px} .article .mapa-card p{font-size:14px;line-height:1.45}
+.orig{margin:0 0 14px} .orig-l,.orig-l ul{list-style:none;margin:0;padding:0} .orig-l ul{margin-left:8px;padding-left:12px;border-left:2px solid var(--line)}
+.orig-l .io{font-size:14.5px;padding:9px 0} .orig-l .io .v .tag{margin-left:6px;vertical-align:1px}
 
 .ic{display:block;width:24px;height:24px}
 </style>
@@ -860,13 +916,17 @@ const LESSONS = [
     id: 'ir', title: 'Imposto de Renda (regras de 2026)', sum: 'Declarar pelo custo de aquisição e entender quando a venda paga imposto.',
     body: [
       { h: 'Declaração anual' },
-      { p: 'Bitcoin vai na ficha <b>Bens e Direitos</b>, <b>Grupo 08 (Criptoativos), Código 01 (Bitcoin)</b>. Você informa o <b>custo de aquisição</b>, isto é, quanto pagou, e não o valor de mercado. A declaração é obrigatória quando o custo de aquisição do seu bitcoin é de R$ 5 mil ou mais em 31 de dezembro.' },
+      { p: 'Bitcoin vai na ficha <b>Bens e Direitos</b>, <b>Grupo 08 (Criptoativos), Código 01 (Bitcoin)</b>. Os dois campos de situação, <b>31/12 do ano anterior</b> e <b>31/12 do ano da declaração</b>, levam o <b>custo de aquisição</b> do bitcoin que você tinha em cada data: quanto pagou, com as taxas. Nunca o valor de mercado: a cotação de 31/12 não vai em campo nenhum.' },
+      { p: 'Na <b>Discriminação</b> vão a quantidade e onde ele está guardado: o nome e o CNPJ da corretora ou, na autocustódia, o modelo da carteira.' },
+      { p: 'Quem entrega a declaração inclui o bitcoin quando o custo de aquisição dele é de R$ 5 mil ou mais em 31 de dezembro; abaixo disso, informar é opcional. Ter bitcoin, por si só, não obriga a entregar a declaração: isso depende das outras regras da Receita, como renda, patrimônio ou ganho de capital.' },
       { h: 'Quando há venda' },
-      { list: ['Em plataformas nacionais, se o total vendido no mês for de até R$ 35 mil, o ganho é isento.', 'Acima disso, o ganho é tributado de 15% a 22,5%, com DARF (código 4600) até o último dia útil do mês seguinte.', 'Em plataformas no exterior (Lei 14.754/2023), o ganho é tributado a 15% na declaração anual, sem a isenção de R$ 35 mil.', 'Trocar bitcoin por outra criptomoeda também conta como venda, e pagar uma compra com bitcoin também: pelo valor do que você comprou.'] },
+      { list: ['Em plataformas nacionais, se o total vendido no mês for de até R$ 35 mil, o ganho é isento.', 'Acima disso, o ganho é tributado de 15% a 22,5%, com DARF até o último dia útil do mês seguinte: código 1897 para vendas desde maio de 2026 (antes, 4600).', 'Em plataformas no exterior (Lei 14.754/2023), o ganho é tributado a 15% na declaração anual, sem a isenção de R$ 35 mil.', 'Trocar bitcoin por outra criptomoeda também conta como venda, e pagar uma compra com bitcoin também: pelo valor do que você comprou.'] },
       { p: 'A MP 1.303/2025, que propunha alíquota única de 17,5%, perdeu a validade em outubro de 2025; as regras acima seguem valendo. A DeCripto é uma obrigação de informar operações, não um imposto novo: desde julho de 2026, quem vende direto da própria carteira (P2P) ou usa corretora no exterior a entrega pelo e-CAC nos meses em que essas operações passam de R$ 35 mil.' },
       { tip: 'O app monta um resumo do custo de aquisição em 31/12 de cada ano. Não é aconselhamento tributário: confirme com um contador.', act: 'open-ir', actLabel: 'Abrir relatório para o IR' }
     ],
-    quiz: { q: 'Na declaração anual, o bitcoin é informado por…', o: ['Valor de mercado em 31/12', 'Custo de aquisição', 'Não precisa ser declarado'], a: 1, why: 'Bens e Direitos usa o custo de aquisição. O valor de mercado só importa quando há venda.' }
+    // v: versão do teste (sem ela, a 1). Ao reescrever um teste, suba v e guarde em antes a resposta certa de cada versão
+    // antiga, para o nível de quem já tinha acertado (1.8.34). A versão 1 perguntava "o bitcoin é informado por…".
+    quiz: { v: 2, antes: { 1: 1 }, q: 'Na ficha Bens e Direitos, o que vai nos campos “Situação em 31/12”?', o: ['O valor de mercado do bitcoin em cada 31/12', 'O custo de aquisição do bitcoin que você tinha em cada 31/12', 'A soma de tudo o que você comprou, mesmo o que já vendeu'], a: 1, why: 'Os dois campos, do ano anterior e do ano da declaração, levam o custo, com as taxas, do bitcoin que você tinha em cada data, nunca a cotação. A quantidade e onde ele está guardado vão na Discriminação. O valor de mercado só entra na conta quando você vende: o ganho é o valor recebido menos o custo.' }
   },
   {
     id: 'lightning', title: 'Lightning: bitcoin para pagar', sum: 'Rápida e barata para o dia a dia. Para o hold, o padrão é on-chain.',
@@ -963,7 +1023,7 @@ const KS_CARDS = {
    Claude, sem PIN, também espelha num documento privado.
    ========================================================= */
 
-const APP_VERSION = '1.8.33';
+const APP_VERSION = '1.8.37';
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const HIST = {"start":"2015-01","usd":[269,236,249,240,233,247,274,257,233,275,346,404,400,404,427,433,490,602,649,600,593,655,724,855,967,1075,1126,1210,1817,2384,2684,3787,4520,5404,8338,12178,12166,10318,8680,8122,8372,6952,7096,7394,6818,6489,5192,3887,3595,3654,3979,4704,6942,9680,10459,9914,9056,8766,8345,7372,8268,8948,7481,7512,9050,9296,10232,11509,11218,12286,16730,24328,31072,39024,51906,58338,47486,36155,38354,44318,45439,52582,59166,51586,42365,40791,44360,41879,35044,25823,21591,21674,19744,19962,18841,16851,19838,23126,25804,28897,28234,28846,29858,27587,26456,30805,36179,39982,42444,51946,66244,65986,64146,65194,63729,61864,61188,66861,83364,95022,97976,93433,83444,88373,99394,105848,111410,111996,111124,111840,99685,88638,83198,72854,67640,72356,75048,66150,60768,70714,81095,80570],"brl":[708,663,783,731,714,768,883,904,911,1067,1307,1564,1620,1603,1583,1542,1734,2062,2125,1926,1930,2088,2418,2866,3091,3338,3522,3795,5832,7858,8605,11932,14171,17247,27175,40087,39062,33444,28462,27676,30443,26233,27169,29059,28068,24388,19662,15101,13451,13608,15305,18328,27776,37353,39528,39856,37326,35825,34676,30296,34306,38845,36536,40003,51073,48305,54030,62853,60569,69121,90640,125185,166425,211371,293069,324482,251253,181928,197777,232745,239904,291307,328780,291530,234452,211975,220398,199260,173644,130385,115903,111476,103397,104809,99381,88340,103169,119603,134475,145054,140682,139952,143345,135273,130613,156021,177216,195797,208587,257883,329902,338449,329261,351333,353186,343509,339079,376033,484100,579349,589992,538697,479536,511123,563308,587149,615933,610031,596450,602314,532408,483352,444108,378882,353863,364172,374017,339193,310759,364403,417209,413273]}; // médias mensais estimadas: {start:'2015-01', usd:[…], brl:[…]}
 const REF_PRICE = { BRL: 416900, USD: 75800, EUR: 68000, at: Date.UTC(2026, 10, 7, 18, 0), src: 'ref' }; // US$ do CoinLore × PTAX de 06/11/2026 (R$ 5,50; € 6,13)
@@ -1066,14 +1126,14 @@ function curSym(c = cur()) { return c === 'BRL' ? 'R$' : c === 'USD' ? 'US$' : '
 function defaultState() {
   return {
     v: 2, createdAt: Date.now(), updatedAt: 0, demo: false,
-    settings: { offline: false, currency: 'BRL', monthly: 100, day: 10, goalSats: 1000000, unit: 'sats', theme: 'auto', hide: false, utxo: false, feeRate: 5, wdFee: 0, wdPct: 1, exchange: '', onboarded: false, pin: null, bio: null, lockMin: 5, gridAll: false, viewCur: null, bkAt: 0, bkSig: '', bkAdiar: 0, bkLembrar: true, grafModo: 'valor' /* gráfico da pilha: valor | pilha (1.8.26) */ },
+    settings: { offline: false, currency: 'BRL', monthly: 100, day: 10, goalSats: 1000000, unit: 'sats', theme: 'auto', hide: false, utxo: false, feeRate: 5, wdFee: 0, wdPct: 1, exchange: '', onboarded: false, pin: null, bio: null, lockMin: 5, gridAll: false, viewCur: null, bkAt: 0, bkSig: '', bkAdiar: 0, bkLembrar: true, grafModo: 'valor' /* gráfico da pilha: valor | pilha (1.8.26) */, trilhaTudo: false /* lições concluídas também na trilha (1.8.34) */, irExOutro: {} /* ano → sats de outras pessoas na corretora em 31/12 (1.8.35) */ },
     aportes: [], saques: [], utxos: [], wallets: [], addresses: [], spends: [],
-    learn: { done: {}, quiz: {} },
+    learn: { done: {}, quiz: {}, nivel: {}, qv: {} },   // nivel: maior nível de teste acertado; qv: versão do teste respondido (1.8.34)
     price: { ...REF_PRICE }, fees: null, fxm: null   // fxm: dólar de hoje informado no modo offline (1.8.7)
   };
 }
 let state = defaultState();
-const ui = { tab: 'home', page: null, arg: null, sel: new Set(), selMode: false, showSpent: false, sheet: null, form: {}, locked: false, hiddenAt: 0, sim: null, irYear: null, gl: '', stack: [], hl: null, tabTop: {}, setSec: null, quizAberto: null };
+const ui = { tab: 'home', page: null, arg: null, sel: new Set(), selMode: false, showSpent: false, sheet: null, form: {}, locked: false, hiddenAt: 0, sim: null, irYear: null, gl: '', stack: [], hl: null, tabTop: {}, setSec: null, quizAberto: null, revisao: false };
 const caps = { downloads: null };
 const cur = () => state.settings.currency;
 const S = () => state.settings;
@@ -1092,7 +1152,7 @@ const SF = {
   nums: new Set(['fiat', 'price', 'sats', 'fee', 'feeSats', 'dolar', 'vsize', 'outSats', 'sent']),
   bools: new Set(['kyc', 'frozen', 'spent', 'rem', 'vsizeReal', 'sale', 'entrada']),
   texts: new Set(['note', 'ex', 'name', 'label', 'addr']),
-  opts: new Set(['type', 'kind', 'role', 'origin', 'dest', 'src', 'moeda']),
+  opts: new Set(['type', 'kind', 'role', 'origin', 'dest', 'src', 'moeda', 'dono']),
   dates: new Set(['date', 'spentAt'])
 };
 /* Campos que o app não conhece (1.8.21, auditoria S8): a validação cuida só dos campos conhecidos e deixa os outros como
@@ -1103,7 +1163,7 @@ function camposDesconhecidos(o) {
   ver(o, new Set(Object.keys(d)), '');
   ver(o.settings, new Set([...Object.keys(d.settings), 'xiServer']), 'settings.');
   ver(o.price, new Set(['BRL', 'USD', 'EUR', 'at', 'src']), 'price.');
-  ver(o.learn, new Set(['done', 'quiz']), 'learn.');
+  ver(o.learn, new Set(['done', 'quiz', 'nivel', 'qv']), 'learn.');
   for (const k of ['aportes', 'saques', 'utxos', 'wallets', 'addresses', 'spends'])
     for (const x of o[k] || []) { ver(x, SF_REG, k + '.'); if (x && Array.isArray(x.outputs)) for (const y of x.outputs) ver(y, SF_REG, k + '.outputs.'); }
   return [...fora];
@@ -1136,23 +1196,30 @@ function sanitizeState(o) {
   for (const k of ['aportes', 'saques', 'utxos', 'wallets', 'addresses', 'spends']) {
     o[k] = objs(o[k]); o[k].forEach(rec);
     for (const x of o[k]) if (x.id == null || x.id === '') { x.id = uid(); n++; }
+    // de quem é (1.8.35): só 'eu' ou 'outro'
+    for (const x of o[k]) if (x.dono != null && x.dono !== 'eu' && x.dono !== 'outro') { delete x.dono; n++; }
   }
   const s = o.settings, d = defaultState().settings;
   for (const k of ['monthly', 'day', 'goalSats', 'feeRate', 'wdFee', 'wdPct', 'lockMin', 'bkAt', 'bkAdiar']) if (s[k] != null) { const f = toNum(s[k]); if (!isNum(f)) { s[k] = d[k]; n++; } else if (f !== s[k]) { s[k] = f; n++; } }
-  for (const k of ['offline', 'hide', 'utxo', 'onboarded', 'gridAll', 'bkLembrar']) if (s[k] != null && typeof s[k] !== 'boolean') { s[k] = !!s[k]; n++; }
+  for (const k of ['offline', 'hide', 'utxo', 'onboarded', 'gridAll', 'bkLembrar', 'trilhaTudo']) if (s[k] != null && typeof s[k] !== 'boolean') { s[k] = !!s[k]; n++; }
   if (s.bkSig != null && !(typeof s.bkSig === 'string' && /^[0-9a-f]{0,16}$/.test(s.bkSig))) { s.bkSig = ''; n++; }
   const pick = (k, list, def) => { if (s[k] != null && !list.includes(s[k])) { s[k] = def; n++; } };
   pick('currency', ['BRL', 'USD', 'EUR'], 'BRL'); pick('unit', ['sats', 'btc'], 'sats'); pick('theme', ['auto', 'light', 'dark'], 'auto'); pick('viewCur', ['BRL', 'USD'], null); pick('grafModo', ['valor', 'pilha'], 'valor');
   if (s.exchange != null && typeof s.exchange !== 'string') { s.exchange = ''; n++; }
+  if (s.irExOutro != null) {   // 1.8.35: ano (AAAA) → sats inteiros
+    if (typeof s.irExOutro !== 'object' || Array.isArray(s.irExOutro)) { s.irExOutro = {}; n++; }
+    else for (const k of Object.keys(s.irExOutro)) { const v = s.irExOutro[k]; if (!/^\d{4}$/.test(k) || !(Number.isInteger(v) && v >= 0 && v <= 21e14)) { delete s.irExOutro[k]; n++; } }
+  }
   if (s.xiServer != null && !(typeof s.xiServer === 'string' && SAFE_URL.test(s.xiServer))) { delete s.xiServer; n++; }
   const p = o.price;
   for (const k of ['BRL', 'USD', 'EUR', 'at']) if (p[k] != null && !isNum(p[k])) { p[k] = REF_PRICE[k]; n++; }
   if (p.src != null && !(typeof p.src === 'string' && /^[\w .-]{0,40}$/.test(p.src))) { p.src = 'ref'; n++; }
   if (o.fees != null) { if (typeof o.fees !== 'object' || Array.isArray(o.fees)) { o.fees = null; n++; } else for (const k of Object.keys(o.fees)) if (!isNum(o.fees[k])) { delete o.fees[k]; n++; } }
   if (o.fxm != null && !(typeof o.fxm === 'object' && isNum(o.fxm.r) && isNum(o.fxm.at))) { o.fxm = null; n++; }
-  for (const k of ['done', 'quiz']) {
+  for (const k of ['done', 'quiz', 'nivel', 'qv']) {
     const m = o.learn[k]; if (!m || typeof m !== 'object' || Array.isArray(m)) { o.learn[k] = {}; n++; continue; }
-    for (const id of Object.keys(m)) if (!SAFE_ID.test(id) || !(isNum(m[id]) || typeof m[id] === 'boolean')) { delete m[id]; n++; }
+    const inteiro = k === 'nivel' || k === 'qv';   // nível e versão: inteiros de 1 a 99
+    for (const id of Object.keys(m)) if (!SAFE_ID.test(id) || !(inteiro ? Number.isInteger(m[id]) && m[id] >= 1 && m[id] <= 99 : isNum(m[id]) || typeof m[id] === 'boolean')) { delete m[id]; n++; }
   }
   for (const k of ['createdAt', 'updatedAt']) if (o[k] != null && !isNum(o[k])) { o[k] = k === 'createdAt' ? Date.now() : 0; n++; }
   if (o.demo != null && typeof o.demo !== 'boolean') { o.demo = !!o.demo; n++; }
@@ -1163,12 +1230,28 @@ function migrate(s) {
   if (!s || typeof s !== 'object') return d;
   const o = { ...d, ...s, settings: { ...d.settings, ...(s.settings || {}) }, learn: { ...d.learn, ...(s.learn || {}) }, price: { ...d.price, ...(s.price || {}) } };
   for (const k of ['aportes', 'saques', 'utxos', 'wallets', 'addresses', 'spends']) if (!Array.isArray(o[k])) o[k] = [];
-  if (!o.learn.done) o.learn.done = {}; if (!o.learn.quiz) o.learn.quiz = {};
+  for (const k of ['done', 'quiz', 'nivel', 'qv']) if (!o.learn[k]) o.learn[k] = {};
   if (!(o.price.at >= REF_PRICE.at)) o.price = { ...REF_PRICE };
   migrateFixes = sanitizeState(o);
   for (const x of o.aportes) if (!x.ex) x.ex = DEF_EX(x.type);
   migrateV2(o);
+  migrateLearn(o);
   return o;
+}
+/* Testes das lições com versão e nível (1.8.34). learn.quiz[id] guarda a resposta e learn.qv[id], a versão do teste em
+   que ela foi dada (sem qv, a 1). Teste reescrito (quiz.v maior) não aproveita a resposta antiga: a lição concluída avisa
+   que o teste mudou. learn.nivel[id] é o maior nível acertado; o Refazer não o apaga, e é ele que vai liberar o nível 2.
+   A resposta certa de uma versão antiga fica em quiz.antes[versão], no content.js. */
+const quizV = l => l.quiz.v || 1;
+const quizCerta = (l, v) => v === quizV(l) ? l.quiz.a : (l.quiz.antes || {})[v];
+const quizResp = l => { const k = state.learn.quiz[l.id]; return k != null && (state.learn.qv[l.id] || 1) === quizV(l) ? k : null; };
+const quizVelho = l => state.learn.quiz[l.id] != null && (state.learn.qv[l.id] || 1) !== quizV(l);
+// quem já tinha acertado o teste (de qualquer versão) fica no nível 1; idempotente, e nunca baixa um nível
+function migrateLearn(o) {
+  for (const l of LESSONS) {
+    const k = o.learn.quiz[l.id]; if (k == null || o.learn.nivel[l.id] >= 1) continue;
+    if (k === quizCerta(l, o.learn.qv[l.id] || 1)) o.learn.nivel[l.id] = 1;
+  }
 }
 /* rede só depois da escolha nas boas-vindas e fora do modo 100% offline */
 const NET = () => S().onboarded && !S().offline;
@@ -1487,13 +1570,28 @@ function render() {
   applyTheme();
   $('#hide-btn').innerHTML = S().hide ? I.eyeOff : I.eye;
   $('#hide-btn').setAttribute('aria-label', S().hide ? 'Mostrar valores' : 'Ocultar valores');
-  let html = state.demo ? `<div class="demo-bar"><span>Você está vendo dados de exemplo.</span><button data-act="clear-demo">Apagar exemplo</button></div>` : '';
+  let html = state.demo ? `<div class="demo-wrap"><div class="demo-bar"><span>Você está vendo um exemplo.</span><button data-act="clear-demo">Apagar exemplo</button></div></div>` : '';
   if (ui.page) html += renderPage();
   else html += ui.tab === 'home' ? viewHome() : ui.tab === 'aportes' ? viewAportes() : ui.tab === 'carteira' ? viewCarteira() : viewAprender();
-  $('#view').innerHTML = html;
+  const v = $('#view'); v.innerHTML = html; v.dataset.tela = ui.page ? 'pagina' : ui.tab;   // 1.8.36: os cartões do Início
   for (const b of $$('.tab[data-tab]')) { const on = b.dataset.tab === ui.tab; b.classList.toggle('on', on); b.setAttribute('aria-current', on ? 'page' : 'false'); }
-  histQueue();
+  histQueue(); topoRolou();
 }
+/* 1.8.36 (pedido do Nicolas, a alternativa mostrada na 1.8.35): o laranja sempre fecha com canto de 24 px. Enquanto o laranja
+   do Início (ou a faixa do exemplo) está logo abaixo do topo, o topo emenda nele e fica reto; quando esse laranja passa por
+   baixo do topo, ou quando não há laranja embaixo (outras abas e páginas), o topo fecha com o canto (classe so). Com conteúdo
+   passando por baixo, ganha sombra (classe rolou). Conta pela posição na tela, uma vez por quadro. */
+function topoRolou() {
+  const t = $('.top'), v = $('#view'); if (!t || !v) return;
+  const fim = t.getBoundingClientRect().bottom, lar = [...v.querySelectorAll(':scope > .hero, :scope > .demo-wrap')].pop();
+  const so = !lar || lar.getBoundingClientRect().bottom <= fim + 1, rolou = so && v.getBoundingClientRect().top < fim - 1;
+  if (t.classList.contains('so') !== so) t.classList.toggle('so', so);
+  if (t.classList.contains('rolou') !== rolou) t.classList.toggle('rolou', rolou);
+}
+let topoQuadro = 0;
+const topoAgenda = () => { if (!topoQuadro) topoQuadro = requestAnimationFrame(() => { topoQuadro = 0; topoRolou(); }); };
+window.addEventListener('scroll', topoAgenda, { passive: true });
+window.addEventListener('resize', topoAgenda, { passive: true });
 
 /* ---------------- Início ---------------- */
 function viewHome() {
@@ -1529,8 +1627,8 @@ function viewHome() {
   if (set.utxo) h += `<section class="sec"><div class="sec-head"><h2 class="sec-t">Onde está sua pilha</h2><button class="link-btn" data-act="tab" data-tab="carteira">Abrir carteira</button></div>${splitBar(c)}${withdrawLine(c)}</section>`;
   const next = LESSONS.find(l => !state.learn.done[l.id]);
   if (next) h += `<section class="sec"><h2 class="sec-t">Continue aprendendo</h2>${lessonRow(next)}</section>`;
-  h += `<section class="sec"><button class="tool" data-act="page" data-page="sim"><b>Se eu tivesse começado antes</b><span>Simule o aporte mensal desde 2015 com preços históricos</span><span class="chev" aria-hidden="true">›</span></button></section>`;
-  if (state.aportes.length) h += `<section class="sec" style="padding-top:0">${ksCard(set.utxo ? 'steel' : 'hw')}</section>`;
+  h += `<section class="sec solo"><button class="tool" data-act="page" data-page="sim"><b>Se eu tivesse começado antes</b><span>Simule o aporte mensal desde 2015 com preços históricos</span><span class="chev" aria-hidden="true">›</span></button></section>`;
+  if (state.aportes.length) h += `<section class="sec solo">${ksCard(set.utxo ? 'steel' : 'hw')}</section>`;
   return h;
 }
 /* ---------------- Evolução da pilha (1.8.26) ----------------
@@ -1761,7 +1859,7 @@ function apRes(v) {
 }
 function viewAportes() {
   const c = calc(), aps = [...state.aportes].sort((a, b) => b.date.localeCompare(a.date) || (isSale(b) - isSale(a)) || b.id.localeCompare(a.id));
-  const tools = `<div class="btn-row" style="margin-top:14px"><button class="btn btn-q btn-s" data-act="new-sale">Registrar venda</button><button class="btn btn-q btn-s" data-act="import">Importar</button><button class="btn btn-q btn-s" data-act="export">Exportar</button><button class="btn btn-q btn-s" data-act="page" data-page="ir">IR</button><button class="btn btn-q btn-s" data-act="page" data-page="sim">Simular</button></div>`;
+  const tools = `<div class="btn-row" style="margin-top:14px"><button class="btn btn-q btn-s" data-act="new-sale">Registrar venda</button><button class="btn btn-q btn-s" data-act="import">Importar</button><button class="btn btn-q btn-s" data-act="export">Exportar</button><button class="btn btn-q btn-s" data-act="ir-menu">IR</button><button class="btn btn-q btn-s" data-act="page" data-page="sim">Simular</button></div>`;
   if (!aps.length) return `<div class="empty"><h2>Nenhum aporte ainda</h2><p class="muted">Registre sua primeira compra de bitcoin ou traga os aportes da planilha do Hold BTC 100.</p><div class="btn-row"><button class="btn btn-p" data-act="new-aporte">Registrar aporte</button><button class="btn btn-o" data-act="import">Importar planilha</button></div><p style="margin-top:14px"><button class="link-btn" data-act="demo">Explorar com dados de exemplo</button></p></div>`;
   const hide = S().hide, sg = v => hide ? OCULTO : esc((v >= 0 ? '+' : '−') + fmtV(Math.abs(v)));
   // 1.8.29: o livro tem as taxas, os envios sem venda e as entradas de terceiros; "Em carteira" é a pilha da aba Carteira
@@ -1778,7 +1876,10 @@ function viewAportes() {
   </div>`;
   h += fxNote() + tools + `</section>`;
   if (aps.length >= 2) h += `<section class="sec"><h2 class="sec-t">${c.sales ? 'Cotação de cada compra e venda' : 'Cotação de cada compra'}</h2>${chartAportes([...aps].reverse().map(apV), c.avg, c.P)}<div class="chart-legend"><span><i></i>cotação paga</span>${c.avg > 0 ? '<span><i class="d"></i>preço médio</span>' : ''}<span><i class="o"></i>hoje</span>${c.sales ? '<span><i class="s"></i>venda</span>' : ''}</div></section>`;
-  h += `<section class="sec ap-lista">`;
+  // 1.8.34 (pedido do Nicolas): cada compra mostra quanto vale hoje. É a quantidade comprada pela cotação de agora; com
+  // vendas ou envios, a soma passa do valor atual, porque o custo médio não tira o que sai de uma compra específica
+  const saiu = [c.sales ? 'vendas' : '', S().utxo && c.outSats > 0 ? 'envios' : ''].filter(Boolean).join(' e ');
+  h += `<section class="sec ap-lista">${saiu ? `<p class="hint ap-hoje">“Hoje” é quanto os sats de cada compra valem pela cotação de agora. Como já houve ${saiu}, a soma das compras passa do valor atual da pilha: no custo médio, o que sai não vem de uma compra específica.</p>` : ''}`;
   let year = null; const ys = {};
   for (const a of aps) { const y = a.date.slice(0, 4); const o = ys[y] || (ys[y] = { n: 0, f: 0, fb: 0, s: 0, v: 0 }); if (isSale(a)) o.v++; else { o.n++; o.f += toVa(a, a.fiat); o.fb += a.fiat; o.s += a.sats; } }
   // com o par, cada linha mostra também o valor na outra moeda (valReg): a compra na moeda dos valores (1.8.31) e a venda em
@@ -1790,12 +1891,12 @@ function viewAportes() {
     if (y !== year) { year = y; const o = ys[y]; h += `<div class="yhead"><b>${y}</b><span>${o.n} ${o.n === 1 ? 'aporte' : 'aportes'} · ${MV(o.f, 0)}${fxOn() ? ` (${priv(fmtMoney(o.fb, cur(), 0))})` : ''} · ${AMT(o.s)}${o.v ? ` · ${o.v} ${o.v === 1 ? 'venda' : 'vendas'}` : ''}</span></div>`; }
     if (isSale(a)) {
       const r = fxOn() ? emR(a0) : a, rc = fxOn() ? 'BRL' : vcur(), now = a.sats / 1e8 * priceNow(rc), d = now / r.fiat - 1;
-      h += `<button class="row-btn sale" data-act="edit-aporte" data-id="${a.id}"><span class="a">${fmtDate(a.date)} · ${valReg(a0)}</span><span class="r"><b>${AMT(-a.sats)}</b></span><span class="b"><span class="tag s">venda</span> ${esc(fmtMoney(r.price, rc, 0))}${a.ex && !isDefEx(a.ex) ? ' · ' + esc(a.ex) : ''}${taxa(r, rc)}${S().utxo && a.src === 'self' ? ' · ◈ ' + (a.wallet ? esc(walletName(a.wallet)) : 'saiu da carteira') : ''}${fxt}</span><span class="r b">hoje valeriam ${priv(fmtMoney(now, rc))} <span class="${d > 0 ? 'neg' : 'pos'}">${esc(fmtPct(d))}</span></span></button>`;
+      h += `<button class="row-btn sale" data-act="edit-aporte" data-id="${a.id}"><span class="a">${fmtDate(a.date)} · ${valReg(a0)}</span><span class="r"><b>${AMT(-a.sats)}</b></span><span class="b"><span class="tag s">venda</span> ${esc(fmtMoney(r.price, rc, 0))}${a.ex && !isDefEx(a.ex) ? ' · ' + esc(a.ex) : ''}${taxa(r, rc)}${S().utxo && a.src === 'self' ? ' · ◈ ' + (a.wallet ? esc(walletName(a.wallet)) : 'saiu da carteira') : ''}${fxt}</span><span class="hj">hoje valeriam ${priv(fmtMoney(now, rc))}</span><span class="r b res"><span class="${d > 0 ? 'neg' : 'pos'}">${esc(fmtPct(d))}</span></span></button>`;
       continue;
     }
     // quanto o aporte rende: o valor de hoje dos sats sobre o valor pago, com a taxa (1.8.32; antes, pela cotação sem a taxa)
-    const v = a.sats > 0 && a.fiat > 0 ? c.P * a.sats / 1e8 / a.fiat - 1 : 0;
-    h += `<button class="row-btn${apLado(v) > 0 ? ' up' : apLado(v) < 0 ? ' down' : ''}" data-act="edit-aporte" data-id="${a.id}"><span class="a">${fmtDate(a.date)} · ${valReg(a0)}</span><span class="r"><b>${AMT(a.sats)}</b></span><span class="b">${esc(fmtV(a.price, 0))}${a.ex ? ' · ' + esc(a.ex) : ''}${taxa(a)}${S().utxo && a.dest === 'self' ? (a.entrada ? ' · ◈ compra de terceiros' : ' · ◈ direto na carteira') : ''}${fxt}</span><span class="r b res">${apRes(v)}</span></button>`;
+    const hoje = c.P * a.sats / 1e8, v = a.sats > 0 && a.fiat > 0 ? hoje / a.fiat - 1 : 0;
+    h += `<button class="row-btn${apLado(v) > 0 ? ' up' : apLado(v) < 0 ? ' down' : ''}" data-act="edit-aporte" data-id="${a.id}"><span class="a">${fmtDate(a.date)} · ${valReg(a0)}</span><span class="r"><b>${AMT(a.sats)}</b></span><span class="b">${esc(fmtV(a.price, 0))}${a.ex ? ' · ' + esc(a.ex) : ''}${taxa(a)}${S().utxo && a.dest === 'self' ? (a.entrada ? ' · ◈ compra de terceiros' : ' · ◈ direto na carteira') : ''}${fxt}</span><span class="hj">hoje ${MV(hoje)}</span><span class="r b res">${apRes(v)}</span></button>`;
   }
   return h + `</section>` + (c.sales ? vendasSecao(c) : '') + (S().utxo && (c.feeSats || c.outSats || c.extSats) ? contaSecao(c) : '');
 }
@@ -1878,20 +1979,23 @@ function chartAportes(asc, avg, P) {
   </svg>`;
 }
 /* ---------------- Aprender ---------------- */
-function lessonRow(l) {
-  const i = LESSONS.indexOf(l) + 1, done = !!state.learn.done[l.id];
-  return `<button class="lesson ${done ? 'done' : ''}" data-act="lesson" data-id="${l.id}"><span class="n">${done ? '✓' : i}</span><span class="t">${esc(l.title)}</span><span class="s">${esc(l.sum)}</span><span class="chev" aria-hidden="true">›</span></button>`;
+function lessonRow(l, act = 'lesson') {
+  const i = LESSONS.indexOf(l) + 1, done = !!state.learn.done[l.id], novo = done && quizVelho(l);
+  return `<button class="lesson ${done ? 'done' : ''}" data-act="${act}" data-id="${l.id}"><span class="n">${done ? '✓' : i}</span><span class="t">${esc(l.title)}${novo ? ' <span class="tag">teste novo</span>' : ''}</span><span class="s">${esc(l.sum)}</span><span class="chev" aria-hidden="true">›</span></button>`;
 }
 function viewAprender() {
   setTimeout(mpStart, 0);
   const done = LESSONS.filter(l => state.learn.done[l.id]).length, pct = done / LESSONS.length, C = 2 * Math.PI * 27;
-  const feitos = LESSONS.filter(l => state.learn.done[l.id] && state.learn.quiz[l.id] != null).length;   // testes que não aparecem mais (1.8.30)
+  // 1.8.34 (pedido do Nicolas): a trilha mostra só o que falta; as concluídas ficam na página Lições concluídas, que pode
+  // devolvê-las à trilha (settings.trilhaTudo). O número de cada lição continua o da ordem da trilha.
+  const feitas = LESSONS.filter(l => state.learn.done[l.id]), lista = S().trilhaTudo ? LESSONS : LESSONS.filter(l => !state.learn.done[l.id]);
+  const trilha = lista.length ? lista.map(l => lessonRow(l)).join('') : `<div class="trilha-fim"><b>Trilha concluída</b><p class="small muted">Você concluiu as ${LESSONS.length} lições. Elas ficam em Lições concluídas, para rever quando quiser.</p><button class="btn btn-q btn-s" data-act="page" data-page="licoes">Ver as lições concluídas</button></div>`;
   const more = (arr, key, n) => { const open = ui[key]; const list = open ? arr : arr.slice(0, n); return `<div class="links">${list.map(([t, u]) => extLink(u, `<b>${esc(t)}</b><span class="ext">${I.ext}</span>`)).join('')}</div>${arr.length > n ? `<p><button class="link-btn" data-act="toggle-ui" data-k="${key}">${open ? 'Mostrar menos' : `Ver todos (${arr.length})`}</button></p>` : ''}`; };
   return `${mempoolHTML()}<section class="sec"><div class="progress"><svg class="ring" viewBox="0 0 64 64" role="img" aria-label="${done} de ${LESSONS.length} lições concluídas"><circle class="bgc" cx="32" cy="32" r="27"/>${done ? `<circle class="fgc" cx="32" cy="32" r="27" stroke-dasharray="${(C * pct).toFixed(1)} ${C.toFixed(1)}"/>` : ''}<text x="32" y="38" text-anchor="middle">${done}</text></svg><div><h1 class="sec-t" style="font-size:28px;margin:0">Aprender</h1><p class="muted small" style="margin:0">${done} de ${LESSONS.length} lições da trilha do holder</p></div></div></section>
-  <section class="sec"><h2 class="sec-t">Trilha do holder</h2>${LESSONS.map(lessonRow).join('')}${feitos ? `<p class="refazer-testes"><span class="small muted">${feitos === 1 ? '1 teste respondido não aparece mais na lição concluída.' : `${feitos} testes respondidos não aparecem mais nas lições concluídas.`}</span><button class="link-btn" data-act="quiz-refazer-todos">Refazer os testes</button></p>` : ''}</section>
+  <section class="sec"><div class="sec-head"><h2 class="sec-t">Trilha do holder</h2>${feitas.length ? `<button class="link-btn" data-act="page" data-page="licoes">Concluídas (${feitas.length})</button>` : ''}</div>${trilha}</section>
   <section class="sec"><h2 class="sec-t">Ferramentas</h2>
     <button class="tool" data-act="page" data-page="sim"><b>Se eu tivesse começado antes</b><span>Aporte mensal desde 2015, com preços históricos</span><span class="chev" aria-hidden="true">›</span></button>
-    <button class="tool" data-act="page" data-page="ir"><b>Relatório para o IR</b><span>Custo de aquisição e quantidade em 31/12</span><span class="chev" aria-hidden="true">›</span></button>
+    <button class="tool" data-act="ir-menu"><b>Relatório para o IR</b><span>Custo de aquisição e quantidade em 31/12</span><span class="chev" aria-hidden="true">›</span></button>
     <button class="tool" data-act="page" data-page="glossary"><b>Glossário</b><span>${GLOSSARY.length} termos do mundo bitcoin, sem complicação</span><span class="chev" aria-hidden="true">›</span></button></section>
   <section class="sec"><h2 class="sec-t">Holdflix</h2><p class="small muted">Vídeos selecionados pelo projeto.</p>${more(HOLDFLIX, 'flixAll', 6)}</section>
   <section class="sec"><h2 class="sec-t">Holdteca</h2><p class="small muted">A biblioteca do Hold BTC 100.</p>${more(HOLDTECA, 'tecaAll', 5)}</section>
@@ -1928,30 +2032,55 @@ function ksCard(k) {
 function pageHead(t) { return `<div class="page-head"><button class="icon-btn" data-act="back" aria-label="Voltar">${I.back}</button><h1>${esc(t)}</h1></div>`; }
 function renderPage() {
   if (ui.page === 'lesson') return pageLesson();
+  if (ui.page === 'licoes') return pageLicoes();
   if (ui.page === 'sim') return pageSim();
   if (ui.page === 'ir') return pageIR();
   if (ui.page === 'glossary') return pageGlossary();
   if (ui.page === 'addr') return pageAddr();
   if (ui.page === 'tx') return pageTx();
   if (ui.page === 'wallet') return pageWallet();
+  if (ui.page === 'mapa') return pageMapa();
   ui.page = null; return viewHome();
 }
 function pageLesson() {
   const l = LESSONS.find(x => x.id === ui.arg) || LESSONS[0], i = LESSONS.indexOf(l);
-  const ans = state.learn.quiz[l.id], done = !!state.learn.done[l.id], next = LESSONS[i + 1];
+  const ans = quizResp(l), done = !!state.learn.done[l.id], next = proxLicao(l);
   const body = l.body.map(b => b.p ? `<p>${b.p}</p>` : b.h ? `<h3>${esc(b.h)}</h3>` : b.list ? `<ul>${b.list.map(x => `<li>${x}</li>`).join('')}</ul>` : b.tip ? `<div class="tip">${b.tip}${b.act ? `<br><button class="btn btn-q btn-s" data-act="${b.act}">${esc(b.actLabel)}</button>` : ''}</div>` : b.ks ? ksCard(b.ks) : '').join('');
   const q = l.quiz;
   const opts = q.o.map((o, k) => { let cls = 'opt'; if (ans != null) { if (k === q.a) cls += ' right'; else if (k === ans) cls += ' wrong'; } return `<button class="${cls}" data-act="quiz" data-id="${l.id}" data-k="${k}" ${ans != null ? 'aria-disabled="true"' : ''}>${esc(o)}</button>`; }).join('');
   // 1.8.30: concluída a lição, o teste respondido deixa de aparecer; fica o resultado e "Refazer o teste" (ou "Refazer os
   // testes", no Aprender). Logo depois de responder ou de pedir para refazer (ui.quizAberto), o teste continua na tela.
-  const acertou = ans === q.a, fechado = done && ans != null && ui.quizAberto !== l.id;
+  // 1.8.34: teste reescrito depois da resposta (quizVelho): a lição concluída avisa e oferece o teste novo
+  const acertou = ans === q.a, aberto = ui.quizAberto === l.id, fechado = done && ans != null && !aberto, mudou = done && ans == null && quizVelho(l) && !aberto;
   const quiz = fechado
     ? `<div class="quiz-feito"><span class="ic ${acertou ? 'ok' : 'nok'}" aria-hidden="true">${acertou ? I.ok : I.close}</span><span class="t"><b>Lição concluída</b><small>Teste rápido: você ${acertou ? 'acertou' : 'errou'}.</small></span><button class="btn btn-q btn-s" data-act="quiz-refazer" data-id="${l.id}">Refazer o teste</button></div>`
+    : mudou
+    ? `<div class="quiz-feito"><span class="ic novo" aria-hidden="true">↻</span><span class="t"><b>Lição concluída</b><small>O teste desta lição foi atualizado.</small></span><button class="btn btn-q btn-s" data-act="quiz-refazer" data-id="${l.id}">Fazer o teste novo</button></div>`
     : `<div class="quiz"><h3>Teste rápido</h3><p style="font-weight:600">${esc(q.q)}</p>${opts}${ans != null ? `<p class="why"><b class="${acertou ? 'pos' : 'neg'}">${acertou ? 'Isso mesmo.' : 'Não exatamente.'}</b> ${esc(q.why)}</p>` : ''}</div>
     ${done ? `<p class="pos" style="font-weight:700">Lição concluída.</p>` : `<button class="btn btn-p block" data-act="lesson-done" data-id="${l.id}" ${ans == null ? 'disabled' : ''}>${ans == null ? 'Responda o teste para concluir' : 'Concluir lição'}</button>`}`;
   return `${pageHead('Lição ' + (i + 1) + ' de ' + LESSONS.length)}<article class="article"><h2 class="lt">${esc(l.title)}</h2><p class="ls">${esc(l.sum)}</p>${body}
     ${quiz}
-    ${next ? `<button class="btn btn-o block" style="margin-top:10px" data-act="lesson" data-id="${next.id}">Próxima: ${esc(next.title)}</button>` : ''}</article>`;
+    ${next ? `<button class="btn btn-o block" style="margin-top:10px" data-act="${ui.revisao ? 'lesson-prox' : 'lesson'}" data-id="${next.id}">${ui.revisao ? 'Próxima concluída' : 'Próxima'}: ${esc(next.title)}</button>`
+      : !ui.revisao && LESSONS.every(x => state.learn.done[x.id]) ? '<button class="btn btn-o block" style="margin-top:10px" data-act="page" data-page="licoes">Ver as lições concluídas</button>' : ''}</article>`;
+}
+/* A próxima lição (1.8.34): na revisão (aberta pelas Lições concluídas), a próxima concluída; na trilha, a próxima que
+   falta (a trilha não mostra as concluídas), ou a da ordem de sempre quando elas também aparecem na trilha. */
+function proxLicao(l) {
+  const i = LESSONS.indexOf(l), feita = x => !!state.learn.done[x.id];
+  if (ui.revisao) return LESSONS.slice(i + 1).find(feita) || null;
+  if (S().trilhaTudo) return LESSONS[i + 1] || null;
+  return LESSONS.slice(i + 1).find(x => !feita(x)) || LESSONS.slice(0, i).find(x => !feita(x)) || null;
+}
+/* Lições concluídas (1.8.34, pedido do Nicolas): fora da trilha do Aprender, para ela mostrar só o que falta. Daqui se
+   revê cada lição (o Voltar volta para cá), refaz os testes e, se a pessoa quiser, devolve as concluídas à trilha. */
+function pageLicoes() {
+  const feitas = LESSONS.filter(l => state.learn.done[l.id]), resp = feitas.filter(l => quizResp(l) != null).length, tudo = !!S().trilhaTudo;
+  return `${pageHead('Lições concluídas')}<section class="sec">
+    <p class="muted" style="margin:0 0 6px">${feitas.length} de ${LESSONS.length} lições da trilha do holder.${feitas.length ? ' Toque numa delas para rever.' : ''}</p>
+    ${feitas.length ? feitas.map(l => lessonRow(l, 'lesson-rev')).join('') : '<p class="note">Nenhuma lição concluída ainda. Elas aparecem aqui quando você conclui cada uma.</p>'}
+    <div class="switch"><span><span class="t">Mostrar também na trilha</span><br><span class="d">As concluídas voltam para a lista do Aprender, com o ✓.</span></span><button class="tog ${tudo ? 'on' : ''}" data-act="trilha-tudo" aria-pressed="${tudo}" aria-label="Mostrar as lições concluídas também na trilha"></button></div>
+    ${resp ? `<p class="refazer-testes"><span class="small muted">${resp === 1 ? '1 teste já respondido.' : `${resp} testes já respondidos.`}</span><button class="link-btn" data-act="quiz-refazer-todos">Refazer os testes</button></p>` : ''}
+  </section>`;
 }
 function simulate(start, amount, c) {
   let sats = 0, inv = 0; const pts = []; const end = nowYM();
@@ -1989,23 +2118,109 @@ function simChart(pts, c) {
   const di = pts.map((p, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(p.inv).toFixed(1)).join(' ');
   return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Total aportado e valor da pilha ao longo do tempo"><line class="ax" x1="0" x2="${W}" y1="${H - pb}" y2="${H - pb}"/><path class="area" d="${dv} L${W} ${H - pb} L0 ${H - pb}Z"/><path class="ln2" d="${dv}"/><path class="ln" d="${di}"/><text x="0" y="${pt - 3}">${esc(fmtMoney(max, c, 0))}</text><text x="0" y="${H - 5}">${fmtYM(pts[0].k)}</text><text x="${W}" y="${H - 5}" text-anchor="end">${fmtYM(pts[pts.length - 1].k)}</text></svg>`;
 }
+/* ---------------- relatório do IR: o que é seu (1.8.35, pedido do Nicolas) ----------------
+   Quem acompanha no app o bitcoin de amigos ou familiares desmarca o que é deles antes do relatório: isso não entra na
+   declaração de quem usa o app. O critério é de quem é o bitcoin, nunca o KYC (o selo aparece só para informação). As
+   escolhas ficam nos registros: u.dono ('outro' = de outra pessoa; 'eu' = seu, quando a origem diria o contrário) e, por
+   ano, a parte de outras pessoas no saldo da corretora (settings.irExOutro). O custo da parte de outras pessoas sai pelo
+   custo médio de tudo o que está registrado; o resto do app continua mostrando tudo.
+   1.8.36 (pedido do Nicolas): as vendas saíram do menu. Elas entram todas no relatório, como estão registradas, e o menu
+   não grava nada nelas; um a.dono gravado pela 1.8.35 fica no registro sem efeito nenhum (migrações não apagam dados). */
+const utxosEm = end => state.utxos.filter(u => u.date <= end && (!u.spent || (u.spentAt || '') > end));
+// de quem é o UTXO: a marca dele; sem marca, as saídas e o troco de uma transação só com entradas de outra pessoa são dela.
+// base: ignora a marca do próprio UTXO (para saber se ela é necessária)
+function donoUtxo(u, memo = new Map(), base = false) {
+  if (!base && (u.dono === 'outro' || u.dono === 'eu')) return u.dono;
+  if (memo.has(u.id)) return memo.get(u.id);
+  memo.set(u.id, 'eu');
+  const sp = u.origin === 'tx' ? byId(state.spends, u.txId) : null;
+  const r = sp && sp.inputs.length && sp.inputs.every(id => { const x = byId(state.utxos, id); return !!x && donoUtxo(x, memo) === 'outro'; }) ? 'outro' : 'eu';
+  memo.set(u.id, r); return r;
+}
+// o que é de outras pessoas em 31/12 do ano y: a parte da corretora e os UTXOs
+function irParte(y) {
+  const end = `${y}-12-31`, at = holdAt(end), ex = Math.max(0, at.ex), memo = new Map();
+  const exOutro = Math.min(ex, Math.max(0, (S().irExOutro || {})[y] || 0));
+  const us = S().utxo ? utxosEm(end).sort((a, b) => b.sats - a.sats) : [], fora = us.filter(u => donoUtxo(u, memo) === 'outro');
+  return { end, at, ex, exOutro, us, fora, outro: exOutro + sumSats(fora) };
+}
+function irAnoPadrao() {
+  if (!ui.irYear) { const fy = +[...state.aportes].sort((a, b) => a.date.localeCompare(b.date))[0].date.slice(0, 4); ui.irYear = Math.max(fy, new Date().getFullYear() - 1); }
+  return ui.irYear;
+}
+// modo: 'pagina' (como as outras páginas), 'pilha' (empilha, aberto da lição) ou 'aqui' (já no relatório)
+function irMenu(modo) {
+  if (cur() !== 'BRL' || !state.aportes.length) return irAbre(modo);   // sem registros (ou fora de reais), o relatório explica
+  const y = irAnoPadrao(), p = irParte(y);
+  ui.form = { kind: 'ir-menu', modo, y, ex: amtIn(p.ex - p.exOutro), fora: new Set(p.fora.map(u => u.id)) };
+  openSheet('ir-menu', irMenuHTML, { label: 'O que é seu no relatório do IR', onOpen: irMenuSoma });
+}
+function irMenuHTML() {
+  const f = ui.form, y = f.y, p = irParte(y), utxo = S().utxo;
+  const linhaU = u => { const fora = f.fora.has(u.id), a = addrById(u.address); return `<button class="ptx-coin ir-coin ${fora ? '' : 'on'}" data-act="ir-pick" data-id="${u.id}" aria-pressed="${!fora}"><span class="ck" aria-hidden="true"></span><span class="a">${esc(u.label || (a || {}).label || 'UTXO')}<small>${esc(walletName(u.wallet))} · ${fmtDate(u.date)}${u.kyc ? ' · <span class="tag k">KYC</span>' : ''}</small></span><b>${AMT(u.sats)}</b></button>`; };
+  return `<h2>O que é seu em 31/12/${y}?</h2>
+    <p class="sub">O relatório vai para a sua declaração. Se você acompanha no app o bitcoin de amigos ou familiares, desmarque o que é deles: isso não entra no seu Imposto de Renda, e sim no de quem é dono. Todo bitcoin que é seu entra, com ou sem KYC.</p>
+    <div class="field"><label for="ir-ex">${utxo ? 'Seu saldo na corretora' : 'Seu bitcoin'} em 31/12/${y} (${unitName()})</label><input class="inp" id="ir-ex" name="irex" ${amtAttrs()} autocomplete="off" value="${esc(f.ex)}" data-inp="ir-ex"><p class="hint">Registrado no app: ${AMT(p.ex)}. Se uma parte é de outra pessoa, deixe só a sua.</p></div>
+    ${utxo ? `<div class="field"><span class="lbl">UTXOs em 31/12/${y}</span>${p.us.length ? p.us.map(linhaU).join('') + `<p class="hint">Marcados: seus. O selo KYC é só informação; o que decide é de quem é o bitcoin.</p>` : '<p class="hint">Nenhum UTXO nessa data.</p>'}</div>` : ''}
+    <p class="calc-line" id="ir-sum" aria-live="polite"></p>
+    <p class="err form" hidden></p>
+    <button class="btn btn-p block" data-act="ir-ok">Gerar relatório</button>`;
+}
+function irMenuSoma() {
+  const f = ui.form, el = $('#ir-sum'); if (!f || f.kind !== 'ir-menu' || !el) return;
+  const p = irParte(f.y), t = String(f.ex || '').trim(), exU = t === '' ? 0 : parseAmt(t), ex = isFinite(exU) && exU >= 0 ? Math.min(exU, p.ex) : p.ex;
+  const outro = p.ex - ex + sumSats(p.us.filter(u => f.fora.has(u.id)));
+  el.innerHTML = outro > 0 ? `No relatório: <b>${AMT(Math.max(0, p.at.hold - outro))}</b> seus. Fica fora, de outras pessoas: ${AMT(outro)}.`
+    : `No relatório: <b>${AMT(Math.max(0, p.at.hold))}</b>, tudo o que está registrado em 31/12/${f.y}.`;
+}
+function irMenuMarca(el, k) {
+  const f = ui.form, id = el.dataset.id; if (!f || f.kind !== 'ir-menu') return;
+  f[k].has(id) ? f[k].delete(id) : f[k].add(id);
+  const seu = !f[k].has(id); el.classList.toggle('on', seu); el.setAttribute('aria-pressed', seu); irMenuSoma();
+}
+function irMenuOk() {
+  const f = ui.form; if (!f || f.kind !== 'ir-menu') return;
+  const p = irParte(f.y), t = (fv('irex') || '').trim(), exU = t === '' ? NaN : parseAmt(t);
+  if (!(exU >= 0)) return formErr(`Informe ${S().utxo ? 'o seu saldo na corretora' : 'o seu bitcoin'} em 31/12/${f.y}: 0 se nada for seu.`);
+  if (exU > p.ex) return formErr(`Estão registrados ${amtTxt(p.ex)}${S().utxo ? ' na corretora' : ''} em 31/12/${f.y}. A sua parte não pode passar disso.`);
+  const set = S(), outroEx = p.ex - exU;
+  set.irExOutro = { ...(set.irExOutro || {}) }; if (outroEx > 0) set.irExOutro[f.y] = outroEx; else delete set.irExOutro[f.y];
+  for (const u of p.us) { if (f.fora.has(u.id)) u.dono = 'outro'; else if (donoUtxo(u, new Map(), true) === 'outro') u.dono = 'eu'; else delete u.dono; }
+  save(); irAbre(f.modo);
+}
+function irAbre(modo) {
+  closeSheet(true);
+  if (modo === 'aqui' && ui.page === 'ir') { render(); return; }
+  if (modo === 'pilha') return openPage('ir');
+  guardaTopo(); ui.stack = []; ui.hl = null; ui.page = 'ir'; ui.arg = null; render(); window.scrollTo(0, 0);
+}
 function pageIR() {
   if (cur() !== 'BRL') return `${pageHead('Relatório para o IR')}<div class="article"><p class="ls">O relatório usa os valores em reais. Seus registros estão em ${cur()}.</p></div>`;
   const aps = [...state.aportes].sort((a, b) => a.date.localeCompare(b.date));
   if (!aps.length) return `${pageHead('Relatório para o IR')}<div class="article"><p class="ls">Registre seus aportes para gerar o resumo do Imposto de Renda.</p><button class="btn btn-p" data-act="new-aporte">Registrar aporte</button></div>`;
   const fy = +aps[0].date.slice(0, 4), cy = new Date().getFullYear();
-  if (!ui.irYear) ui.irYear = Math.max(fy, cy - 1);
-  const y = ui.irYear, end = `${y}-12-31`, endP = `${y - 1}-12-31`;
+  const y = irAnoPadrao(), end = `${y}-12-31`, endP = `${y - 1}-12-31`;
   const ev = ledgerEvents(), Ly = ledger(aps.filter(a => a.date <= end), ev.filter(e => e.date <= end)), Lp = ledger(aps.filter(a => a.date <= endP), ev.filter(e => e.date <= endP)), Lall = ledger(aps, ev);
   const inY = a => a.date > endP && a.date <= end, buysY = aps.filter(a => !isSale(a) && inY(a)), salesY = aps.filter(a => isSale(a) && inY(a));
   const at = holdAt(end), buysUpTo = aps.filter(a => !isSale(a) && a.date <= end);
+  // 1.8.35: o que é de outras pessoas (marcado no menu antes do relatório) sai dos campos de situação, da quantidade e da
+  // discriminação; o custo dessa parte sai pelo custo médio. As vendas entram todas (1.8.36)
+  const sel = irParte(y), selP = irParte(y - 1), parte = (L, s) => L.held > 0 ? Math.max(0, Math.min(1, (L.held - s.outro) / L.held)) : 1;
+  const custoY = Ly.cost * parte(Ly, sel), custoP = Lp.cost * parte(Lp, selP), qtd = Math.max(0, at.hold - sel.outro);
+  const foraTxt = [sel.fora.length ? `${sel.fora.length} ${sel.fora.length === 1 ? 'UTXO' : 'UTXOs'}` : '', sel.exOutro ? `${amtTxt(sel.exOutro)} da corretora` : ''].filter(Boolean);
+  const comFora = foraTxt.length > 0;
   // custódia: só onde os bitcoins ficaram (compras na corretora e vendas feitas nela); nome de venda da carteira (P2P) não é corretora
   const exs = [...new Set(aps.filter(a => a.date <= end && (isSale(a) ? a.src !== 'self' : a.dest !== 'self')).map(a => a.ex).filter(x => x && !isDefEx(x)))];
-  const custody = S().utxo ? `${fmtBTC(Math.max(0, at.ex))} BTC em ${exs.length ? exs.join(', ') : 'corretora'} [informe o CNPJ] e ${fmtBTC(Math.max(0, at.self))} BTC em carteira própria (autocustódia)` : `${exs.length ? exs.join(', ') : '[corretora]'} [informe o CNPJ] e/ou carteira própria (autocustódia). Ajuste conforme onde os bitcoins estavam em 31/12/${y}`;
+  // 1.8.34: na autocustódia, a Receita pede o modelo da carteira; com a gestão de UTXOs, vão também os nomes das carteiras
+  // que tinham saldo em 31/12, para a pessoa saber quais modelos informar
+  const wsAt = S().utxo ? [...new Set(state.utxos.filter(u => u.date <= end && (!u.spent || (u.spentAt || '') > end)).map(u => u.wallet))].map(walletName) : [];
+  const custody = S().utxo ? `${fmtBTC(Math.max(0, at.ex))} BTC em ${exs.length ? exs.join(', ') : 'corretora'} [informe o CNPJ] e ${fmtBTC(Math.max(0, at.self))} BTC em carteira própria (autocustódia${wsAt.length ? ': ' + wsAt.join(', ') : ''}) [informe o modelo da carteira]` : `${exs.length ? exs.join(', ') : '[corretora]'} [informe o CNPJ] e/ou carteira própria (autocustódia) [informe o modelo da carteira]. Ajuste conforme onde os bitcoins estavam em 31/12/${y}`;
   // 1.8.29: o que saiu sem venda e as taxas pagas em bitcoin também entram na discriminação
   const desc = [Ly.sold ? `${fmtBTC(Ly.sold)} BTC vendidos` : '', Ly.outSats ? `${fmtBTC(Ly.outSats)} BTC enviados sem venda (pelo custo médio)` : '', Ly.feeSats ? `${fmtBTC(Ly.feeSats)} BTC de taxas de saque e de rede` : ''].filter(Boolean);
   const descTxt = desc.length ? `, já descontados ${desc.length > 1 ? desc.slice(0, -1).join(', ') + ' e ' + desc[desc.length - 1] : desc[0]}` : '';
-  const disc = buysUpTo.length ? `${fmtBTC(at.hold)} BTC (bitcoin) adquiridos em ${buysUpTo.length} compras entre ${fmtYM(buysUpTo[0].date.slice(0, 7))} e ${fmtYM(buysUpTo[buysUpTo.length - 1].date.slice(0, 7))}${Ly.extSats ? `, mais ${fmtBTC(Ly.extSats)} BTC recebidos de terceiros sem custo informado` : ''}${descTxt}. Custo de aquisição de ${fmtMoney(Ly.cost, 'BRL')} pelo custo médio (${fmtMoney(Ly.avg, 'BRL', 0)} por BTC)${Ly.feeSats ? ', com as taxas pagas em bitcoin somadas ao custo' : ''}. Custódia em 31/12/${y}: ${custody}.` : '';
+  const usSeu = sel.us.filter(u => !sel.fora.includes(u)), wsSeu = [...new Set(usSeu.map(u => u.wallet))].map(walletName);
+  const custodySeu = S().utxo ? `${fmtBTC(sel.ex - sel.exOutro)} BTC em ${exs.length ? exs.join(', ') : 'corretora'} [informe o CNPJ] e ${fmtBTC(sumSats(usSeu))} BTC em carteira própria (autocustódia${wsSeu.length ? ': ' + wsSeu.join(', ') : ''}) [informe o modelo da carteira]` : custody;
+  const disc = !buysUpTo.length ? '' : sel.outro > 0 ? `${fmtBTC(qtd)} BTC (bitcoin). Custo de aquisição de ${fmtMoney(custoY, 'BRL')} pelo custo médio (${fmtMoney(Ly.avg, 'BRL', 0)} por BTC). Custódia em 31/12/${y}: ${custodySeu}.` : `${fmtBTC(at.hold)} BTC (bitcoin) adquiridos em ${buysUpTo.length} compras entre ${fmtYM(buysUpTo[0].date.slice(0, 7))} e ${fmtYM(buysUpTo[buysUpTo.length - 1].date.slice(0, 7))}${Ly.extSats ? `, mais ${fmtBTC(Ly.extSats)} BTC recebidos de terceiros sem custo informado` : ''}${descTxt}. Custo de aquisição de ${fmtMoney(Ly.cost, 'BRL')} pelo custo médio (${fmtMoney(Ly.avg, 'BRL', 0)} por BTC)${Ly.feeSats ? ', com as taxas pagas em bitcoin somadas ao custo' : ''}. Custódia em 31/12/${y}: ${custody}.`;
   const envY = ev.filter(e => e.ev === 'envio' && inY(e)), envS = envY.reduce((t, e) => t + e.sats, 0), envC = envY.reduce((t, e) => t + ((Lall.info[e.id] || {}).cost || 0), 0);
   const taxY = ev.filter(e => e.ev === 'taxa' && inY(e)).reduce((t, e) => t + e.sats, 0);
   ui.irText = disc;
@@ -2018,18 +2233,20 @@ function pageIR() {
   return `${pageHead('Relatório para o IR')}<div class="article">
     ${fxOn() ? '<p class="note" style="margin:0 0 14px">O relatório do IR fica sempre em reais, como pede a Receita, mesmo com os valores do app em dólar.</p>' : ''}
     <div class="field"><label for="ir-y">Ano-base</label><select class="inp" id="ir-y" data-inp="ir-year">${yrs.map(k => `<option ${k === y ? 'selected' : ''}>${k}</option>`).join('')}</select></div>
-    <div class="panel"><b>Ficha Bens e Direitos</b><p class="small muted" style="margin:2px 0 8px">Grupo 08 · Criptoativos · Código 01 · Bitcoin (BTC)</p>
-    <ul class="receipt"><li><span class="k">Situação em 31/12/${y - 1}</span><span class="dots"></span><span class="v">${M(Lp.cost)}</span></li>
-    <li><span class="k">Situação em 31/12/${y}</span><span class="dots"></span><span class="v">${M(Ly.cost)}</span></li>
+    <div class="ir-seu"><span class="t">${comFora ? `<b>Só o que é seu.</b> Fica fora, de outras pessoas: ${esc(foraTxt.join(', '))}.` : `<b>Tudo o que está registrado</b> em 31/12/${y} entra no relatório.`}</span><button class="btn btn-q btn-s" data-act="ir-menu">Rever o que é seu</button></div>
+    <div class="panel"><b>Ficha Bens e Direitos</b><p class="small muted" style="margin:2px 0 8px">Grupo 08 · Criptoativos · Código 01 · Bitcoin (BTC). Os dois campos de situação levam o custo de aquisição, nunca a cotação de 31/12.</p>
+    <ul class="receipt"><li><span class="k">Situação em 31/12/${y - 1}</span><span class="dots"></span><span class="v">${M(custoP)}</span></li>
+    <li><span class="k">Situação em 31/12/${y}</span><span class="dots"></span><span class="v">${M(custoY)}</span></li>
     <li><span class="k">Comprado em ${y}</span><span class="dots"></span><span class="v">${M(buysY.reduce((t, a) => t + a.fiat, 0))}<small>${buysY.length} ${buysY.length === 1 ? 'aporte' : 'aportes'}</small></span></li>
     ${salesY.length ? `<li><span class="k">Vendido em ${y}</span><span class="dots"></span><span class="v">${M(salesY.reduce((t, a) => t + a.fiat, 0))}<small>${salesY.length} ${salesY.length === 1 ? 'venda' : 'vendas'}</small></span></li>` : ''}
     ${envY.length ? `<li><span class="k">Enviado sem venda em ${y}</span><span class="dots"></span><span class="v">${M(envC)}<small>custo de ${BTCx(envS)} BTC</small></span></li>` : ''}
     ${taxY ? `<li><span class="k">Taxas em bitcoin em ${y}</span><span class="dots"></span><span class="v">${BTCx(taxY)} BTC<small>somadas ao custo</small></span></li>` : ''}
-    <li><span class="k">Quantidade em 31/12/${y}</span><span class="dots"></span><span class="v">${BTCx(at.hold)} BTC</span></li></ul>
+    <li><span class="k">Quantidade em 31/12/${y}</span><span class="dots"></span><span class="v">${BTCx(qtd)} BTC</span></li></ul>
+    ${comFora ? `<p class="small muted" style="margin:8px 0 0">Os campos de situação e a quantidade já estão só com o que é seu; compras, vendas, envios e taxas do ano somam todos os registros. Confira a situação em 31/12/${y - 1} com a sua declaração do ano passado: os dois valores têm de ser iguais.</p>` : ''}
     ${Ly.pend > 0 ? `<p class="note warn" style="margin:8px 0 0">Em 31/12/${y}, ${esc(amtTxt(Ly.pend))} tinham saído da carteira sem aportes registrados antes que os cobrissem. Registre os aportes que faltam ou confira as datas.</p>` : ''}
-    <p class="small ${Ly.cost >= 5000 ? 'warn' : 'muted'}" style="margin:8px 0 0;font-weight:600">${Ly.cost >= 5000 ? 'Declaração obrigatória: o custo de aquisição passou de R$ 5 mil.' : 'Custo abaixo de R$ 5 mil: este item não é de declaração obrigatória.'}</p></div>
+    <p class="small ${custoY >= 5000 ? 'warn' : 'muted'}" style="margin:8px 0 0;font-weight:600">${custoY >= 5000 ? 'Item obrigatório na declaração: o custo de aquisição chegou a R$ 5 mil.' : 'Custo abaixo de R$ 5 mil: informar este item na declaração é opcional.'}</p></div>
     ${disc ? `<div class="field" style="margin-top:16px"><label for="ir-d">Discriminação sugerida</label><textarea class="inp" id="ir-d" rows="6" readonly>${esc(disc)}</textarea></div><button class="btn btn-q btn-s" data-act="copy-ir">Copiar discriminação</button>` : ''}
-    ${sales ? `<h3>Vendas em ${y}</h3>${sales}<p class="hint">Custo pelo custo médio. Vendas de até R$ 35 mil no mês em plataformas no Brasil têm o ganho isento. Acima disso, o ganho paga de 15% a 22,5%, com DARF (código 4600) até o último dia útil do mês seguinte. No exterior não há isenção: 15% na declaração anual.${temP2P ? ' Venda direta da carteira (P2P), sem corretora no Brasil: quando as operações assim passam de R$ 35 mil no mês, você mesmo informa a Receita na DeCripto, pelo e-CAC (desde julho de 2026; antes, a IN 1.888 pedia acima de R$ 30 mil). É obrigação de informar, não imposto.' : ''}</p>` : ''}
+    ${sales ? `<h3>Vendas em ${y}</h3>${sales}<p class="hint">Custo pelo custo médio. Vendas de até R$ 35 mil no mês em plataformas no Brasil têm o ganho isento. Acima disso, o ganho paga de 15% a 22,5%, com DARF até o último dia útil do mês seguinte (código 1897 para vendas desde maio de 2026; antes, 4600). No exterior não há isenção: 15% na declaração anual.${temP2P ? ' Venda direta da carteira (P2P), sem corretora no Brasil: quando as operações assim passam de R$ 35 mil no mês, você mesmo informa a Receita na DeCripto, pelo e-CAC (desde julho de 2026; antes, a IN 1.888 pedia acima de R$ 30 mil). É obrigação de informar, não imposto.' : ''}</p>` : ''}
     ${envY.length || taxY ? `<p class="hint">Envio sem venda (presente, doação) sai pelo custo médio, sem ganho: é a doação pelo valor da sua declaração; por um valor maior, a diferença é ganho de capital. Pagamento com bitcoin é venda: marque a saída como Venda. As taxas de saque e de rede, pagas em bitcoin, tiram sats e ficam no custo de aquisição do que sobrou.</p>` : ''}
     <div class="tip">Informe sempre o <b>custo de aquisição</b>, não o valor de mercado. Ele já inclui as taxas informadas nos aportes; nas vendas, o valor recebido é líquido da taxa. O app calcula o custo das vendas pelo custo médio. Trocas por outra criptomoeda e gastos também contam como venda. Isto não é aconselhamento tributário: confirme com um contador.</div>
     <button class="link-btn" data-act="lesson" data-id="ir">Ler a lição sobre Imposto de Renda</button></div>`;
@@ -2237,7 +2454,7 @@ function saleSelfHTML() {
   if (!f.sw || !ws.some(w => w.id === f.sw)) { f.sw = ws[0].id; f.pick = new Set(); f.pickTouched = false; }
   const free = unusedChange(f.sw);
   return `<div class="field"><label for="s-w">Carteira</label><select class="inp" id="s-w" name="sw" data-inp="sale-w">${ws.map(w => `<option value="${w.id}" ${w.id === f.sw ? 'selected' : ''}>${esc(w.name)}</option>`).join('')}</select></div>
-    <div class="field"><span class="lbl">UTXOs usados na venda</span><div id="sale-utxos">${saleUtxoRows()}</div><p class="hint"><button class="link-btn small" data-act="sale-auto">Escolher automaticamente</button> · os maiores primeiro, até cobrir a venda e a taxa.</p></div>
+    <div class="field"><span class="lbl">UTXOs usados na venda</span><div id="sale-utxos">${saleUtxoRows()}</div><div id="sale-mix"></div><p class="hint"><button class="link-btn small" data-act="sale-auto">Escolher automaticamente</button> · a menor moeda que cobre sozinha a venda e a taxa; se nenhuma cobre, as maiores, sem misturar moedas com e sem KYC quando der.</p></div>
     <div class="field"><label for="s-x">Para quem foi (opcional)</label><input class="inp" id="s-x" name="sx" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="bc1q… do comprador ou descrição" value="${esc(f.sx || '')}" data-inp="sale-tx"></div>
     <div class="two"><div class="field"><label for="s-r">Taxa (sat/vB)</label><input class="inp" id="s-r" name="srate" inputmode="decimal" data-num="dec" autocomplete="off" value="${esc(f.srate || String(S().feeRate))}" data-inp="sale-rate"></div><div class="field"><label for="s-f">Taxa total (sats)</label><input class="inp" id="s-f" name="sfee" inputmode="numeric" data-num="int" autocomplete="off" value="${esc(f.sfee || '')}" data-inp="sale-fee"></div></div>
     <div class="out rem"><p class="calc-line" id="sale-change" style="margin:0 0 12px"></p><div id="sale-ch-box">${addrPicker('sc_', f.sw, free ? free.id : '__new', { addrLabel: 'Endereço do troco', prefer: 'troco', fixedWallet: true })}<p class="hint" style="margin:-6px 0 12px">Se você não escolher um, o app cria o endereço de troco ao registrar.</p></div></div>
@@ -2246,23 +2463,32 @@ function saleSelfHTML() {
 function saleUtxoRows() {
   const f = ui.form, us = state.utxos.filter(u => u.wallet === f.sw && !u.spent).sort((x, y) => y.sats - x.sats);
   if (!f.pick) f.pick = new Set();
-  return us.map(u => `<button class="utxo ${f.pick.has(u.id) ? 'sel' : ''}" data-act="sale-pick" data-id="${u.id}" aria-pressed="${f.pick.has(u.id)}"><span class="g" aria-hidden="true"><span class="ck">${f.pick.has(u.id) ? '✓' : ''}</span></span><span class="amt">${AMT(u.sats)}</span><span class="cost">${u.frozen ? '<span class="tag f">congelado</span>' : ''}</span><span class="lbl">${esc(u.label || (addrById(u.address) || {}).label || 'UTXO')}</span></button>`).join('');
+  // 1.8.36: os selos como na lista da carteira (KYC e congelado), para a pessoa ver o que está juntando
+  return us.map(u => { const tags = (u.kyc ? '<span class="tag k">KYC</span>' : '') + (u.frozen ? '<span class="tag f">congelado</span>' : '');
+    return `<button class="utxo ${f.pick.has(u.id) ? 'sel' : ''}" data-act="sale-pick" data-id="${u.id}" aria-pressed="${f.pick.has(u.id)}"><span class="g" aria-hidden="true"><span class="ck">${f.pick.has(u.id) ? '✓' : ''}</span></span><span class="amt">${AMT(u.sats)}</span><span class="cost"></span><span class="lbl">${tags ? `<span class="tags">${tags}</span> ` : ''}${esc(u.label || (addrById(u.address) || {}).label || 'UTXO')}</span></button>`; }).join('');
 }
-function saleTxCalc(sats) {
-  const f = ui.form, ins = [...(f.pick || [])].map(id => byId(state.utxos, id)).filter(u => u && !u.spent && u.wallet === f.sw), tot = sumSats(ins);
-  const extT = typeFromAddr((fv('sx') || '').trim()) || 'p2wpkh';
-  const cs = fv('sc_address'), ca = cs && cs !== '__new' ? addrById(cs) : null, chT = ca ? ca.type : (typeFromAddr((fv('sc_newAddr') || '').trim()) || walletType(f.sw));
-  const vIn = VB.ovh + ins.reduce((t, u) => t + (VB.in[u.type] || 68), 0), vNo = Math.ceil(vIn + (VB.out[extT] || 31)), vWith = Math.ceil(vNo + (VB.out[chT] || 31)), dust = DUST[chT] || 294;
-  const feeAt = v => f.sfeeMode === 'sats' ? parseIntSafe(fv('sfee')) : (parseNum(fv('srate')) > 0 ? Math.ceil(parseNum(fv('srate')) * v - 1e-9) : NaN);
-  let vsize = vWith, fee = feeAt(vsize), change = tot - sats - fee, toFee = 0;
-  if (!(change >= dust)) { vsize = vNo; const f0 = feeAt(vsize), left = tot - sats - f0; if (!isFinite(f0)) { fee = NaN; change = NaN; } else if (left < 0) { fee = f0; change = left; } else { fee = tot - sats; change = 0; toFee = left; } }
-  return { ins, tot, sats, fee, change, toFee, vsize, rate: vsize > 0 ? fee / vsize : NaN, dust, extT };
+// 1.8.36: a mesma conta do Enviar (txBalanco): a saída do comprador, o troco e a taxa em sat/vB ou em sats
+function saleTxParams() {
+  const f = ui.form, cs = fv('sc_address'), ca = cs && cs !== '__new' ? addrById(cs) : null;
+  return { extT: typeFromAddr((fv('sx') || '').trim()) || 'p2wpkh', chT: ca ? ca.type : (typeFromAddr((fv('sc_newAddr') || '').trim()) || walletType(f.sw)), modo: f.sfeeMode === 'sats' ? 'sats' : 'rate', rate: parseNum(fv('srate')), fee: parseIntSafe(fv('sfee')) };
 }
+function saleTxCalc(sats, ins, p = saleTxParams()) {
+  const f = ui.form; ins = ins || [...(f.pick || [])].map(id => byId(state.utxos, id)).filter(u => u && !u.spent && u.wallet === f.sw);
+  return { ...txBalanco({ ins, outs: [{ sats, type: p.extT }], chType: p.chT, modo: p.modo, rate: p.rate, fee: p.fee }), sats, extT: p.extT };
+}
+/* Escolha automática (1.8.36): a menor moeda que cobre sozinha a venda e a taxa (uma entrada só: taxa menor e nenhuma moeda
+   ligada a outra); senão, as maiores de um grupo só, com KYC ou sem KYC (o que cobrir com menos moedas); senão, as maiores de
+   todas, e o formulário avisa da mistura. Congeladas ficam de fora. A taxa é a digitada, ou a padrão das Configurações. */
 function saleAutoPick(sats) {
-  const f = ui.form, us = state.utxos.filter(u => u.wallet === f.sw && !u.spent && !u.frozen).sort((x, y) => y.sats - x.sats);
-  const rate = f.sfeeMode === 'sats' ? 0 : (parseNum(fv('srate')) || S().feeRate), fixedFee = f.sfeeMode === 'sats' ? (parseIntSafe(fv('sfee')) || 0) : 0, pick = []; let tot = 0;
-  for (const u of us) { pick.push(u.id); tot += u.sats; const fee = rate ? Math.ceil(rate * (VB.ovh + pick.length * 68 + 62)) : fixedFee; if (tot >= sats + fee) break; }
-  f.pick = new Set(pick);
+  const f = ui.form, us = state.utxos.filter(u => u.wallet === f.sw && !u.spent && !u.frozen), p = saleTxParams();
+  if (p.modo === 'rate' && !(p.rate > 0)) p.rate = S().feeRate;
+  if (p.modo === 'sats' && !(p.fee >= 0)) p.fee = 0;
+  const cobre = ins => { const n = saleTxCalc(sats, ins, p); return isFinite(n.fee) && n.change >= 0; };
+  const maiores = lista => { const pick = []; for (const u of [...lista].sort((x, y) => y.sats - x.sats)) { pick.push(u); if (cobre(pick)) return pick; } return null; };
+  const uma = [...us].sort((x, y) => x.sats - y.sats).find(u => cobre([u]));
+  const grupo = uma ? null : [us.filter(u => u.kyc), us.filter(u => !u.kyc)].map(maiores).filter(Boolean).sort((a, b) => a.length - b.length || sumSats(a) - sumSats(b))[0];
+  const pick = uma ? [uma] : grupo || maiores(us) || [...us].sort((x, y) => y.sats - x.sats);
+  f.pick = new Set(pick.map(u => u.id));
 }
 function updateSaleTx() {
   const f = ui.form; if (!f || f.kind !== 'aporte' || f.type !== 'venda' || f.src !== 'self' || !$('#sale-change')) return;
@@ -2271,12 +2497,13 @@ function updateSaleTx() {
   const n = saleTxCalc(sats), A = v => esc(amtTxt(v)), F = v => esc(fmtSats(v)), rEl = $('#s-r'), fEl = $('#s-f');
   if (f.sfeeMode === 'sats') { if (document.activeElement !== rEl) rEl.value = isFinite(n.rate) && n.rate > 0 ? fmtRate(n.rate) : ''; }
   else if (document.activeElement !== fEl) fEl.value = isFinite(n.fee) && n.fee > 0 ? fmtSats(n.fee - n.toFee) : '';
-  const ch = $('#sale-change'), box = $('#sale-ch-box');
+  const ch = $('#sale-change'), box = $('#sale-ch-box'), mix = $('#sale-mix');
+  if (mix) mix.innerHTML = n.ins.some(u => u.kyc) && n.ins.some(u => !u.kyc) ? `<p class="note warn" style="margin:8px 0 4px">${MIX_KYC}</p>` : '';
   if (!(sats > 0)) ch.innerHTML = 'Informe o valor recebido e a cotação (ou os sats vendidos).';
   else if (!n.ins.length) ch.innerHTML = 'Escolha os UTXOs usados na venda.';
   else if (!isFinite(n.fee)) ch.innerHTML = 'Informe a taxa da rede.';
   else if (n.change < 0) ch.innerHTML = `<span class="neg">Os UTXOs escolhidos não cobrem a venda e a taxa: faltam ${A(-n.change)}.</span>`;
-  else ch.innerHTML = `Entradas ${A(n.tot)} − vendido ${A(sats)} − taxa ${F(n.fee - n.toFee)} sats = <b>${n.change > 0 ? 'troco ' + A(n.change) : 'sem troco'}</b>${n.toFee > 0 ? `<br><span class="warn">A sobra de ${F(n.toFee)} sats fica abaixo do limite de poeira e vai para a taxa.</span>` : ''}<br><span class="small">${esc(fmtRate(n.rate))} sat/vB · ${F(n.vsize)} vB estimado</span>`;
+  else ch.innerHTML = `Entradas ${A(n.tot)} − vendido ${A(sats)} − taxa ${F(n.fee - n.toFee)} sats = <b>${n.change > 0 ? 'troco ' + A(n.change) : 'sem troco'}</b>${n.toFee > 0 ? `<br><span class="warn">Sobram ${F(n.toFee)} sats, ${esc(sobraTxt(n))}: vão para a taxa.</span>` : ''}<br><span class="small">${esc(fmtRate(n.rate))} sat/vB · ${F(n.vsize)} vB estimado</span>${taxaAltaAviso(n)}`;
   if (box) box.hidden = !(n.change > 0);
 }
 function apSwitch(type, over = {}) {
@@ -2436,7 +2663,8 @@ function saveAporte() {
       if (looksAddr(sx) && !validAddr(sx)) return formErr('O endereço do comprador não é válido.');
       if (sx && findAddrByString(sx)) return formErr('Esse endereço é de uma carteira sua. Numa venda, os sats vão para o comprador.');
       if (!validTxid(txid)) return formErr('O TXID tem 64 caracteres (0-9 e a-f).');
-      if (n.toFee > 0 && !f.dustOk) { f.dustOk = true; return formErr(`Sobram ${fmtSats(n.toFee)} sats, abaixo do limite de poeira para virar troco. Esse valor vai para a taxa. Toque de novo em salvar para confirmar.`); }
+      if (n.toFee > 0 && !f.dustOk) { f.dustOk = true; return formErr(`Sobram ${fmtSats(n.toFee)} sats, ${sobraTxt(n)}. Esse valor vai para a taxa. Toque de novo em salvar para confirmar.`); }
+      if (taxaAltaPede(f, n)) return false;
       const desc = `Venda${!isDefEx(ap.ex) ? ' · ' + ap.ex : ''}`;
       const ok = attempt(() => {
         const sid = uid(), kyc = n.ins.some(u => u.kyc), outs = [{ key: uid(), kind: 'ext', addr: sx || desc, sats: ap.sats, rem: false, sale: true }];
@@ -3445,10 +3673,16 @@ const ACT = {
   // seção Vendas, no fim da aba Aportes (1.8.28): do resumo ou do Início, abaixo do topo fixo
   'ver-vendas': () => irSecao('#vendas-sec'),
   'ver-conta': () => irSecao('#conta-sec'),   // 1.8.29
-  'lesson': el => { guardaTopo(); ui.stack = []; ui.hl = null; ui.page = 'lesson'; ui.arg = el.dataset.id; ui.quizAberto = null; closeSheet(true); render(); window.scrollTo(0, 0); },
-  'quiz': el => { const id = el.dataset.id; if (state.learn.quiz[id] != null) return; state.learn.quiz[id] = +el.dataset.k; ui.quizAberto = id; save(); render(); const q = $('.quiz'); if (q) q.scrollIntoView({ block: 'nearest' }); },
-  'quiz-refazer': el => { const id = el.dataset.id; delete state.learn.quiz[id]; ui.quizAberto = id; save(); render(); const q = $('.quiz'); if (q) q.scrollIntoView({ block: 'center' }); const o = $('.quiz .opt'); if (o) o.focus({ preventScroll: true }); },
-  'quiz-refazer-todos': () => confirmSheet('Refazer os testes?', 'As respostas dos testes rápidos são apagadas e os testes voltam a aparecer nas lições. As lições continuam concluídas.', 'Refazer os testes', () => { state.learn.quiz = {}; ui.quizAberto = null; save(); closeSheet(); render(); toast('Pronto: os testes voltaram para as lições'); }),
+  'lesson': el => { guardaTopo(); ui.stack = []; ui.hl = null; ui.page = 'lesson'; ui.arg = el.dataset.id; ui.quizAberto = null; ui.revisao = false; closeSheet(true); render(); window.scrollTo(0, 0); },
+  // 1.8.34: lição aberta pelas Lições concluídas (revisão): empilha a página, e o Voltar volta para a lista delas;
+  // a "Próxima concluída" troca a lição sem empilhar
+  'lesson-rev': el => { ui.revisao = true; ui.quizAberto = null; openPage('lesson', el.dataset.id); },
+  'lesson-prox': el => { ui.arg = el.dataset.id; ui.quizAberto = null; render(); window.scrollTo(0, 0); },
+  'trilha-tudo': () => { S().trilhaTudo = !S().trilhaTudo; save(); render(); toast(S().trilhaTudo ? 'As lições concluídas também aparecem na trilha' : 'A trilha mostra só as lições que faltam'); },
+  // a resposta guarda a versão do teste; acertar dá o nível 1, que o Refazer não tira (1.8.34)
+  'quiz': el => { const id = el.dataset.id, l = LESSONS.find(x => x.id === id); if (!l || quizResp(l) != null) return; const k = +el.dataset.k; state.learn.quiz[id] = k; state.learn.qv[id] = quizV(l); if (k === l.quiz.a && !(state.learn.nivel[id] >= 1)) state.learn.nivel[id] = 1; ui.quizAberto = id; save(); render(); const q = $('.quiz'); if (q) q.scrollIntoView({ block: 'nearest' }); },
+  'quiz-refazer': el => { const id = el.dataset.id; delete state.learn.quiz[id]; delete state.learn.qv[id]; ui.quizAberto = id; save(); render(); const q = $('.quiz'); if (q) q.scrollIntoView({ block: 'center' }); const o = $('.quiz .opt'); if (o) o.focus({ preventScroll: true }); },
+  'quiz-refazer-todos': () => confirmSheet('Refazer os testes?', 'As respostas dos testes rápidos são apagadas e os testes voltam a aparecer nas lições. As lições continuam concluídas.', 'Refazer os testes', () => { state.learn.quiz = {}; state.learn.qv = {}; ui.quizAberto = null; save(); closeSheet(); render(); toast('Pronto: os testes voltaram para as lições'); }),
   'lesson-done': el => { state.learn.done[el.dataset.id] = Date.now(); ui.quizAberto = null; save(); render(); toast('Lição concluída'); const f = $('.quiz-feito'); if (f) f.scrollIntoView({ block: 'nearest' }); },
   'toggle-ui': el => { ui[el.dataset.k] = !ui[el.dataset.k]; render(); },
   'edit-aporte': el => { closeSheet(true); sheetAporte(el.dataset.id); },
@@ -3536,7 +3770,10 @@ const ACT = {
   'fee-preset': el => { S().feeRate = +el.dataset.v; save(); render(); },
   'bip329-save': () => { const t = bip329(); if (!t) return toast('Preencha TXID e vout dos UTXOs para exportar etiquetas.'); saveFile(`holdbtc100-etiquetas-bip329.${caps.downloads ? 'txt' : 'jsonl'}`, t + '\n', 'application/jsonl'); },
   'bip329-copy': () => { const t = bip329(); if (!t) return toast('Preencha TXID e vout dos UTXOs para exportar etiquetas.'); copyText(t); },
-  'open-ir': () => openPage('ir'),
+  'open-ir': () => irMenu('pilha'),   // da lição: o relatório empilha, e o Voltar volta à lição
+  'ir-menu': () => irMenu(ui.page === 'ir' ? 'aqui' : 'pagina'),
+  'ir-pick': el => irMenuMarca(el, 'fora'),
+  'ir-ok': () => irMenuOk(),
   'sim-cur': el => { ui.sim.c = el.dataset.c; render(); },
   'pin-set': () => sheetPin('set'), 'pin-change': () => sheetPin('change'), 'pin-remove': () => sheetPin('remove'), 'save-pin': savePin,
   'toggle-cifra': sheetCifra, 'save-cifra': saveCifra,
@@ -3578,6 +3815,7 @@ document.addEventListener('input', e => {
   else if (k === 'sim') { const amt = parseNum($('#sim-amt').value); ui.sim.amount = amt; ui.sim.start = `${$('#sim-y').value}-${pad2(+$('#sim-m').value)}`; $('#sim-out').innerHTML = simOut(); }
   else if (k === 'gl') { ui.gl = e.target.value; $('#gl-list').innerHTML = glList(); }
   else if (k === 'ir-year') { ui.irYear = +e.target.value; render(); }
+  else if (k === 'ir-ex') { if (ui.form && ui.form.kind === 'ir-menu') ui.form.ex = e.target.value; irMenuSoma(); }
   else if (k === 'lk-apagar') lkApagar();
   else if (k === 'bk-forca') bkForca(e.target.value);
   else if (INP[k]) INP[k](e.target, e);
@@ -3913,17 +4151,20 @@ function utxoSource(u) {
 }
 function sheetEditUtxo(id) {
   const u = byId(state.utxos, id); if (!u) return;
-  const a = addrById(u.address), sp = u.spent ? byId(state.spends, u.spendId) : null, src = utxoSource(u);
+  const a = addrById(u.address), sp = u.spent ? byId(state.spends, u.spendId) : null, src = utxoSource(u), kycDif = kycDifs().find(d => d.id === u.id);
   ui.form = { kind: 'utxo-edit', id, kyc: !!u.kyc, frozen: !!u.frozen };
   const onAddr = ui.page === 'addr' && ui.arg === u.address;
   openSheet('utxo-edit', () => `<h2>◈ ${AMT(u.sats)}</h2><p class="sub">${esc(src.t)} · recebido em ${fmtDate(u.date)}${u.spent ? ` · gasto em ${fmtDate(u.spentAt || u.date)}` : ''}</p>
-    <div class="btn-row" style="margin-bottom:14px">${sp ? `<button class="btn btn-q btn-s" data-act="open-tx" data-id="${sp.id}">Transação que gastou</button>` : ''}${!u.spent ? `<button class="btn btn-q btn-s" data-act="tx-from-utxo" data-id="${u.id}" data-k="move">Transferir</button><button class="btn btn-q btn-s" data-act="tx-from-utxo" data-id="${u.id}" data-k="send">Enviar</button><button class="btn btn-q btn-s" data-act="tx-from-utxo" data-id="${u.id}" data-k="sale">Vender</button>` : ''}${onAddr ? '' : `<button class="btn btn-q btn-s" data-act="open-addr" data-id="${u.address}" data-hl="${u.id}">Ver o endereço</button>`}</div>
+    <div class="btn-row" style="margin-bottom:14px">${sp ? `<button class="btn btn-q btn-s" data-act="open-tx" data-id="${sp.id}">Transação que gastou</button>` : ''}${!u.spent ? `<button class="btn btn-q btn-s" data-act="tx-from-utxo" data-id="${u.id}" data-k="move">Transferir</button><button class="btn btn-q btn-s" data-act="tx-from-utxo" data-id="${u.id}" data-k="send">Enviar</button><button class="btn btn-q btn-s" data-act="tx-from-utxo" data-id="${u.id}" data-k="sale">Vender</button>` : ''}${onAddr ? '' : `<button class="btn btn-q btn-s" data-act="open-addr" data-id="${u.address}" data-hl="${u.id}">Ver o endereço</button>`}<button class="btn btn-q btn-s" data-act="mapa-utxo" data-id="${u.id}">Ver no mapa</button></div>
+    ${kycDif ? `<p class="note warn" style="margin:0 0 12px">O KYC deste UTXO não bate com o das entradas da transação que o criou (${kycDif.para ? 'uma delas tem KYC' : 'nenhuma tem KYC'}). O Mapa dos sats mostra e oferece corrigir.</p>` : ''}
+    ${origemHTML(u)}
     <div class="field"><label for="e-l">Etiqueta</label><input class="inp" id="e-l" name="label" autocomplete="off" value="${esc(u.label)}" placeholder="${esc(a ? a.label : '')}"></div>
     ${u.origin === 'externo' ? `<div class="field"><label for="e-s">Valor (${unitName()})</label><input class="inp" id="e-s" name="sats" ${amtAttrs()} value="${amtIn(u.sats)}"></div>
     <div class="field"><label for="e-c">Valor pago (${curSym()}, opcional)</label><input class="inp" id="e-c" name="cost" inputmode="decimal" data-num="money" placeholder="0,00" autocomplete="off"><p class="hint">Se você pagou por estes sats (numa compra P2P, por exemplo), informe quanto: o valor entra no total aportado e no custo médio. Sem valor, eles ficam na pilha com custo zero.</p></div>` : ''}
     ${addrPicker('e_', u.wallet, u.address, { addrLabel: 'Endereço', exclude: u.id })}
     <div class="two"><div class="field"><label for="e-t">TXID</label><input class="inp mono" id="e-t" name="txid" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(u.txid || '')}"></div><div class="field"><label for="e-v">vout</label><input class="inp" id="e-v" name="vout" inputmode="numeric" value="${esc(u.vout || '')}"></div></div>
     <div class="switch"><span><span class="t">Origem com cadastro (KYC)</span></span><button class="tog ${u.kyc ? 'on' : ''}" data-act="form-kyc" aria-pressed="${!!u.kyc}" aria-label="KYC"></button></div>
+    ${u.spent ? '<p class="hint" style="margin-top:-4px">Este UTXO já foi gasto: mudar o KYC dele não muda o das moedas que vieram dele. O Mapa dos sats aponta a diferença e oferece corrigir.</p>' : ''}
     ${u.spent ? '' : `<div class="switch"><span><span class="t">Congelado</span><br><span class="d">Lembrete para não gastar esta moeda</span></span><button class="tog ${u.frozen ? 'on' : ''}" data-act="form-frozen" aria-pressed="${!!u.frozen}" aria-label="Congelado"></button></div>`}
     <p class="err form" hidden style="margin-top:12px"></p><button class="btn btn-p block" style="margin-top:14px" data-act="save-edit-utxo">Salvar</button>
     ${u.origin === 'saque' && u.saqueId ? `<button class="btn btn-q block" style="margin-top:10px" data-act="edit-saque" data-id="${u.saqueId}">Abrir o saque de origem</button>` : ''}
@@ -4077,16 +4318,18 @@ function txSheetHTML() {
   txNormDrafts();
   const t = ui.form.tx, ins = txInputs(), tot = sumSats(ins), edit = t.mode === 'edit', venda = t.outputs.some(o => o.kind === 'ext' && o.sale);
   const mix = ins.some(u => u.kyc) && ins.some(u => !u.kyc), frozen = ins.filter(u => u.frozen).length;
-  const title = edit ? (venda ? 'Editar venda' : 'Editar transação') : venda ? 'Vender' : 'Enviar';
-  return `<h2>${title}</h2><p class="sub">${edit ? 'As entradas ficam como estão. Ajuste valores e taxa: o troco e o que depende dele são recalculados.' : venda ? 'Venda direta (P2P): os sats saem desta carteira para a do comprador, sem passar pela corretora. Informe quanto foi para ele e quanto você recebeu. O que sobrar das entradas, depois da taxa, volta como troco.' : 'Pague alguém ou mande uma parte para outra carteira sua: informe o valor exato de cada saída. O que sobrar das entradas, depois da taxa, volta como troco.'}</p>
-    ${mix ? `<p class="note warn" style="margin-bottom:12px"><b>Privacidade:</b> você está juntando moedas com e sem KYC. Na blockchain elas passam a ficar ligadas.</p>` : ''}
+  // 1.8.36: "Consolidar só uma parte" chega aqui com a saída Para mim pronta; o título acompanha enquanto ela for a única
+  const parte = !edit && t.parte && t.outputs.length === 1 && t.outputs[0].kind === 'own', many = ins.length > 1;
+  const title = edit ? (venda ? 'Editar venda' : 'Editar transação') : venda ? 'Vender' : parte ? (many ? 'Consolidar uma parte' : 'Transferir uma parte') : 'Enviar';
+  return `<h2>${title}</h2><p class="sub">${edit ? 'As entradas ficam como estão. Ajuste valores e taxa: o troco e o que depende dele são recalculados.' : venda ? 'Venda direta (P2P): os sats saem desta carteira para a do comprador, sem passar pela corretora. Informe quanto foi para ele e quanto você recebeu. O que sobrar das entradas, depois da taxa, volta como troco.' : parte ? `Uma parte ${many ? 'das entradas vai, num UTXO só,' : 'do UTXO vai'} para um endereço seu: informe quanto. O que sobrar, depois da taxa, volta como troco para a carteira de origem. <button class="link-btn small" data-act="tx-tudo">${many ? 'Consolidar tudo' : 'Transferir tudo'}</button>` : 'Pague alguém ou mande uma parte para outra carteira sua: informe o valor exato de cada saída. O que sobrar das entradas, depois da taxa, volta como troco.'}</p>
+    ${mix ? `<p class="note warn" style="margin-bottom:12px">${MIX_KYC}</p>` : ''}
     ${frozen && !edit ? `<p class="note" style="margin-bottom:12px">${frozen === 1 ? 'Um UTXO selecionado está congelado.' : `${frozen} UTXOs selecionados estão congelados.`}</p>` : ''}
     <h3 class="mini">Entradas</h3>
     <ul class="receipt">${ins.map(u => `<li><span class="k">◈ ${esc(u.label || (addrById(u.address) || {}).label || 'UTXO')}</span><span class="dots"></span><span class="v">${AMT(u.sats)}</span></li>`).join('')}<li><span class="k"><b>Total</b></span><span class="dots"></span><span class="v">${AMT(tot)}</span></li></ul>
     <h3 class="mini">Saídas</h3>
     ${t.outputs.map((o, i) => txOutBlock(o, i, t.outputs.length)).join('')}
     <button class="btn btn-q btn-s" style="margin:0 0 6px" data-act="tx-add">+ Adicionar saída</button>
-    <h3 class="mini">Taxa da rede</h3><p class="hint" style="margin:-4px 0 10px">Preencha um dos dois campos. O outro é calculado pelo tamanho da transação.</p>
+    <h3 class="mini">Taxa da rede</h3><p class="hint" style="margin:-4px 0 10px">Preencha a taxa, em sat/vB ou em sats, ou o troco, mais abaixo: o último que você digitar manda, e os outros são calculados pelo tamanho da transação.</p>
     <div class="two"><div class="field"><label for="tx-rate">Taxa (sat/vB)</label><input class="inp" id="tx-rate" name="rate" inputmode="decimal" autocomplete="off" data-num="dec" value="${esc(t.rate || '')}" data-inp="tx"></div>
     <div class="field"><label for="tx-fee">Taxa total (sats)</label><input class="inp" id="tx-fee" name="fee" inputmode="numeric" autocomplete="off" data-num="int" value="${esc(t.fee ? fmtSats(parseIntSafe(t.fee)) : '')}" data-inp="tx"></div></div>
     <div class="field"><label for="tx-vs">Tamanho real (vB, opcional)</label><input class="inp" id="tx-vs" name="vsize" inputmode="decimal" autocomplete="off" data-num="dec" value="${t.vsizeReal ? esc(fmtNum(t.vsizeReal)) : ''}" data-inp="tx"><p class="hint">Em branco, o app usa a estimativa. Se a carteira mostrar o vsize, informe para o sat/vB ficar exato.</p></div>
@@ -4106,7 +4349,7 @@ function consSheetHTML() {
   const mix = ins.some(u => u.kyc) && ins.some(u => !u.kyc), frozen = ins.filter(u => u.frozen).length;
   const title = edit ? (many ? 'Editar consolidação' : 'Editar transferência') : many ? `Consolidar ${ins.length} UTXOs` : 'Transferir UTXO';
   return `<h2>${title}</h2><p class="sub">${many ? 'Junta tudo num UTXO só, num endereço seu. Vai o total menos a taxa: não há troco.' : 'Leva o UTXO inteiro para outro endereço seu, na mesma ou em outra carteira. Vai o total menos a taxa: não há troco.'}</p>
-    ${mix ? `<p class="note warn" style="margin-bottom:12px"><b>Privacidade:</b> você está juntando moedas com e sem KYC. Na blockchain elas passam a ficar ligadas.</p>` : ''}
+    ${mix ? `<p class="note warn" style="margin-bottom:12px">${MIX_KYC}</p>` : ''}
     ${frozen && !edit ? `<p class="note" style="margin-bottom:12px">${frozen === 1 ? 'Um UTXO selecionado está congelado.' : `${frozen} UTXOs selecionados estão congelados.`}</p>` : ''}
     <h3 class="mini">Entradas</h3>
     <ul class="receipt">${ins.map(u => `<li><span class="k">◈ ${esc(u.label || (addrById(u.address) || {}).label || 'UTXO')}</span><span class="dots"></span><span class="v">${AMT(u.sats)}</span></li>`).join('')}<li><span class="k"><b>Total</b></span><span class="dots"></span><span class="v">${AMT(tot)}</span></li></ul>
@@ -4116,7 +4359,7 @@ function consSheetHTML() {
     <div class="two"><div class="field"><label for="tx-rate">Taxa (sat/vB)</label><input class="inp" id="tx-rate" name="rate" inputmode="decimal" autocomplete="off" data-num="dec" value="${esc(t.rate || '')}" data-inp="tx"></div>
     <div class="field"><label for="tx-fee">Taxa total (sats)</label><input class="inp" id="tx-fee" name="fee" inputmode="numeric" autocomplete="off" data-num="int" value="${esc(t.fee ? fmtSats(parseIntSafe(t.fee)) : '')}" data-inp="tx"></div></div>
     <div class="field"><label for="tx-vs">Tamanho real (vB, opcional)</label><input class="inp" id="tx-vs" name="vsize" inputmode="decimal" autocomplete="off" data-num="dec" value="${t.vsizeReal ? esc(fmtNum(t.vsizeReal)) : ''}" data-inp="tx"><p class="hint">Em branco, o app usa a estimativa.</p></div>
-    <div class="field"><label for="o0_s">Valor do novo UTXO (${unitName()})</label><input class="inp big" id="o0_s" name="o0_sats" ${amtAttrs()} autocomplete="off" value="${esc(o.sats || '')}" data-inp="tx"><p class="hint" id="cons-hint">É o total das entradas menos a taxa.</p></div>
+    <div class="field"><label for="o0_s">Valor do novo UTXO (${unitName()})</label><input class="inp big" id="o0_s" name="o0_sats" ${amtAttrs()} autocomplete="off" value="${esc(o.sats || '')}" data-inp="tx"><p class="hint" id="cons-hint">É o total das entradas menos a taxa.</p>${edit ? '' : `<p class="hint" style="margin-top:4px"><button class="link-btn small" data-act="tx-parte">${many ? 'Consolidar só uma parte' : 'Transferir só uma parte'}</button>: o resto volta como troco para a carteira de origem.</p>`}</div>
     <div class="calc-line" id="tx-sum" aria-live="polite"></div>
     <div class="two"><div class="field"><label for="tx-d">Data</label><input class="inp" id="tx-d" name="date" type="date" value="${t.date}" max="${todayISO()}"></div><div class="field"><label for="tx-n">Nota</label><input class="inp" id="tx-n" name="note" autocomplete="off" value="${esc(t.note || '')}" placeholder="Opcional"></div></div>
     <div class="field"><label for="tx-t">TXID (opcional)</label><input class="inp mono" id="tx-t" name="txid" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(t.txid || '')}"></div>
@@ -4124,14 +4367,11 @@ function consSheetHTML() {
     <button class="btn btn-p block" data-act="save-tx">${edit ? 'Salvar alterações' : many ? 'Registrar consolidação' : 'Registrar transferência'}</button>
     ${edit ? `<button class="btn btn-d block" style="margin-top:10px" data-act="tx-undo" data-id="${t.id}">Desfazer transação</button>` : ''}`;
 }
+// Consolidar: a saída única é o "troco" que existe sempre; o modo 'value' é o modo 'troco' da conta única
 function consCalc() {
-  const t = ui.form.tx, ins = txInputs(), tot = sumSats(ins), o = t.outputs[0];
-  const vEst = Math.ceil(VB.ovh + ins.reduce((a, u) => a + (VB.in[u.type] || 68), 0) + (VB.out[txOutType(o)] || 31)), v = t.vsizeReal > 0 ? t.vsizeReal : vEst;
-  let fee, value;
-  if (t.feeMode === 'value') { value = parseAmt(o.sats); fee = tot - value; }
-  else if (t.feeMode === 'sats') { fee = parseIntSafe(t.fee); value = tot - fee; }
-  else { const r = parseNum(t.rate); fee = r > 0 ? Math.ceil(r * v - 1e-9) : NaN; value = tot - fee; }
-  return { ins, tot, v, vEst, fee, value, rate: v > 0 ? fee / v : NaN, dust: DUST[txOutType(o)] || 294 };
+  const t = ui.form.tx, o = t.outputs[0];
+  const n = txBalanco({ ins: txInputs(), chType: txOutType(o), sempre: true, real: t.vsizeReal > 0 ? t.vsizeReal : 0, modo: t.feeMode === 'value' ? 'troco' : t.feeMode, rate: parseNum(t.rate), fee: parseIntSafe(t.fee), troco: parseAmt(o.sats) });
+  return { ...n, v: n.vsize, value: n.change };
 }
 function consRefresh() {
   const t = ui.form.tx, n = consCalc(), rEl = $('#tx-rate'), fEl = $('#tx-fee'), vEl = $('#o0_s'), F = v => esc(fmtSats(v)), A = v => esc(amtTxt(v));
@@ -4142,7 +4382,7 @@ function consRefresh() {
   let h;
   if (!isFinite(n.fee) || n.fee <= 0) h = n.fee <= 0 && isFinite(n.fee) ? '<span class="neg">O valor do novo UTXO não pode ser igual ou maior que o total das entradas: falta a taxa.</span>' : 'Informe a taxa ou o valor que chegou ao destino.';
   else if (!(n.value >= n.dust)) h = `<span class="neg">O novo UTXO ficaria com ${A(Math.max(0, n.value))}, abaixo do limite de poeira (${F(n.dust)} sats). Diminua a taxa ou junte mais UTXOs.</span>`;
-  else h = `Entradas <b>${A(n.tot)}</b> − taxa <b>${F(n.fee)} sats</b> = novo UTXO <b>${A(n.value)}</b><br>${esc(fmtRate(n.rate))} sat/vB · ${F(n.v)} vB ${t.vsizeReal ? 'informado' : 'estimado'} · ${esc((n.fee / n.tot * 100).toLocaleString('pt-BR', { maximumFractionDigits: 2 }))}% do valor${n.rate < 1 ? '<br><span class="warn">Abaixo de 1 sat/vB a confirmação pode demorar.</span>' : ''}`;
+  else h = `Entradas <b>${A(n.tot)}</b> − taxa <b>${F(n.fee)} sats</b> = novo UTXO <b>${A(n.value)}</b><br>${esc(fmtRate(n.rate))} sat/vB · ${F(n.v)} vB ${t.vsizeReal ? 'informado' : 'estimado'} · ${taxaPct(n)}% do valor${n.rate < 1 ? '<br><span class="warn">Abaixo de 1 sat/vB a confirmação pode demorar.</span>' : ''}${taxaAltaAviso(n)}`;
   $('#tx-sum').innerHTML = h;
   const el = $('#o0_merge'), o = t.outputs[0], inW = (n.ins[0] || {}).wallet;
   if (el) { const extra = t.mode === 'new' && o.address && o.address !== '__new' ? addrUtxos(o.address).filter(u => !u.spent && !t.inputs.includes(u.id) && u.wallet === inW) : [];
@@ -4152,6 +4392,7 @@ function consSave() {
   txRead(); const t = ui.form.tx, n = consCalc();
   if (!isFinite(n.fee) || n.fee < 1) return formErr('Informe a taxa (em sat/vB ou em sats) ou o valor que chegou ao destino. A taxa precisa ser de pelo menos 1 sat.');
   if (!(n.value >= n.dust)) return formErr(`O novo UTXO ficaria com ${amtTxt(Math.max(0, n.value))}, abaixo do limite de poeira (${fmtSats(n.dust)} sats). Diminua a taxa ou junte mais UTXOs.`);
+  if (taxaAltaPede(t, n)) return false;
   t.outputs[0].sats = amtIn(n.value); t.feeMode = 'sats'; t.fee = String(n.fee);
   const vEl = $('#o0_s'), fEl = $('#tx-fee'); if (vEl) vEl.value = amtIn(n.value); if (fEl) fEl.value = fmtSats(n.fee);
   return txSave();
@@ -4206,7 +4447,7 @@ function txSaleRefresh() {
 function txChangeBlock(t) {
   const w = txSrcWallet(), c = t.change;
   return `<h3 class="mini">Troco</h3><p class="hint" style="margin:-2px 0 10px">Entradas − saídas − taxa. Volta sempre para um endereço de troco da carteira ${esc(walletName(w))}.</p>
-    <div class="out rem"><p class="calc-line" id="tx-change" style="margin:0 0 12px"></p>
+    <div class="out rem"><div class="field"><label for="tx-troco">Valor do troco (${unitName()})</label><input class="inp" id="tx-troco" name="troco" ${amtAttrs()} autocomplete="off" value="${esc(t.troco || '')}" data-inp="tx"><p class="hint">Se a carteira mostrou o troco, digite aqui: a taxa é o que sobra. Com 0, não há troco e a sobra vai toda para a taxa.</p></div><p class="calc-line" id="tx-change" style="margin:0 0 12px"></p>
     <div id="ch-box">${addrPicker('ch_', w, c.address, { addrLabel: 'Endereço do troco', newLabel: c.newLabel, newAddr: c.newAddr, exclude: c.utxo || '', prefer: 'troco', fixedWallet: true })}<p class="hint" id="ch-auto" style="margin:-6px 0 12px" ${c.address && c.address !== '__new' ? 'hidden' : ''}>Se você não escolher um, o app cria o endereço de troco ao registrar a transação.</p></div></div>`;
 }
 function extHint(s, i) {
@@ -4224,46 +4465,83 @@ function txRead() {
     o.sats = fv(p + 'sats');
   });
   const c = t.change; c.address = fv('ch_address') || c.address; c.newLabel = fv('ch_newLabel'); c.newAddr = fv('ch_newAddr').trim();
-  t.rate = fv('rate'); t.fee = fv('fee'); const vs = parseNum(fv('vsize')); t.vsizeReal = vs > 0 ? vs : null;
+  t.rate = fv('rate'); t.fee = fv('fee'); if ($('#tx-troco')) t.troco = fv('troco'); const vs = parseNum(fv('vsize')); t.vsizeReal = vs > 0 ? vs : null;
   t.date = fv('date') || t.date; t.txid = fv('txid').trim(); t.note = fv('note');
   if ($('#sv-f')) { const v = t.sv || (t.sv = txSvVazio()); v.fiat = fv('svfiat'); v.fee = fv('svfee'); v.ex = fv('svex'); }
 }
-function txCalc() {
-  const t = ui.form.tx, ins = txInputs(), tot = sumSats(ins);
-  let fixed = 0, bad = false; for (const o of t.outputs) { const v = parseAmt(o.sats); if (!(v > 0)) bad = true; else fixed += v; }
-  const vIn = VB.ovh + ins.reduce((a, u) => a + (VB.in[u.type] || 68), 0), vb = vIn + t.outputs.reduce((a, o) => a + (VB.out[txOutType(o)] || 31), 0);
-  const chType = txChangeType(), dust = DUST[chType] || 294, vNo = Math.ceil(vb), vWith = Math.ceil(vb + (VB.out[chType] || 31)), real = t.vsizeReal > 0 ? t.vsizeReal : 0;
-  const feeAt = v => t.feeMode === 'sats' ? parseIntSafe(t.fee) : (parseNum(t.rate) > 0 ? Math.ceil(parseNum(t.rate) * v - 1e-9) : NaN);
-  let vsize = real || vWith, fee = feeAt(vsize), change = tot - fixed - fee, toFee = 0;
-  if (!(change >= dust)) {
-    vsize = real || vNo; const f0 = feeAt(vsize), left = tot - fixed - f0;
-    if (!isFinite(f0)) { fee = NaN; change = NaN; }
-    else if (left < 0) { fee = f0; change = left; }
-    else { fee = tot - fixed; change = 0; toFee = left; }
+/* 1.8.36 (itens 3 e 6): a conta única de uma transação, para Enviar, Consolidar e a venda pela carteira. Entradas, saídas de
+   valor informado (outs: { sats, type }), taxa e troco. O tamanho vem do tipo de cada entrada e saída (VB) ou do tamanho
+   real informado. modo diz o que a pessoa digitou por último: 'rate' (sat/vB), 'sats' (taxa total) ou 'troco' (o valor do
+   troco; a taxa é o que sobra). sempre: a saída do troco existe sempre e não vai para a taxa (Consolidar: ela é o novo UTXO,
+   e o modo 'troco' é o valor dele). Sem sempre, um troco abaixo do limite de poeira não vira saída: vai para a taxa (toFee),
+   como fazem as carteiras; no modo 'troco', 0 é "sem troco" e a sobra inteira é a taxa, e um troco digitado abaixo do limite
+   (tendendo a zero) também vai para a taxa (1.8.37, pedido do Nicolas; no Consolidar, sempre, ele continua bloqueado).
+   max: com uma saída só, o valor dela sem troco (nos modos 'sats' e 'troco', com a mesma taxa em sats). */
+function txBalanco({ ins, outs = [], chType, real = 0, modo = 'rate', rate, fee, troco, sempre = false }) {
+  const tot = sumSats(ins); let fixed = 0, bad = false;
+  for (const o of outs) { if (!(o.sats > 0)) bad = true; else fixed += o.sats; }
+  const vIn = VB.ovh + ins.reduce((a, u) => a + (VB.in[u.type] || 68), 0), vOut = vIn + outs.reduce((a, o) => a + (VB.out[o.type] || 31), 0);
+  const vNo = Math.ceil(vOut), vWith = Math.ceil(vOut + (VB.out[chType] || 31)), dust = DUST[chType] || 294;
+  const feeAt = v => modo === 'sats' ? (fee >= 0 ? fee : NaN) : modo === 'rate' ? (rate > 0 ? Math.ceil(rate * v - 1e-9) : NaN) : NaN;
+  let vsize, f, change, toFee = 0;
+  if (modo === 'troco') {
+    if (troco >= 0) { change = troco; vsize = real || (troco > 0 || sempre ? vWith : vNo); f = tot - fixed - troco;
+      if (!sempre && troco > 0 && troco < dust && f > 0) { change = 0; toFee = troco; vsize = real || vNo; f = tot - fixed; } }
+    else { change = NaN; f = NaN; vsize = real || vWith; }
+  } else {
+    vsize = real || vWith; f = feeAt(vsize); change = tot - fixed - f;
+    if (!sempre && !(change >= dust)) {
+      vsize = real || vNo; const f0 = feeAt(vsize), left = tot - fixed - f0;
+      if (!isFinite(f0)) { f = NaN; change = NaN; }
+      else if (left < 0) { f = f0; change = left; }
+      else { f = tot - fixed; change = 0; toFee = left; }
+    }
   }
-  const v1 = t.outputs.length === 1 ? (real || Math.ceil(vIn + (VB.out[txOutType(t.outputs[0])] || 31))) : 0, max = v1 ? tot - feeAt(v1) : NaN;
-  return { ins, tot, fixed, bad, fee, rate: vsize > 0 ? fee / vsize : NaN, vsize, vEst: change > 0 ? vWith : vNo, change, toFee, dust, chType, max };
+  const max = outs.length === 1 ? tot - (modo === 'rate' ? feeAt(real || vNo) : f - toFee) : NaN;
+  return { ins, tot, fixed, bad, fee: f, rate: vsize > 0 ? f / vsize : NaN, vsize, vEst: change > 0 || sempre ? vWith : vNo, change, toFee, dust, chType, max, modo };
+}
+/* Taxa alta pede confirmação antes de gravar (1.8.36): acima de 300 sat/vB ou de 10% das entradas, quase sempre é um zero a
+   mais ou um troco digitado errado. */
+const TAXA_ALTA = { rate: 300, pct: 10 };
+const taxaAlta = n => n.fee > 0 && n.tot > 0 && (n.rate > TAXA_ALTA.rate || n.fee * 100 >= n.tot * TAXA_ALTA.pct);
+const taxaPct = n => esc((n.fee / n.tot * 100).toLocaleString('pt-BR', { maximumFractionDigits: 2 }));
+const taxaAltaAviso = n => taxaAlta(n) ? `<br><span class="warn">Taxa alta: ${taxaPct(n)}% das entradas, ${esc(fmtRate(n.rate))} sat/vB. Confira antes de registrar.</span>` : '';
+const taxaAltaErro = n => `A taxa ficou alta: ${fmtSats(n.fee)} sats, ${fmtRate(n.rate)} sat/vB, ${(n.fee / n.tot * 100).toLocaleString('pt-BR', { maximumFractionDigits: 2 })}% das entradas. Confira se não sobrou um zero. Toque de novo em salvar para confirmar.`;
+// confirmação da taxa alta: vale para a taxa confirmada; mudou a taxa, pergunta de novo
+function taxaAltaPede(alvo, n) { if (!taxaAlta(n) || alvo.taxaOk === n.fee) return false; alvo.taxaOk = n.fee; formErr(taxaAltaErro(n)); return true; }
+/* Sobra que vai para a taxa (toFee): abaixo do limite de poeira, ou, com taxas altas, uma sobra que não paga a própria saída
+   de troco e ficaria abaixo do limite depois dela (1.8.36: antes, a mensagem dizia "abaixo do limite" nos dois casos) */
+const sobraTxt = n => n.toFee < n.dust ? `abaixo do limite de poeira (${fmtSats(n.dust)} sats) para virar troco` : `mas com a taxa da própria saída o troco ficaria abaixo do limite de poeira (${fmtSats(n.dust)} sats)`;
+const MIX_KYC = '<b>Privacidade:</b> você está juntando moedas com e sem KYC. Na blockchain elas passam a ficar ligadas.';
+function txCalc() {
+  const t = ui.form.tx;
+  return txBalanco({ ins: txInputs(), outs: t.outputs.map(o => ({ sats: parseAmt(o.sats), type: txOutType(o) })), chType: txChangeType(), real: t.vsizeReal > 0 ? t.vsizeReal : 0, modo: t.feeMode, rate: parseNum(t.rate), fee: parseIntSafe(t.fee), troco: parseAmt(t.troco) });
 }
 function txRefresh() {
   const t = ui.form && ui.form.tx; if (!t || !$('#tx-sum')) return;
   if (t.simple) return consRefresh();
-  const n = txCalc(), rEl = $('#tx-rate'), fEl = $('#tx-fee'), F = v => esc(fmtSats(v)), A = v => esc(amtTxt(v));
-  if (t.feeMode === 'sats') { if (document.activeElement !== rEl) rEl.value = isFinite(n.rate) && n.rate > 0 ? fmtRate(n.rate) : ''; }
-  else if (document.activeElement !== fEl) fEl.value = isFinite(n.fee) && n.fee > 0 ? fmtSats(n.fee - n.toFee) : '';
+  const n = txCalc(), rEl = $('#tx-rate'), fEl = $('#tx-fee'), cEl = $('#tx-troco'), F = v => esc(fmtSats(v)), A = v => esc(amtTxt(v));
+  // 1.8.36: taxa (sat/vB), taxa total e troco ficam ligados; o último digitado manda (feeMode) e os outros dois acompanham
+  const troco = t.feeMode === 'troco', ok = !n.bad && isFinite(n.fee);
+  if (t.feeMode !== 'rate' && document.activeElement !== rEl) rEl.value = isFinite(n.rate) && n.rate > 0 ? fmtRate(n.rate) : '';
+  if (t.feeMode !== 'sats' && document.activeElement !== fEl) fEl.value = isFinite(n.fee) && n.fee > 0 ? fmtSats(n.fee - n.toFee) : '';
+  if (cEl && !troco && document.activeElement !== cEl) cEl.value = ok && n.change >= 0 ? amtIn(n.change) : '';
   $('#tx-vs').placeholder = `estimado: ${n.vEst} vB`;
   const mv = $('#tx-maxv'); if (mv) mv.textContent = isFinite(n.max) && n.max > 0 ? `(${amtTxt(n.max)}, sem troco)` : '';
   const ch = $('#tx-change'), box = $('#ch-box'), auto = $('#ch-auto');
   if (n.bad) ch.innerHTML = 'Informe o valor de cada saída para calcular o troco.';
-  else if (!isFinite(n.fee)) ch.innerHTML = 'Informe a taxa para calcular o troco.';
+  else if (!isFinite(n.fee)) ch.innerHTML = troco ? 'Informe o troco, ou a taxa, para fechar a conta.' : 'Informe a taxa para calcular o troco.';
+  else if (troco && n.fee <= 0) ch.innerHTML = `<span class="neg">Com esse troco não sobra nada para a taxa: entradas − saídas = ${A(n.tot - n.fixed)}. Diminua o troco.</span>`;
   else if (n.change < 0) ch.innerHTML = `<span class="neg">As saídas e a taxa passam do total das entradas em ${A(-n.change)}.</span>`;
-  else ch.innerHTML = `Entradas ${A(n.tot)} − saídas ${A(n.fixed)} − taxa ${F(n.fee - n.toFee)} sats = <b>${n.change > 0 ? A(n.change) : F(n.toFee) + ' sats'}</b>${n.change > 0 ? '' : n.toFee > 0 ? `<br><span class="warn">Abaixo do limite de poeira (${F(n.dust)} sats): não vira troco e vai para a taxa.</span>` : '<br>Sem troco: as saídas e a taxa usam todo o valor das entradas.'}`;
-  box.hidden = n.bad || !isFinite(n.fee) || !(n.change > 0);
+  else ch.innerHTML = `Entradas ${A(n.tot)} − saídas ${A(n.fixed)} − taxa ${F(n.fee - n.toFee)} sats = <b>${n.change > 0 ? A(n.change) : F(n.toFee) + ' sats'}</b>${n.change > 0 ? '' : n.toFee > 0 ? `<br><span class="warn">Sobram ${F(n.toFee)} sats, ${esc(sobraTxt(n))}: vão para a taxa.</span>` : '<br>Sem troco: as saídas e a taxa usam todo o valor das entradas.'}`;
+  box.hidden = !(ok && n.fee > 0 && n.change >= n.dust);
   if (auto) auto.hidden = !!(t.change.address && t.change.address !== '__new');
   let h;
   if (n.bad) h = 'Informe o valor de cada saída. Ele é obrigatório.';
-  else if (!isFinite(n.fee) || n.fee <= 0) h = 'Informe a taxa em sat/vB ou em sats.';
+  else if (!isFinite(n.fee)) h = troco ? 'Informe o troco, ou a taxa em sat/vB ou em sats.' : 'Informe a taxa em sat/vB ou em sats.';
+  else if (n.fee <= 0) h = troco ? '<span class="neg">O troco não deixa nada para a taxa da rede. Diminua o troco.</span>' : 'Informe a taxa em sat/vB ou em sats.';
   else if (n.change < 0) h = `<span class="neg">Faltam ${A(-n.change)} para cobrir as saídas e a taxa.</span>`;
-  else h = `Entradas <b>${A(n.tot)}</b> · saídas <b>${A(n.fixed)}</b> · troco <b>${A(n.change)}</b> · taxa <b>${F(n.fee)} sats</b><br>${esc(fmtRate(n.rate))} sat/vB · ${F(n.vsize)} vB ${t.vsizeReal ? 'informado' : 'estimado'} · ${esc((n.fee / n.tot * 100).toLocaleString('pt-BR', { maximumFractionDigits: 2 }))}% do valor${n.rate < 1 ? '<br><span class="warn">Abaixo de 1 sat/vB a confirmação pode demorar.</span>' : ''}`;
+  else h = `Entradas <b>${A(n.tot)}</b> · saídas <b>${A(n.fixed)}</b> · troco <b>${A(n.change)}</b> · taxa <b>${F(n.fee)} sats</b><br>${esc(fmtRate(n.rate))} sat/vB · ${F(n.vsize)} vB ${t.vsizeReal ? 'informado' : 'estimado'} · ${taxaPct(n)}% do valor${n.rate < 1 ? '<br><span class="warn">Abaixo de 1 sat/vB a confirmação pode demorar.</span>' : ''}${taxaAltaAviso(n)}`;
   $('#tx-sum').innerHTML = h;
   const inW = (n.ins[0] || {}).wallet;
   t.outputs.forEach((o, i) => {
@@ -4350,7 +4628,7 @@ function txSave() {
   if (!ok) return false;
   ui.sel.clear(); ui.selMode = false; save(); closeSheet(); render();
   if (sv && !sale0) toastRegistro('Venda e transação registradas');
-  else toast(edit ? (sv ? 'Venda atualizada' : sale0 ? 'Transação atualizada; a venda saiu dos registros' : 'Transação atualizada') : t.simple ? (n.ins.length > 1 ? 'Consolidação registrada' : 'Transferência registrada') : 'Transação registrada');
+  else toast(edit ? (sv ? 'Venda atualizada' : sale0 ? 'Transação atualizada; a venda saiu dos registros' : 'Transação atualizada') : t.simple || (t.parte && t.outputs.length === 1 && t.outputs[0].kind === 'own') ? (n.ins.length > 1 ? 'Consolidação registrada' : 'Transferência registrada') : 'Transação registrada');
   if (sv) fxSync();
 }
 
@@ -4416,7 +4694,7 @@ function pageTx() {
   };
   const ganho = sale ? ((fxOn() ? ledger(state.aportes.map(apV)) : ledger()).info[sale.id] || null) : null, sg = v => `${v >= 0 ? '+' : '−'}${MV(Math.abs(v))}`;
   return `${pageHead('Transação')}<div class="article">
-    <h2 class="lt">${esc(txKind(sp))}</h2><p class="ls">${fmtDate(sp.date)}${sp.note ? ' · ' + esc(sp.note) : ''}</p>
+    <h2 class="lt">${esc(txKind(sp))}</h2><p class="ls">${fmtDate(sp.date)}${sp.note ? ' · ' + esc(sp.note) : ''} · <button class="link-btn small" data-act="mapa-tx" data-id="${sp.id}">Ver no Mapa dos sats</button></p>
     ${sale ? `<p class="note" style="margin:0 0 12px">Venda de ${fmtDate(sale.date)}: <b>${MV(toVa(sale, sale.fiat))}</b> recebidos${!isDefEx(sale.ex) ? ' · ' + esc(sale.ex) : ''}${ganho ? ` · lucro realizado <b class="${ganho.gain >= 0 ? 'pos' : 'neg'}">${sg(ganho.gain)}</b>` : ''}. <button class="link-btn small" data-act="edit-aporte" data-id="${sale.id}">Abrir a venda</button></p>` : ''}
     ${sp.txid ? `<p class="addr-str">${esc(sp.txid)}</p><div class="btn-row" style="margin:10px 0 4px"><button class="btn btn-q btn-s" data-act="copy" data-v="${esc(sp.txid)}">Copiar TXID</button>${extLink('https://mempool.space/tx/' + sp.txid, 'Ver no mempool.space', 'btn btn-q btn-s')}</div>` : ''}
     <h3>Entradas · ${AMT(tin)}</h3>${ins.map(inRow).join('')}
@@ -4449,6 +4727,253 @@ function pageWallet() {
     ${addrGroup(w.id, 'Recebimento', info.filter(([a]) => a.role !== 'troco'), true)}
     ${addrGroup(w.id, 'Troco', info.filter(([a]) => a.role === 'troco'), true)}
     ${!info.length ? '<p class="muted">Nenhum endereço ainda.</p>' : ''}</div>`;
+}
+
+/* ======================= MAPA DOS SATS (1.8.37, item 5 do plano de 23/11/2026) =======================
+   Onde os sats estavam depois de cada movimento, em ordem de data: a corretora (compras menos vendas e saques, a conta do
+   calc e do holdAt), os UTXOs vivos de cada carteira e o que saiu (vendido, enviado e taxas). Aportes seguidos na corretora
+   ficam num passo só. Sem campo novo: a origem sai de origin, saqueId, aporteId, txId e spends[].inputs/outputs. O KYC de
+   cada UTXO é o de hoje (o registro não guarda o histórico dele); a corretora tem cadastro, então tem KYC. */
+const MAPA = { W: 340, P: 12, LH: 26, G: 6, R: 50, RMIN: 3, SVG: 'http://www.w3.org/2000/svg' };
+// transações em ordem de data; se uma gasta a saída de outra, a de origem vem antes, mesmo com as datas trocadas
+function spendsEmOrdem() {
+  const pai = new Map();
+  for (const sp of state.spends) for (const o of sp.outputs) if (o.kind === 'own' && o.utxo) pai.set(o.utxo, sp);
+  const ord = [], feito = new Set(), vendo = new Set();
+  const visita = sp => {
+    if (feito.has(sp.id) || vendo.has(sp.id)) return; vendo.add(sp.id);
+    for (const id of sp.inputs) { const p = pai.get(id); if (p && p !== sp) visita(p); }
+    vendo.delete(sp.id); feito.add(sp.id); ord.push(sp);
+  };
+  state.spends.map((sp, i) => [sp, i]).sort((a, b) => a[0].date.localeCompare(b[0].date) || a[1] - b[1]).forEach(([sp]) => visita(sp));
+  return ord;
+}
+/* Os passos. Cada um guarda a foto depois dele (snap: corretora, vivos, vendido, enviado e taxas), o que nasceu e o que foi
+   gasto nele e as linhas do texto, com os valores à parte ({ s: sats }) para o olho de ocultar valores. Uma entrada que ainda
+   não tinha aparecido (datas trocadas à mão) entra na transação que a gasta; gasto sem a transação registrada sai na data do
+   gasto, como enviado. */
+function mapaPassos() {
+  const U = new Map(state.utxos.map(u => [u.id, u])), SP = new Map(state.spends.map(sp => [sp.id, sp]));
+  const naTx = new Set(), gastoNaTx = new Set(), doSaque = new Set(state.saques.map(w => w.utxoId).filter(Boolean)), ev = [];
+  for (const sp of state.spends) { for (const o of sp.outputs) if (o.kind === 'own' && o.utxo) naTx.add(o.utxo); for (const id of sp.inputs) gastoNaTx.add(id); }
+  for (const a of state.aportes) {
+    if (isSale(a)) { if (a.src !== 'self') ev.push({ d: a.date, o: 1, t: 'venda', a }); }   // a venda da carteira vem pela transação
+    else if (a.dest !== 'self') ev.push({ d: a.date, o: 0, t: 'compra', a });             // a compra direto na carteira vem pelo UTXO
+  }
+  for (const w of state.saques) ev.push({ d: w.date, o: 2, t: 'saque', w });
+  for (const u of state.utxos) if (!naTx.has(u.id) && !doSaque.has(u.id)) ev.push({ d: u.date, o: 3, t: 'entrada', u });
+  spendsEmOrdem().forEach((sp, i) => ev.push({ d: sp.date, o: 4, i, t: 'tx', sp }));
+  for (const u of state.utxos) if (u.spent && !gastoNaTx.has(u.id)) ev.push({ d: u.spentAt || u.date, o: 5, t: 'sumiu', u });
+  ev.sort((x, y) => x.d.localeCompare(y.d) || x.o - y.o || (x.i || 0) - (y.i || 0));
+  const vivos = new Map(), nasceu = new Set(), passos = [], kycT = u => u.kyc ? 'com KYC' : 'sem KYC';
+  let ex = 0, vend = 0, env = 0, tax = 0;
+  const entra = u => { if (!u || nasceu.has(u.id)) return; nasceu.add(u.id); vivos.set(u.id, { id: u.id, w: u.wallet, sats: u.sats, kyc: !!u.kyc }); };
+  const foto = () => ({ ex, vend, env, tax, vivos: [...vivos.values()] });
+  for (const e of ev) {
+    const ult = passos[passos.length - 1];
+    if (e.t === 'compra') {
+      ex += e.a.sats;
+      if (ult && ult.t === 'aportes') { ult.n++; ult.sats += e.a.sats; ult.d = e.d; ult.snap = foto(); }
+      else passos.push({ t: 'aportes', d0: e.d, d: e.d, n: 1, sats: e.a.sats, snap: foto() });
+    } else if (e.t === 'venda') {
+      ex -= e.a.sats; vend += e.a.sats;
+      passos.push({ t: 'venda', d: e.d, titulo: 'Venda na corretora', linhas: [[{ s: e.a.sats }, ' vendidos na corretora']], snap: foto() });
+    } else if (e.t === 'saque') {
+      const w = e.w, u = U.get(w.utxoId), fee = w.fee || 0; ex -= w.sats + fee; tax += fee; entra(u);
+      passos.push({ t: 'saque', d: e.d, novos: u ? [u.id] : [], titulo: u ? `Saque para a ${walletName(u.wallet)}` : 'Saque',
+        linhas: [[{ s: w.sats }, ` saíram da corretora${u ? ` para um UTXO ${kycT(u)}` : ''}`], ...(fee ? [[`Taxa de saque: ${fmtSats(fee)} sats`]] : [])], snap: foto() });
+    } else if (e.t === 'entrada') {
+      const u = e.u, ap = u.origin === 'aporte' ? byId(state.aportes, u.aporteId) : null; entra(u);
+      const nome = u.origin === 'aporte' ? (ap && ap.entrada ? 'Compra de terceiros' : 'Compra direto na carteira') : u.origin === 'externo' ? 'Entrada de terceiros' : u.origin === 'saque' ? 'Saque' : 'Entrada';
+      passos.push({ t: 'entrada', d: e.d, novos: [u.id], titulo: `${nome} · ${walletName(u.wallet)}`, linhas: [[{ s: u.sats }, ` ${kycT(u)}`]], snap: foto() });
+    } else if (e.t === 'tx') {
+      const sp = e.sp, ins = sp.inputs.map(id => U.get(id)).filter(Boolean), sv = saidaVenda(sp), novos = [];
+      for (const u of ins) { entra(u); vivos.delete(u.id); }
+      const linhas = [[`${ins.length} ${ins.length === 1 ? 'entrada' : 'entradas'}: `, { s: sumSats(ins) }]];
+      for (const o of sp.outputs) {
+        if (o.kind === 'own') { const u = U.get(o.utxo); if (u) { entra(u); novos.push(u.id); linhas.push([{ s: o.sats }, ` para a ${walletName(u.wallet)}${o.rem ? ' (troco)' : ''}`]); } }
+        else if (o === sv) { vend += o.sats; linhas.push([{ s: o.sats }, ' vendidos']); }
+        else { env += o.sats; linhas.push([{ s: o.sats }, ' enviados para terceiros']); }
+      }
+      tax += sp.fee || 0; if (sp.fee) linhas.push([`Taxa da rede: ${fmtSats(sp.fee)} sats`]);
+      passos.push({ t: 'tx', d: e.d, tx: sp.id, novos, foram: ins.map(u => u.id), mix: ins.some(u => u.kyc) && ins.some(u => !u.kyc), titulo: sp.saleId ? 'Venda pela carteira' : txKind(sp), linhas, snap: foto() });
+    } else if (e.t === 'sumiu') {
+      entra(e.u); vivos.delete(e.u.id); env += e.u.sats;
+      passos.push({ t: 'sumiu', d: e.d, foram: [e.u.id], titulo: 'Gasto sem a transação registrada', linhas: [[{ s: e.u.sats }, ` saíram da ${walletName(e.u.wallet)}`]], snap: foto() });
+    }
+  }
+  for (const p of passos) if (p.t === 'aportes') { p.titulo = p.n === 1 ? 'Aporte na corretora' : `${p.n} aportes na corretora`; p.linhas = [['+', { s: p.sats }, ' na corretora']]; }
+  return passos;
+}
+/* KYC que não acompanhou as entradas: em ordem, o KYC de cada saída própria é o OU das entradas (a regra do txSave), já com
+   as correções de antes. A diferença aparece quando o KYC de uma entrada muda depois da transação (a cascata refaz só os
+   valores) ou quando a saída foi editada; o mapa mostra e oferece corrigir. */
+function kycDifs() {
+  const k = new Map(state.utxos.map(u => [u.id, !!u.kyc])), difs = [];
+  for (const sp of spendsEmOrdem()) {
+    const ins = sp.inputs.filter(id => k.has(id)); if (!ins.length) continue;
+    const esp = ins.some(id => k.get(id));
+    for (const o of sp.outputs) if (o.kind === 'own' && o.utxo && k.has(o.utxo) && k.get(o.utxo) !== esp) { difs.push({ id: o.utxo, para: esp, tx: sp.id }); k.set(o.utxo, esp); }
+  }
+  return difs;
+}
+function kycCorrige() {
+  const difs = kycDifs(); if (!difs.length) return;
+  const snap = fotoDados();
+  for (const d of difs) { const u = byId(state.utxos, d.id); if (u) u.kyc = d.para; }
+  save(); render(); toastDesfazer(`KYC corrigido em ${difs.length === 1 ? '1 UTXO' : difs.length + ' UTXOs'}`, snap);
+}
+// geometria única para todos os passos: a maior bolha de todos tem R, e as faixas têm a altura do passo mais cheio
+function mapaFila(itens, raio) {
+  const larg = MAPA.W - 2 * MAPA.P, pos = []; let x = 0, y = 0, alt = 0, linha = [];
+  const fecha = () => { for (const o of linha) o.y = y + alt / 2; y += alt + MAPA.G; x = 0; alt = 0; linha = []; };
+  for (const v of itens) { const r = raio(v.sats), d = 2 * r; if (linha.length && x + d > larg) fecha(); const o = { v, x: MAPA.P + x + r, r }; pos.push(o); linha.push(o); x += d + MAPA.G; alt = Math.max(alt, d); }
+  if (linha.length) { for (const o of linha) o.y = y + alt / 2; y += alt; }
+  return { pos, h: y };
+}
+function mapaGeo(passos) {
+  let max = 1;
+  for (const p of passos) { const s = p.snap; max = Math.max(max, s.ex, s.vend, s.env, s.tax); for (const v of s.vivos) if (v.sats > max) max = v.sats; }
+  const raio = v => v > 0 ? Math.max(MAPA.RMIN, MAPA.R * Math.sqrt(v / max)) : 0;
+  const ids = new Set(); for (const p of passos) for (const v of p.snap.vivos) ids.add(v.w);
+  const ws = [...state.wallets.filter(w => ids.has(w.id)).map(w => ({ id: w.id, nome: w.name })), ...[...ids].filter(id => !byId(state.wallets, id)).map(id => ({ id, nome: 'Carteira apagada' }))];
+  const maior = f => passos.reduce((m, p) => Math.max(m, f(p)), 0);   // sem espalhar arrays grandes em Math.max
+  const rEx = maior(p => raio(p.snap.ex)), rSai = maior(p => Math.max(raio(p.snap.vend), raio(p.snap.env), raio(p.snap.tax)));
+  const faixas = []; let y = 0;
+  const faixa = (k, nome, h) => { faixas.push({ k, nome, y, h }); y += h; };
+  faixa('ex', 'Corretora', MAPA.LH + Math.max(2 * rEx, 10) + 10);
+  for (const w of ws) faixa('w:' + w.id, w.nome, MAPA.LH + Math.max(10, maior(p => mapaFila(p.snap.vivos.filter(v => v.w === w.id), raio).h)) + 10);
+  faixa('sai', 'Saiu', MAPA.LH + Math.max(2 * rSai, 10) + 40);
+  return { raio, ws, rEx, rSai, faixas, H: Math.ceil(y) };
+}
+const mapaSai = [['v', 'vendido', 'vend'], ['e', 'enviado', 'env'], ['t', 'taxas', 'tax']];
+function mapaBolhas(k) {
+  const M = ui.mapa, g = M.geo, s = M.passos[k].snap, fx = Object.fromEntries(g.faixas.map(f => [f.k, f])), bs = [];
+  if (s.ex > 0) bs.push({ k: 'ex', cls: 'ex', kyc: true, cx: MAPA.P + g.rEx, cy: fx.ex.y + MAPA.LH + g.rEx, r: g.raio(s.ex) });
+  for (const w of g.ws) {
+    const f = fx['w:' + w.id];
+    for (const o of mapaFila(s.vivos.filter(v => v.w === w.id), g.raio).pos) bs.push({ k: 'u:' + o.v.id, cls: 'ut', kyc: o.v.kyc, cx: o.x, cy: f.y + MAPA.LH + o.y, r: o.r });
+  }
+  const larg = MAPA.W - 2 * MAPA.P;
+  mapaSai.forEach(([c, , campo], i) => { if (s[campo] > 0) bs.push({ k: 'o:' + c, cls: 'sai ' + c, kyc: false, cx: MAPA.P + larg * (2 * i + 1) / 6, cy: fx.sai.y + MAPA.LH + g.rSai, r: g.raio(s[campo]) }); });
+  return bs;
+}
+const mapaN = v => (Math.round(v * 10) / 10).toString();
+const mapaGeoAttr = (b, r) => `cx="${mapaN(b.cx)}" cy="${mapaN(b.cy)}" r="${mapaN(r)}" style="cx:${mapaN(b.cx)}px;cy:${mapaN(b.cy)}px;r:${mapaN(r)}px"`;
+const mapaBolhaSVG = b => `<g class="b ${b.cls}${b.kyc ? ' kyc' : ''}${ui.mapaSel === b.k ? ' sel' : ''}" data-k="${b.k}" data-act="mapa-b"><circle class="alvo" ${mapaGeoAttr(b, Math.max(b.r, 12))}/><circle class="c" ${mapaGeoAttr(b, b.r)}/>${b.kyc ? `<circle class="h" ${mapaGeoAttr(b, b.r)}/>` : ''}</g>`;
+function mapaPoe(el, b) {
+  for (const c of el.querySelectorAll('circle')) {
+    const r = !b ? 0 : c.classList.contains('alvo') ? Math.max(b.r, 12) : b.r;
+    if (b) { c.setAttribute('cx', mapaN(b.cx)); c.setAttribute('cy', mapaN(b.cy)); c.style.cx = mapaN(b.cx) + 'px'; c.style.cy = mapaN(b.cy) + 'px'; }
+    c.setAttribute('r', mapaN(r)); c.style.r = mapaN(r) + 'px';
+  }
+}
+// textos do palco (valores com o olho de ocultar valores) e o resumo para leitor de tela
+const mapaAmt = v => S().hide ? `•••• ${unitName()}` : amtTxt(v);
+function mapaTotais(k) {
+  const M = ui.mapa, s = M.passos[k].snap, t = { ex: mapaAmt(s.ex), sai: mapaAmt(s.vend + s.env + s.tax) };
+  for (const w of M.geo.ws) { const vs = s.vivos.filter(v => v.w === w.id); t['w:' + w.id] = vs.length ? `${vs.length} ${vs.length === 1 ? 'UTXO' : 'UTXOs'} · ${mapaAmt(sumSats(vs))}` : 'sem UTXOs'; }
+  return t;
+}
+function mapaRotulo(k) {
+  const M = ui.mapa, p = M.passos[k], s = p.snap, t = mapaTotais(k);
+  return `Passo ${k + 1} de ${M.passos.length}, ${mapaQuando(p)}: ${p.titulo}. Corretora: ${t.ex}. ${M.geo.ws.map(w => `${w.nome}: ${t['w:' + w.id]}`).join('. ')}. Vendido: ${mapaAmt(s.vend)}; enviado: ${mapaAmt(s.env)}; taxas: ${mapaAmt(s.tax)}.`;
+}
+const mapaQuando = p => p.t === 'aportes' && p.n > 1 && p.d0 !== p.d ? `${fmtDate(p.d0)} a ${fmtDate(p.d)}` : fmtDate(p.d);
+function mapaSVG(k) {
+  const M = ui.mapa, g = M.geo, W = MAPA.W, t = mapaTotais(k), s = M.passos[k].snap, curto = n => n.length > 20 ? n.slice(0, 19) + '…' : n;
+  let h = `<svg id="mapa-svg" viewBox="0 0 ${W} ${g.H}" role="img" aria-label="${esc(mapaRotulo(k))}"><defs><pattern id="mapa-hach" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect class="hb" width="2" height="5"/></pattern></defs>`;
+  g.faixas.forEach((f, i) => { h += `${i ? `<line class="sep" x1="${MAPA.P}" x2="${W - MAPA.P}" y1="${f.y}" y2="${f.y}"/>` : ''}<text class="fn" x="${MAPA.P}" y="${f.y + 18}">${esc(curto(f.nome))}</text><text class="ft" x="${W - MAPA.P}" y="${f.y + 18}" text-anchor="end" data-t="${f.k}">${esc(t[f.k])}</text>`; });
+  h += `<g class="bolhas">${mapaBolhas(k).map(mapaBolhaSVG).join('')}</g>`;
+  const fs = g.faixas[g.faixas.length - 1], larg = W - 2 * MAPA.P, yl = fs.y + MAPA.LH + 2 * g.rSai + 18;
+  mapaSai.forEach(([c, nome, campo], i) => { const x = mapaN(MAPA.P + larg * (2 * i + 1) / 6); h += `<text class="sl" x="${x}" y="${yl}" text-anchor="middle">${nome}</text><text class="sv" x="${x}" y="${yl + 15}" text-anchor="middle" data-t="o:${c}">${esc(mapaAmt(s[campo]))}</text>`; });
+  return h + '</svg>';
+}
+const mapaParte = x => typeof x === 'object' ? AMT(x.s) : esc(x);
+function mapaInfo(k) {
+  const M = ui.mapa, p = M.passos[k];
+  return `<p class="mapa-n">Passo ${k + 1} de ${M.passos.length} · ${mapaQuando(p)}</p><h3 class="mapa-tt">${esc(p.titulo)}</h3>
+    <ul class="mapa-l">${p.linhas.map(l => `<li>${l.map(mapaParte).join('')}</li>`).join('')}</ul>
+    ${p.mix ? `<p class="note warn" style="margin:0 0 10px"><b>Mistura de KYC:</b> moedas com e sem KYC se juntaram nesta transação. Na blockchain elas passam a ficar ligadas, e as saídas ficam com KYC.</p>` : ''}
+    ${p.tx ? `<p style="margin:0 0 6px"><button class="link-btn small" data-act="open-tx" data-id="${p.tx}">Abrir a transação</button></p>` : ''}`;
+}
+function mapaSelHTML() {
+  const M = ui.mapa, key = ui.mapaSel; if (!M || !key) return '';
+  const k = ui.mapaPasso, s = M.passos[k].snap;
+  if (key === 'ex') return `<div class="mapa-card"><b>Corretora · ${AMT(s.ex)}</b> <span class="tag k">KYC</span><p class="small muted" style="margin:4px 0 0">Saldo na corretora depois deste passo. A corretora tem o seu cadastro: o saldo tem KYC.</p></div>`;
+  if (key.startsWith('o:')) { const [, nome, campo] = mapaSai.find(x => x[0] === key[2]) || []; return nome ? `<div class="mapa-card"><b>${nome[0].toUpperCase() + nome.slice(1)} até aqui · ${AMT(s[campo])}</b><p class="small muted" style="margin:4px 0 0">${campo === 'vend' ? 'Sats vendidos, na corretora e pela carteira.' : campo === 'env' ? 'Sats que saíram para terceiros sem venda (pagamento, presente ou envio).' : 'Taxas de saque e da rede.'}</p></div>` : ''; }
+  const id = key.slice(2), u = byId(state.utxos, id); if (!u) return '';
+  const vivo = s.vivos.some(v => v.id === id), nasce = M.passos.findIndex(p => (p.novos || []).includes(id)), gasto = M.passos.findIndex(p => (p.foram || []).includes(id));
+  return `<div class="mapa-card"><b>◈ ${AMT(u.sats)}</b> ${u.kyc ? '<span class="tag k">KYC</span>' : '<span class="tag">sem KYC</span>'}
+    <p class="small muted" style="margin:4px 0 0">${(nm => nm ? esc(nm) + ' · ' : '')(u.label || (addrById(u.address) || {}).label || '')}${esc(walletName(u.wallet))} · ${esc(utxoSource(u).t)} em ${fmtDate(u.date)}${vivo ? '' : ` · <b>fora deste passo</b> (${nasce > k ? 'ainda não existia' : 'já tinha sido gasto'})`}</p>
+    <div class="btn-row" style="margin-top:10px">${nasce >= 0 && nasce !== k ? `<button class="btn btn-q btn-s" data-act="mapa-ir" data-k="${nasce}">Quando nasceu</button>` : ''}${gasto >= 0 && gasto !== k ? `<button class="btn btn-q btn-s" data-act="mapa-ir" data-k="${gasto}">Quando foi gasto</button>` : ''}<button class="btn btn-q btn-s" data-act="edit-utxo" data-id="${id}">Abrir UTXO</button></div></div>`;
+}
+function pageMapa() {
+  const head = pageHead('Mapa dos sats');
+  if (!S().utxo) return `${head}<div class="article"><p class="ls">O mapa usa a gestão de UTXOs. Ative na aba Carteira.</p></div>`;
+  const passos = mapaPassos();
+  if (!passos.length) return `${head}<div class="article"><p class="ls">Ainda não há movimentos para mostrar. Registre um aporte, um saque ou um UTXO.</p></div>`;
+  ui.mapa = { passos, geo: mapaGeo(passos) };
+  // aberto por um UTXO (u:id) ou por uma transação (t:id): começa no passo em que ele nasceu; pela aba, no último passo
+  const arg = ui.arg || '';
+  if (ui.mapaArg !== arg) {
+    ui.mapaArg = arg; ui.mapaSel = null; ui.mapaPasso = passos.length - 1;
+    const [t, id] = arg.split(':'), k = !id ? -1 : t === 't' ? passos.findIndex(p => p.tx === id) : passos.findIndex(p => (p.novos || []).includes(id));
+    if (k >= 0) ui.mapaPasso = k; if (t === 'u' && id) ui.mapaSel = arg;
+  }
+  if (!(ui.mapaPasso >= 0 && ui.mapaPasso < passos.length)) ui.mapaPasso = passos.length - 1;
+  const k = ui.mapaPasso, n = passos.length, difs = kycDifs(), mix = passos.map((p, i) => p.mix ? i : -1).filter(i => i >= 0);
+  const um = (q, a, b) => q === 1 ? a : b;
+  const kyc = difs.length ? `<div class="note warn mapa-kyc"><b>KYC que não acompanhou as entradas.</b> ${um(difs.length, 'Um UTXO tem', `${difs.length} UTXOs têm`)} o KYC diferente do que veio da transação que ${um(difs.length, 'o criou', 'os criou')}: uma entrada com KYC passa o KYC para as saídas. Acontece quando o KYC de uma entrada muda depois da transação.
+    <ul>${difs.slice(0, 5).map(d => { const u = byId(state.utxos, d.id); return `<li>${AMT(u.sats)} · ${esc(walletName(u.wallet))}: ${d.para ? 'sem KYC → com KYC' : 'com KYC → sem KYC'}</li>`; }).join('')}${difs.length > 5 ? `<li>e mais ${difs.length - 5}</li>` : ''}</ul>
+    <button class="btn btn-p btn-s" data-act="mapa-kyc">Corrigir ${um(difs.length, 'o UTXO', `os ${difs.length} UTXOs`)}</button></div>` : '';
+  const ym = d => fmtYM(d.slice(0, 7));
+  return `${head}<div class="article mapa">
+    <p class="ls">Onde estavam os seus sats depois de cada movimento, da primeira compra até hoje. A área de cada bolha é proporcional aos sats.</p>
+    <div class="mapa-leg"><span><i class="lg ex"></i>Corretora</span><span><i class="lg ut"></i>Seus UTXOs</span><span><i class="lg sai"></i>Saiu</span><span><i class="lg kyc"></i>Com KYC</span></div>
+    ${kyc}
+    ${mix.length ? `<p class="small mapa-mix">Moedas com e sem KYC se juntaram ${um(mix.length, 'num passo', `em ${mix.length} passos`)}: ${mix.map(i => `<button class="link-btn small" data-act="mapa-ir" data-k="${i}">passo ${i + 1}</button>`).join(' · ')}</p>` : ''}
+    <div class="mapa-palco">${mapaSVG(k)}</div>
+    <div class="mapa-ctl"><button class="icon-btn" data-act="mapa-ant" aria-label="Passo anterior"${k === 0 ? ' disabled' : ''}>‹</button><input class="range" type="range" id="mapa-r" min="0" max="${n - 1}" step="1" value="${k}" data-inp="mapa-passo" aria-label="Linha do tempo dos passos" aria-valuetext="${esc(`Passo ${k + 1} de ${n}, ${mapaQuando(passos[k])}: ${passos[k].titulo}`)}"${n === 1 ? ' disabled' : ''}><button class="icon-btn" data-act="mapa-prox" aria-label="Próximo passo"${k === n - 1 ? ' disabled' : ''}>›</button></div>
+    <div class="mapa-datas"><span>${ym(passos[0].t === 'aportes' ? passos[0].d0 : passos[0].d)}</span><span>${ym(passos[n - 1].d)}</span></div>
+    <div id="mapa-info">${mapaInfo(k)}</div>
+    <div id="mapa-sel">${mapaSelHTML()}</div>
+    <p class="hint">Toque numa bolha para ver de que é. O KYC de cada UTXO é o registrado hoje; numa transação, uma entrada com KYC passa o KYC para as saídas.</p></div>`;
+}
+// passo a passo sem refazer a página: as bolhas que continuam crescem, encolhem ou andam; as novas nascem do zero e as gastas somem
+function mapaVai(k) {
+  const M = ui.mapa, svg = $('#mapa-svg'); if (!M || !svg) return;
+  k = Math.max(0, Math.min(M.passos.length - 1, k)); ui.mapaPasso = k;
+  const g = svg.querySelector('.bolhas'), velhas = new Map([...g.children].map(el => [el.dataset.k, el])), calmo = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  for (const b of mapaBolhas(k)) {
+    let el = velhas.get(b.k);
+    if (el) { velhas.delete(b.k); clearTimeout(el._sai); el.classList.remove('saindo'); }
+    else { const t = document.createElementNS(MAPA.SVG, 'g'); t.innerHTML = mapaBolhaSVG({ ...b, r: 0 }); el = t.firstElementChild; g.appendChild(el); el.getBoundingClientRect(); }
+    mapaPoe(el, b); el.classList.toggle('sel', ui.mapaSel === b.k);
+  }
+  for (const el of velhas.values()) { if (el.classList.contains('saindo')) continue; el.classList.add('saindo'); mapaPoe(el, null); el._sai = setTimeout(() => el.remove(), calmo ? 0 : 400); }
+  const t = mapaTotais(k), s = M.passos[k].snap;
+  for (const el of svg.querySelectorAll('[data-t]')) { const c = el.dataset.t; el.textContent = c.startsWith('o:') ? mapaAmt(s[mapaSai.find(x => x[0] === c[2])[2]]) : t[c] || ''; }
+  svg.setAttribute('aria-label', mapaRotulo(k));
+  const p = M.passos[k], r = $('#mapa-r'); if (r) { if (+r.value !== k) r.value = k; r.setAttribute('aria-valuetext', `Passo ${k + 1} de ${M.passos.length}, ${mapaQuando(p)}: ${p.titulo}`); }
+  const a = $('[data-act="mapa-ant"]'), z = $('[data-act="mapa-prox"]'); if (a) a.disabled = k === 0; if (z) z.disabled = k === M.passos.length - 1;
+  const inf = $('#mapa-info'); if (inf) inf.innerHTML = mapaInfo(k);
+  const sel = $('#mapa-sel'); if (sel) sel.innerHTML = mapaSelHTML();
+}
+/* De onde vieram (na folha do UTXO): as entradas da transação que o criou e, de cada uma, as de antes, até a origem (saque,
+   compra ou terceiros). Para em 6 níveis e 24 moedas. */
+function origemHTML(u) {
+  const sp = u.origin === 'tx' ? byId(state.spends, u.txId) : null; if (!sp) return '';
+  let n = 0, cheio = false;
+  const no = (x, nivel, vistos) => {
+    if (n >= 24) { cheio = true; return ''; } n++;
+    const tx = x.origin === 'tx' ? byId(state.spends, x.txId) : null, src = utxoSource(x);
+    const filhos = tx && nivel < 6 && !vistos.has(tx.id) ? tx.inputs.map(id => byId(state.utxos, id)).filter(Boolean) : [];
+    const v2 = new Set(vistos); if (tx) v2.add(tx.id);
+    return `<li><button class="io" data-act="edit-utxo" data-id="${x.id}"><span class="k">${esc(src.t)}<small>${fmtDate(x.date)} · ${esc(walletName(x.wallet))}</small></span><span class="v">${AMT(x.sats)} ${x.kyc ? '<span class="tag k">KYC</span>' : '<span class="tag">sem KYC</span>'}</span></button>${filhos.length ? `<ul>${filhos.map(f => no(f, nivel + 1, v2)).join('')}</ul>` : ''}</li>`;
+  };
+  const ins = sp.inputs.map(id => byId(state.utxos, id)).filter(Boolean), lista = ins.map(x => no(x, 1, new Set([sp.id]))).join('');
+  return `<div class="orig"><h3 class="mini">De onde vieram</h3><p class="hint" style="margin:-2px 0 4px">${esc(txKind(sp))} de ${fmtDate(sp.date)}, com ${ins.length} ${ins.length === 1 ? 'entrada' : 'entradas'}:</p><ul class="orig-l">${lista}</ul>${cheio ? '<p class="hint">A lista para em 24 moedas; as mais antigas ficam de fora.</p>' : ''}</div>`;
 }
 
 /* ======================= INTEGRAÇÃO DO MÓDULO v2 =======================
@@ -4493,7 +5018,8 @@ function viewCarteira() {
     ${xiSection()}
     <section class="sec" style="padding-top:0">${ksCard('kit')}</section>`;
   const c = calc(), fr = set.feeRate;
-  let h = `<section class="sec"><div class="sec-head"><h1 class="sec-t" style="font-size:28px">Carteira</h1><button class="link-btn" data-act="utxo-settings">Ajustes</button></div>${splitBar(c, true)}</section>`;
+  let h = `<section class="sec"><div class="sec-head"><h1 class="sec-t" style="font-size:28px">Carteira</h1><button class="link-btn" data-act="utxo-settings">Ajustes</button></div>${splitBar(c, true)}
+    ${state.aportes.length || state.utxos.length ? `<button class="tool" style="margin:16px 0 0" data-act="mapa-abre" data-page="mapa"><b>Mapa dos sats</b><span>De onde vieram e para onde foram os seus sats, passo a passo, com o KYC de cada moeda</span><span class="chev" aria-hidden="true">›</span></button>` : ''}</section>`;
   h += `<section class="sec">${withdrawPanel(c)}</section>`;
   const presets = state.fees ? [['Econômica', state.fees.economyFee], ['1 hora', state.fees.hourFee], ['30 min', state.fees.halfHourFee], ['Rápida', state.fees.fastestFee]] : [[null, 1], [null, 3], [null, 5], [null, 10], [null, 25], [null, 50], [null, 100]];
   h += `<section class="sec"><div class="sec-head"><h2 class="sec-t">Taxa da rede</h2><span class="num"><b id="fr-val" style="font-family:var(--fc);font-size:24px">${fr}</b> sat/vB</span></div>
@@ -4600,8 +5126,14 @@ function txSaveSafe() {
     if (v < d) return formErr(`A saída ${i + 1} tem ${amtTxt(v)}, abaixo do limite de poeira da rede (${fmtSats(d)} sats para esse tipo de endereço).`);
   }
   const n = txCalc();
-  if (isFinite(n.fee) && n.change >= 0 && n.toFee > 0 && !t.dustOk) { t.dustOk = true; return formErr(`Sobram ${fmtSats(n.toFee)} sats, abaixo do limite de poeira para virar troco. Esse valor vai para a taxa. Toque de novo em salvar para confirmar, ou ajuste o valor.`); }
+  // 1.8.36: troco digitado: a taxa é o que sobra. Abaixo do limite de poeira, ele vai para a taxa, com a confirmação abaixo (1.8.37)
+  if (t.feeMode === 'troco') {
+    if (!isFinite(n.fee)) return formErr('Informe o troco, ou a taxa em sat/vB ou em sats.');
+    if (n.fee <= 0) return formErr(`Com esse troco não sobra nada para a taxa da rede: entradas − saídas = ${amtTxt(n.tot - n.fixed)}. Diminua o troco.`);
+  }
+  if (isFinite(n.fee) && n.change >= 0 && n.toFee > 0 && !t.dustOk) { t.dustOk = true; return formErr(`Sobram ${fmtSats(n.toFee)} sats, ${sobraTxt(n)}. Esse valor vai para a taxa. Toque de novo em salvar para confirmar, ou ajuste o valor.`); }
   t.dustOk = false;
+  if (n.fee > 0 && n.change >= 0 && taxaAltaPede(t, n)) return false;
   return txSave();
 }
 
@@ -4685,9 +5217,31 @@ Object.assign(ACT, {
   'tx-venda': el => { closeSheet(true); txEdit(el.dataset.id, { venda: +el.dataset.i }); },
   'tx-max': () => {
     txRead(); const t = ui.form.tx; if (!t || t.outputs.length !== 1) return;
+    // com o troco digitado, o máximo leva o troco para a saída e mantém a taxa em sats (1.8.36)
+    if (t.feeMode === 'troco') { const n0 = txCalc(); if (!n0.bad && n0.fee > 0) { t.feeMode = 'sats'; t.fee = String(n0.fee); } else { t.feeMode = 'rate'; t.rate = String(S().feeRate); const rEl = $('#tx-rate'); if (rEl) rEl.value = fmtRate(S().feeRate); } }
     const n = txCalc(); if (!(n.max > 0)) return toast('Informe a taxa primeiro.');
     t.outputs[0].sats = amtIn(n.max); const el = $('#o0_s'); if (el) el.value = amtIn(n.max); t.dustOk = false; txRefresh();
   },
+  // 1.8.36: "Consolidar só uma parte" abre o Enviar com a saída Para mim pronta (o resto volta como troco); "Consolidar tudo" volta
+  'tx-parte': () => {
+    txRead(); const t = ui.form && ui.form.tx; if (!t || !t.simple || t.mode !== 'new') return;
+    t.simple = false; t.parte = true; t.outputs[0].sats = ''; t.troco = ''; if (t.feeMode === 'value') t.feeMode = 'rate'; t.dustOk = false; t.taxaOk = null;
+    txRerender(); const el = $('#o0_s'); if (el) el.focus();
+  },
+  'tx-tudo': () => {
+    txRead(); const t = ui.form && ui.form.tx; if (!t || t.simple || !t.parte || t.mode !== 'new' || t.outputs.length !== 1 || t.outputs[0].kind !== 'own') return;
+    t.simple = true; t.parte = false; t.outputs[0].sats = ''; if (t.feeMode === 'troco') t.feeMode = 'rate'; t.dustOk = false; t.taxaOk = null;
+    txRerender();
+  },
+  // Mapa dos sats (1.8.37)
+  'mapa-abre': el => { ui.mapaArg = null; ui.mapaPasso = null; ui.mapaSel = null; ACT.page(el); },
+  'mapa-utxo': el => mapaDe('u:' + el.dataset.id),
+  'mapa-tx': el => mapaDe('t:' + el.dataset.id),
+  'mapa-ant': () => mapaVai(ui.mapaPasso - 1),
+  'mapa-prox': () => mapaVai(ui.mapaPasso + 1),
+  'mapa-ir': el => { mapaVai(+el.dataset.k); const s = $('.mapa-palco'), t = s ? s.getBoundingClientRect().top : 0; if (s && (t < 80 || t > innerHeight - 160)) s.scrollIntoView({ block: 'start' }); },
+  'mapa-b': el => { const k = el.dataset.k; ui.mapaSel = ui.mapaSel === k ? null : k; for (const b of $$('#mapa-svg .b')) b.classList.toggle('sel', b.dataset.k === ui.mapaSel); const s = $('#mapa-sel'); if (s) s.innerHTML = mapaSelHTML(); },
+  'mapa-kyc': () => kycCorrige(),
   'tx-ext-own': el => { txRead(); const t = ui.form.tx, i = +el.dataset.i, a = addrById(el.dataset.a); if (!a) return; const o = t.outputs[i]; t.outputs[i] = { key: o.key, kind: 'own', wallet: a.wallet, address: a.id, newLabel: '', newAddr: '', newWallet: '', rem: o.rem, sats: o.sats }; txRerender(); },
   'copy': el => copyText(el.dataset.v || ''),
   'del-wallet': el => {
@@ -4715,7 +5269,16 @@ Object.assign(ACT, {
 });
 
 /* ---------------- entradas de formulário ---------------- */
+// abre o mapa no passo em que o UTXO nasceu (ou o da transação); já no mapa, só anda até lá
+function mapaDe(arg) {
+  if (ui.page === 'mapa' && ui.mapa) {
+    const [t, id] = arg.split(':'), k = t === 't' ? ui.mapa.passos.findIndex(p => p.tx === id) : ui.mapa.passos.findIndex(p => (p.novos || []).includes(id));
+    closeSheet(true); if (t === 'u') ui.mapaSel = arg; if (k >= 0) mapaVai(k); else mapaVai(ui.mapaPasso); return;
+  }
+  ui.mapaArg = null; openPage('mapa', arg);
+}
 const INP = {
+  'mapa-passo': el => mapaVai(+el.value),
   'sale-w': el => { const f = ui.form; f.sw = el.value; f.pick = new Set(); f.pickTouched = false; f.dustOk = false; apCapture(); const box = $('#sale-self'); if (box) box.innerHTML = saleSelfHTML(); updateSaleTx(); },
   'sale-rate': () => { ui.form.sfeeMode = 'rate'; ui.form.dustOk = false; updateSaleTx(); },
   'sale-fee': () => { ui.form.sfeeMode = 'sats'; ui.form.dustOk = false; updateSaleTx(); },
@@ -4730,7 +5293,7 @@ const INP = {
     const id = el.id, pos = el.selectionStart; txRerender();
     const n2 = document.getElementById(id); if (n2) { n2.focus({ preventScroll: true }); try { n2.setSelectionRange(pos, pos); } catch (e) { } }
   },
-  'tx': el => { const t = ui.form && ui.form.tx; if (!t) return; if (el.name === 'rate') t.feeMode = 'rate'; else if (el.name === 'fee') t.feeMode = 'sats'; else if (t.simple && el.name === 'o0_sats') t.feeMode = 'value'; t.dustOk = false; t.highFeeOk = false; txRead(); txRefresh(); },
+  'tx': el => { const t = ui.form && ui.form.tx; if (!t) return; if (el.name === 'rate') t.feeMode = 'rate'; else if (el.name === 'fee') t.feeMode = 'sats'; else if (el.name === 'troco') t.feeMode = 'troco'; else if (t.simple && el.name === 'o0_sats') t.feeMode = 'value'; t.dustOk = false; t.taxaOk = null; txRead(); txRefresh(); },
   'tx-ext': el => { const i = +el.dataset.i, hEl = $(`#o${i}_xh`); if (hEl) hEl.innerHTML = extHint(el.value, i); txRead(); txRefresh(); },
   'tx-sv': () => { txRead(); txSaleRefresh(); },
   'addr-type': el => {
