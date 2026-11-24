@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="App do Projeto Hold BTC 100: registre seus aportes mensais em bitcoin, acompanhe preço médio e resultado, gerencie UTXOs e aprenda autocustódia.">
 <title>Hold BTC 100</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-SuLD8f0OWNHb1wi92X7Hl2skad5E1YFBDCHERLYUegM='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-CFzTVavwl2gqVzia+v0ybfS/oAZA2h6m9I0NTpwOiwE='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -28,6 +28,7 @@
   --orange:#F7931A; --orange-press:#E2850F; --on-orange:#000;
   --bg:#F4F4F4; --hero:#F7931A; --surface:#FFFFFF; --surface-2:#ECECEC;
   --ink:#111111; --muted:#5C5C5C; --line:#E2E2E2; --line-2:#ECECEC;
+  --custodia:#4F46E5;
   --pos:#17773A; --pos-bg:rgba(23,119,58,.11); --neg:#B42318; --neg-bg:rgba(180,35,24,.10);
   --pos-line:rgba(23,119,58,.30); --neg-line:rgba(180,35,24,.28); --pos-ink:#146C33; --press:rgba(0,0,0,.06);
   --warn:#8F4D00; --warn-bg:rgba(247,147,26,.18); --focus:#000; --overlay:rgba(0,0,0,.45); --cell-miss:#E6E6E6;
@@ -40,6 +41,7 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#000000; --hero:#F7931A; --surface:#141414; --surface-2:#1F1F1F;
   --ink:#F2F2F2; --muted:#A6A6A6; --line:#2A2A2A; --line-2:#1F1F1F;
+  --custodia:#818CF8;
   --pos:#57C786; --pos-bg:rgba(87,199,134,.14); --neg:#FF8373; --neg-bg:rgba(255,131,115,.13);
   --pos-line:rgba(87,199,134,.34); --neg-line:rgba(255,131,115,.32); --pos-ink:#57C786; --press:rgba(255,255,255,.08);
   --warn:#F6B45A; --warn-bg:rgba(247,147,26,.16); --focus:#F7931A; --overlay:rgba(0,0,0,.65); --cell-miss:#2A2A2A;
@@ -49,6 +51,7 @@
 :root[data-theme="dark"]{
   --bg:#000000; --hero:#F7931A; --surface:#141414; --surface-2:#1F1F1F;
   --ink:#F2F2F2; --muted:#A6A6A6; --line:#2A2A2A; --line-2:#1F1F1F;
+  --custodia:#818CF8;
   --pos:#57C786; --pos-bg:rgba(87,199,134,.14); --neg:#FF8373; --neg-bg:rgba(255,131,115,.13);
   --pos-line:rgba(87,199,134,.34); --neg-line:rgba(255,131,115,.32); --pos-ink:#57C786; --press:rgba(255,255,255,.08);
   --warn:#F6B45A; --warn-bg:rgba(247,147,26,.16); --focus:#F7931A; --overlay:rgba(0,0,0,.65); --cell-miss:#2A2A2A;
@@ -695,30 +698,46 @@ h1,h2,h3,p,li,b,strong,small,label,.k,.v,.t,.d,.sub,.lead,.note,.hint,.tool b,.t
 .ir-seu .t{flex:1 1 190px;min-width:0}
 .ir-coin .a small .tag{vertical-align:1px}
 .ir-coin b{flex:none;font-variant-numeric:tabular-nums}
-/* 1.8.37: Mapa dos sats (bolhas com área proporcional aos sats; listrado = com KYC) e "De onde vieram" na folha do UTXO */
-.mapa-leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);margin:2px 0 12px}
-.mapa-leg .lg{display:inline-block;width:13px;height:13px;border-radius:50%;vertical-align:-2px;margin-right:6px}
-.mapa-leg .lg.ex{background:var(--muted)} .mapa-leg .lg.ut{background:var(--orange)} .mapa-leg .lg.sai{border:2px solid var(--muted)}
-.mapa-leg .lg.kyc{background:repeating-linear-gradient(45deg,rgba(0,0,0,.38) 0 2px,transparent 2px 5px),var(--orange)}
-.mapa-kyc{margin:0 0 12px} .article .mapa-kyc ul{margin:8px 0 12px;padding-left:18px;font-size:inherit;line-height:1.5} .article .mapa-mix{margin:0 0 10px;font-size:14.5px}
-.mapa-palco{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:4px 0;overflow:hidden;scroll-margin-top:calc(76px + env(safe-area-inset-top,0px))}
-.mapa-palco svg{display:block;width:100%;height:auto;-webkit-tap-highlight-color:transparent}
-.mapa .sep{stroke:var(--line);stroke-width:1}
-.mapa .fn{font:600 12px var(--f);fill:var(--muted)}
-.mapa .ft{font:700 13.5px var(--fc);fill:var(--ink);font-variant-numeric:tabular-nums}
-.mapa .sl{font:500 11.5px var(--f);fill:var(--muted)} .mapa .sv{font:700 12.5px var(--fc);fill:var(--ink)}
-.mapa .b{cursor:pointer} .mapa .b circle{transition:cx .4s ease,cy .4s ease,r .4s ease}
-.mapa .b .alvo{fill:transparent} .mapa .b .h{fill:url(#mapa-hach);pointer-events:none} .mapa .hb{fill:rgba(0,0,0,.36)}
-.mapa .b.ex .c{fill:var(--muted)} .mapa .b.ut .c{fill:var(--orange)}
-.mapa .b.sai .c{fill:none;stroke-width:2.5} .mapa .b.sai.v .c{stroke:var(--pos)} .mapa .b.sai.e .c{stroke:var(--muted)} .mapa .b.sai.t .c{stroke:var(--neg)}
-.mapa .b.sel .c,.mapa .b.sel .h{stroke:var(--ink);stroke-width:3} .mapa .b.sai.sel .c{stroke-width:4.5}
-.mapa-ctl{display:grid;grid-template-columns:48px 1fr 48px;align-items:center;gap:6px;margin:10px 0 0}
-.mapa-ctl .icon-btn{width:48px;height:48px;font:700 30px/1 var(--f);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding-bottom:4px}
-.mapa-ctl .icon-btn:disabled{opacity:.35}
-.mapa-datas{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin:0 56px 8px}
-.mapa-n{font-size:13px;color:var(--muted);margin:10px 0 2px} .mapa-tt{font-family:var(--fc);font-size:23px;margin:0 0 6px}
-.mapa-l{margin:0 0 10px;padding-left:18px} .mapa-l li{margin:2px 0}
-.mapa-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px 14px;margin:6px 0 10px} .article .mapa-card p{font-size:14px;line-height:1.45}
+/* 1.8.38: Mapa dos sats em fluxo contínuo (corretora em índigo, carteira em laranja, listrado = com KYC) e "De onde vieram" na folha do UTXO */
+.mapa-leg{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;font-size:13px;color:var(--muted);margin:2px 0 10px}
+.mapa-leg .lg{display:inline-block;width:13px;height:13px;border-radius:4px;vertical-align:-2px;margin-right:6px}
+.mapa-leg .lg.ex{background:var(--custodia)} .mapa-leg .lg.ut{background:var(--orange)} .mapa-leg .lg.mix{background:var(--orange);box-shadow:inset 0 0 0 2.5px var(--neg)}
+.mapa-leg .lg.kyc{background:repeating-linear-gradient(45deg,rgba(0,0,0,.34) 0 2px,transparent 2px 5px),var(--orange)}
+.mapa-leg .dica{flex-basis:100%;font-size:12.5px}
+.mapa-ctl{display:flex;align-items:center;gap:6px;margin:0 0 8px}
+.mapa-ctl .mz{min-width:44px;font-size:20px;line-height:1;padding-left:0;padding-right:0}
+.mapa-ctl [aria-disabled="true"]{opacity:.45;cursor:default}
+.mapa-ctl .zv{margin-left:auto;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.mapa-palco{position:relative;overflow:hidden;background:var(--surface);border:1px solid var(--line);border-radius:18px;scroll-margin-top:calc(76px + env(safe-area-inset-top,0px))}
+.mapa-rola{overflow:auto;border-radius:17px;overscroll-behavior:contain;touch-action:pan-x pan-y;scrollbar-width:thin;-webkit-tap-highlight-color:transparent}
+.mapa-cont{position:relative} .mapa-tela{position:relative;width:100%} #mapa-svg{display:block}
+.mapa-rot{position:sticky;left:0;width:0;height:0;z-index:2;pointer-events:none}
+.mapa-rot span{position:absolute;left:8px;max-width:128px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 11.5px/1.5 var(--f);color:var(--muted);background:var(--surface);padding:0 6px;border-radius:6px}
+.mapa-eixo{position:sticky;bottom:0;z-index:1;height:34px;overflow:hidden;background:var(--surface);pointer-events:none}
+.mapa-eixo .mapa-ax{position:absolute;left:0;top:0;display:block}
+.mapa-eixo span{position:absolute;top:12px;transform:translateX(-50%);white-space:nowrap;font:500 11px/1.2 var(--f);color:var(--muted)}
+.mapa-eixo span.ty{font-weight:700;color:var(--ink)} .mapa-eixo span.ini{transform:none} .mapa-eixo span.fim{transform:translateX(-100%)}
+.mapa-eixo span.pausa{top:0;font:700 13px/1 var(--f);color:var(--muted)}
+.mapa .el{transition:opacity .12s ease}
+.mapa .foco .el{opacity:.12} .mapa .foco .el.l1{opacity:.5} .mapa .foco .el.l2{opacity:1}
+.mapa .pb-x{fill:var(--custodia)} .mapa .pb-u{fill:var(--orange)} .mapa .ps{fill:rgba(0,0,0,.2)}
+.mapa .s-x{stop-color:var(--custodia)} .mapa .s-u{stop-color:var(--orange)} .mapa .s-v{stop-color:var(--pos)} .mapa .s-e{stop-color:var(--muted)}
+.mapa .rio,.mapa path.ap,.mapa .bo.ap .c{fill:url(#mp-hx)}
+.mapa path.ut,.mapa .bo.ut .c,.mapa .bo.no .c{fill:var(--orange)} .mapa path.ut.k,.mapa .bo.ut.k .c{fill:url(#mp-hu)}
+.mapa .saq{fill:url(#mp-gxu)} .mapa .vx{fill:url(#mp-gxv)} .mapa .se{fill:url(#mp-gue)} .mapa .sv{fill:url(#mp-guv)} .mapa .dx{fill:url(#mp-gux)}
+.mapa .pv{fill:var(--pos)} .mapa .pe{fill:var(--muted)} .mapa .pe.tr{fill:none;stroke:var(--muted);stroke-width:1.5;stroke-dasharray:3 2}
+.mapa .tf{fill:none;stroke:var(--muted);stroke-width:1.4} .mapa .tp{fill:var(--muted)}
+.mapa .bo .alvo{fill:transparent} .mapa .bo .c{stroke:var(--surface);stroke-width:1.5} .mapa .bo.no.mix .c{stroke:var(--neg);stroke-width:2.5}
+.mapa .av{fill:var(--neg);stroke:var(--surface);stroke-width:1.2}
+.mapa .bo.sel .c{stroke:var(--ink);stroke-width:2.5} .mapa .bo.no.mix.sel .c{stroke-width:4} .mapa path.an.sel{stroke:var(--ink);stroke-width:2}
+.mapa [data-k]{cursor:pointer} .mapa .an:focus{outline:none} .mapa .an:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.mapa .sep{stroke:var(--line);stroke-width:1} .mapa .hoje{stroke:var(--muted);stroke-width:1;stroke-dasharray:2 3} .mapa .ax,.mapa .tk{stroke:var(--line);stroke-width:1;fill:none}
+.mapa .bo .c,.mapa .tf,.mapa .pe.tr,.mapa .sep,.mapa .hoje,.mapa path.an.sel,.mapa .av{vector-effect:non-scaling-stroke}
+.mapa-pop{position:absolute;z-index:6;width:min(300px,calc(100% - 12px));max-height:calc(100% - 12px);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.24);padding:11px 13px}
+.mapa-pop[hidden]{display:none}
+.article .mapa-pop p{margin:0 0 4px;font-size:14px;line-height:1.4} .article .mapa-pop .mp-t{font:700 19px/1.25 var(--fc);margin:0 0 6px}
+.mapa-pop .mp-t .tag{vertical-align:2px;margin-left:4px} .article .mapa-pop .mp-av{color:var(--neg);font-size:13.5px} .mapa-pop .mp-bt{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+@media (prefers-reduced-motion:reduce){.mapa .el{transition:none}}
 .orig{margin:0 0 14px} .orig-l,.orig-l ul{list-style:none;margin:0;padding:0} .orig-l ul{margin-left:8px;padding-left:12px;border-left:2px solid var(--line)}
 .orig-l .io{font-size:14.5px;padding:9px 0} .orig-l .io .v .tag{margin-left:6px;vertical-align:1px}
 
@@ -1023,7 +1042,7 @@ const KS_CARDS = {
    Claude, sem PIN, também espelha num documento privado.
    ========================================================= */
 
-const APP_VERSION = '1.8.37';
+const APP_VERSION = '1.8.39';
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const HIST = {"start":"2015-01","usd":[269,236,249,240,233,247,274,257,233,275,346,404,400,404,427,433,490,602,649,600,593,655,724,855,967,1075,1126,1210,1817,2384,2684,3787,4520,5404,8338,12178,12166,10318,8680,8122,8372,6952,7096,7394,6818,6489,5192,3887,3595,3654,3979,4704,6942,9680,10459,9914,9056,8766,8345,7372,8268,8948,7481,7512,9050,9296,10232,11509,11218,12286,16730,24328,31072,39024,51906,58338,47486,36155,38354,44318,45439,52582,59166,51586,42365,40791,44360,41879,35044,25823,21591,21674,19744,19962,18841,16851,19838,23126,25804,28897,28234,28846,29858,27587,26456,30805,36179,39982,42444,51946,66244,65986,64146,65194,63729,61864,61188,66861,83364,95022,97976,93433,83444,88373,99394,105848,111410,111996,111124,111840,99685,88638,83198,72854,67640,72356,75048,66150,60768,70714,81095,80570],"brl":[708,663,783,731,714,768,883,904,911,1067,1307,1564,1620,1603,1583,1542,1734,2062,2125,1926,1930,2088,2418,2866,3091,3338,3522,3795,5832,7858,8605,11932,14171,17247,27175,40087,39062,33444,28462,27676,30443,26233,27169,29059,28068,24388,19662,15101,13451,13608,15305,18328,27776,37353,39528,39856,37326,35825,34676,30296,34306,38845,36536,40003,51073,48305,54030,62853,60569,69121,90640,125185,166425,211371,293069,324482,251253,181928,197777,232745,239904,291307,328780,291530,234452,211975,220398,199260,173644,130385,115903,111476,103397,104809,99381,88340,103169,119603,134475,145054,140682,139952,143345,135273,130613,156021,177216,195797,208587,257883,329902,338449,329261,351333,353186,343509,339079,376033,484100,579349,589992,538697,479536,511123,563308,587149,615933,610031,596450,602314,532408,483352,444108,378882,353863,364172,374017,339193,310759,364403,417209,413273]}; // médias mensais estimadas: {start:'2015-01', usd:[…], brl:[…]}
 const REF_PRICE = { BRL: 416900, USD: 75800, EUR: 68000, at: Date.UTC(2026, 10, 7, 18, 0), src: 'ref' }; // US$ do CoinLore × PTAX de 06/11/2026 (R$ 5,50; € 6,13)
@@ -1150,7 +1169,7 @@ const SAFE_ID = /^[A-Za-z0-9_-]{1,64}$/, SAFE_URL = /^(https:\/\/[^\s"'<>`\\]+|h
 const SF = {
   ids: new Set(['id', 'wallet', 'address', 'utxoId', 'txId', 'spendId', 'spendId0', 'aporteId', 'saqueId', 'saleId', 'utxo', 'out', 'key']),
   nums: new Set(['fiat', 'price', 'sats', 'fee', 'feeSats', 'dolar', 'vsize', 'outSats', 'sent']),
-  bools: new Set(['kyc', 'frozen', 'spent', 'rem', 'vsizeReal', 'sale', 'entrada']),
+  bools: new Set(['kyc', 'frozen', 'spent', 'rem', 'vsizeReal', 'sale', 'entrada', 'fora']),
   texts: new Set(['note', 'ex', 'name', 'label', 'addr']),
   opts: new Set(['type', 'kind', 'role', 'origin', 'dest', 'src', 'moeda', 'dono']),
   dates: new Set(['date', 'spentAt'])
@@ -1427,7 +1446,7 @@ function calc() {
   let boughtEx = 0; for (const a of s.aportes) if (!isSale(a) && a.dest !== 'self') boughtEx += a.sats;
   let ex = L.held, self = 0, fees = 0;
   if (set.utxo) {
-    ex = boughtEx - L.soldEx - s.saques.reduce((t, w) => t + w.sats + (w.fee || 0), 0);
+    ex = boughtEx - L.soldEx - s.saques.reduce((t, w) => t + w.sats + (w.fee || 0), 0) + s.spends.reduce((t, x) => t + txDep(x), 0);   // + envios para a corretora (1.8.39)
     self = s.utxos.filter(u => !u.spent).reduce((t, u) => t + u.sats, 0);
     fees = s.saques.reduce((t, w) => t + (w.fee || 0), 0) + s.spends.reduce((t, x) => t + (x.fee || 0), 0);
   }
@@ -1515,9 +1534,10 @@ function holdAt(date) {
   if (!set.utxo) return { hold: b - sAll, ex: b - sAll, self: 0 };
   const wd = state.saques.filter(w => w.date <= date).reduce((t, w) => t + w.sats + (w.fee || 0), 0);
   const wf = state.saques.filter(w => w.date <= date).reduce((t, w) => t + (w.fee || 0), 0);
-  const sp = state.spends.filter(x => x.date <= date).reduce((t, x) => t + (x.fee || 0) + txSent(x), 0);
+  const spd = state.spends.filter(x => x.date <= date), sp = spd.reduce((t, x) => t + (x.fee || 0) + txSent(x), 0);
+  const dep = spd.reduce((t, x) => t + txDep(x), 0);   // 1.8.39: envio para a corretora (o espelho do saque) volta ao saldo dela
   const ext = state.utxos.filter(u => u.origin === 'externo' && u.date <= date).reduce((t, u) => t + u.sats, 0);
-  const hold = b - wf - sp + ext - sEx; const ex = bx - wd - sEx;
+  const hold = b - wf - sp + ext - sEx; const ex = bx - wd - sEx + dep;
   return { hold, ex, self: hold - ex };
 }
 const walletName = id => { const w = byId(state.wallets, id); return w ? w.name : 'Carteira'; };
@@ -1575,6 +1595,7 @@ function render() {
   else html += ui.tab === 'home' ? viewHome() : ui.tab === 'aportes' ? viewAportes() : ui.tab === 'carteira' ? viewCarteira() : viewAprender();
   const v = $('#view'); v.innerHTML = html; v.dataset.tela = ui.page ? 'pagina' : ui.tab;   // 1.8.36: os cartões do Início
   for (const b of $$('.tab[data-tab]')) { const on = b.dataset.tab === ui.tab; b.classList.toggle('on', on); b.setAttribute('aria-current', on ? 'page' : 'false'); }
+  if (ui.page === 'mapa') mapaDepois();   // 1.8.38: rolagem, destaque e balão do Mapa dos sats
   histQueue(); topoRolou();
 }
 /* 1.8.36 (pedido do Nicolas, a alternativa mostrada na 1.8.35): o laranja sempre fecha com canto de 24 px. Enquanto o laranja
@@ -1798,8 +1819,8 @@ function openPlus(tab = 'aporte') {
 }
 /* O que foi a transação, com os mesmos nomes das saídas do formulário: Para mim (transferência ou consolidação), Venda
    (direta, P2P, com o valor recebido) ou Envio (pagamento, presente ou doação) */
-const PTX_KINDS = [['minha', 'Para mim'], ['venda', 'Venda'], ['terceiros', 'Envio']];
-const ptxHint = k => k === 'venda' ? 'Para o comprador, sem passar pela corretora (P2P). No passo seguinte você informa quanto foi para ele e quanto recebeu: o app calcula o lucro.' : k === 'terceiros' ? 'Pagamento, presente ou doação para outra pessoa. Os sats saem da pilha.' : 'Para outra carteira ou endereço seu: transferência ou consolidação. A pilha não muda.';
+const PTX_KINDS = [['minha', 'Para mim'], ['corretora', 'Corretora'], ['venda', 'Venda'], ['terceiros', 'Envio']];
+const ptxHint = k => k === 'corretora' ? 'Para a sua conta numa corretora. Não é venda: não há imposto, e a pilha só paga a taxa da rede. Os sats voltam para o saldo da corretora.' : k === 'venda' ? 'Para o comprador, sem passar pela corretora (P2P). No passo seguinte você informa quanto foi para ele e quanto recebeu: o app calcula o lucro.' : k === 'terceiros' ? 'Pagamento, presente ou doação para outra pessoa. Os sats saem da pilha.' : 'Para outra carteira ou endereço seu: transferência ou consolidação. A pilha não muda.';
 function plusTxHTML() {
   const p = ui.ptx, live = state.utxos.filter(u => !u.spent && !u.frozen), ws = state.wallets.filter(w => live.some(u => u.wallet === w.id));
   const head = '<h2>Registrar transação</h2><p class="sub">Registre uma transação que você já fez na sua carteira. O app não envia bitcoin: só anota, para manter saldo, UTXOs, custo médio e lucro certos.</p>';
@@ -1815,7 +1836,7 @@ function refreshPlusTx() { if (!ui.sheet || ui.sheet.kind !== 'plus-tx') return;
 function ptxGo() {
   const p = ui.ptx; if (!p || !p.sel.size) return toast('Marque as moedas que saíram.');
   const keep = ui.sel; ui.sel = new Set(p.sel); closeSheet(true);
-  txNew(p.kind === 'terceiros' ? 'send' : p.kind === 'venda' ? 'sale' : undefined);
+  txNew(p.kind === 'terceiros' ? 'send' : p.kind === 'venda' ? 'sale' : p.kind === 'corretora' ? 'dep' : undefined);
   ui.sel = ui.selMode ? keep : new Set(); ui.ptx = null;
 }
 function ctaAporte(map) {
@@ -2210,16 +2231,20 @@ function pageIR() {
   const foraTxt = [sel.fora.length ? `${sel.fora.length} ${sel.fora.length === 1 ? 'UTXO' : 'UTXOs'}` : '', sel.exOutro ? `${amtTxt(sel.exOutro)} da corretora` : ''].filter(Boolean);
   const comFora = foraTxt.length > 0;
   // custódia: só onde os bitcoins ficaram (compras na corretora e vendas feitas nela); nome de venda da carteira (P2P) não é corretora
-  const exs = [...new Set(aps.filter(a => a.date <= end && (isSale(a) ? a.src !== 'self' : a.dest !== 'self')).map(a => a.ex).filter(x => x && !isDefEx(x)))];
+  const exsFora = [...new Set(state.spends.filter(x => x.date <= end).flatMap(x => x.outputs.filter(o => o.kind === 'ex' && o.ex && o.fora).map(o => o.ex)))];   // 1.8.39: envios para corretora no exterior
+  const exs = [...new Set([...aps.filter(a => a.date <= end && (isSale(a) ? a.src !== 'self' : a.dest !== 'self')).map(a => a.ex).filter(x => x && !isDefEx(x)),
+    ...state.spends.filter(x => x.date <= end).flatMap(x => x.outputs.filter(o => o.kind === 'ex' && o.ex && !o.fora).map(o => o.ex))])].filter(x => !exsFora.includes(x));   // e no Brasil
+  // onde: as do Brasil com o CNPJ; as do exterior com o país (ficam localizadas no exterior, IN RFB 2.180/2024, art. 9º)
+  const exOnde = [exs.length || !exsFora.length ? `${exs.length ? exs.join(', ') : 'corretora'} [informe o CNPJ]` : '', exsFora.length ? `${exsFora.join(', ')}, no exterior [informe o país]` : ''].filter(Boolean).join(' e ');
   // 1.8.34: na autocustódia, a Receita pede o modelo da carteira; com a gestão de UTXOs, vão também os nomes das carteiras
   // que tinham saldo em 31/12, para a pessoa saber quais modelos informar
   const wsAt = S().utxo ? [...new Set(state.utxos.filter(u => u.date <= end && (!u.spent || (u.spentAt || '') > end)).map(u => u.wallet))].map(walletName) : [];
-  const custody = S().utxo ? `${fmtBTC(Math.max(0, at.ex))} BTC em ${exs.length ? exs.join(', ') : 'corretora'} [informe o CNPJ] e ${fmtBTC(Math.max(0, at.self))} BTC em carteira própria (autocustódia${wsAt.length ? ': ' + wsAt.join(', ') : ''}) [informe o modelo da carteira]` : `${exs.length ? exs.join(', ') : '[corretora]'} [informe o CNPJ] e/ou carteira própria (autocustódia) [informe o modelo da carteira]. Ajuste conforme onde os bitcoins estavam em 31/12/${y}`;
+  const custody = S().utxo ? `${fmtBTC(Math.max(0, at.ex))} BTC em ${exOnde} e ${fmtBTC(Math.max(0, at.self))} BTC em carteira própria (autocustódia${wsAt.length ? ': ' + wsAt.join(', ') : ''}) [informe o modelo da carteira]` : `${exs.length ? exs.join(', ') : '[corretora]'} [informe o CNPJ] e/ou carteira própria (autocustódia) [informe o modelo da carteira]. Ajuste conforme onde os bitcoins estavam em 31/12/${y}`;
   // 1.8.29: o que saiu sem venda e as taxas pagas em bitcoin também entram na discriminação
   const desc = [Ly.sold ? `${fmtBTC(Ly.sold)} BTC vendidos` : '', Ly.outSats ? `${fmtBTC(Ly.outSats)} BTC enviados sem venda (pelo custo médio)` : '', Ly.feeSats ? `${fmtBTC(Ly.feeSats)} BTC de taxas de saque e de rede` : ''].filter(Boolean);
   const descTxt = desc.length ? `, já descontados ${desc.length > 1 ? desc.slice(0, -1).join(', ') + ' e ' + desc[desc.length - 1] : desc[0]}` : '';
   const usSeu = sel.us.filter(u => !sel.fora.includes(u)), wsSeu = [...new Set(usSeu.map(u => u.wallet))].map(walletName);
-  const custodySeu = S().utxo ? `${fmtBTC(sel.ex - sel.exOutro)} BTC em ${exs.length ? exs.join(', ') : 'corretora'} [informe o CNPJ] e ${fmtBTC(sumSats(usSeu))} BTC em carteira própria (autocustódia${wsSeu.length ? ': ' + wsSeu.join(', ') : ''}) [informe o modelo da carteira]` : custody;
+  const custodySeu = S().utxo ? `${fmtBTC(sel.ex - sel.exOutro)} BTC em ${exOnde} e ${fmtBTC(sumSats(usSeu))} BTC em carteira própria (autocustódia${wsSeu.length ? ': ' + wsSeu.join(', ') : ''}) [informe o modelo da carteira]` : custody;
   const disc = !buysUpTo.length ? '' : sel.outro > 0 ? `${fmtBTC(qtd)} BTC (bitcoin). Custo de aquisição de ${fmtMoney(custoY, 'BRL')} pelo custo médio (${fmtMoney(Ly.avg, 'BRL', 0)} por BTC). Custódia em 31/12/${y}: ${custodySeu}.` : `${fmtBTC(at.hold)} BTC (bitcoin) adquiridos em ${buysUpTo.length} compras entre ${fmtYM(buysUpTo[0].date.slice(0, 7))} e ${fmtYM(buysUpTo[buysUpTo.length - 1].date.slice(0, 7))}${Ly.extSats ? `, mais ${fmtBTC(Ly.extSats)} BTC recebidos de terceiros sem custo informado` : ''}${descTxt}. Custo de aquisição de ${fmtMoney(Ly.cost, 'BRL')} pelo custo médio (${fmtMoney(Ly.avg, 'BRL', 0)} por BTC)${Ly.feeSats ? ', com as taxas pagas em bitcoin somadas ao custo' : ''}. Custódia em 31/12/${y}: ${custody}.`;
   const envY = ev.filter(e => e.ev === 'envio' && inY(e)), envS = envY.reduce((t, e) => t + e.sats, 0), envC = envY.reduce((t, e) => t + ((Lall.info[e.id] || {}).cost || 0), 0);
   const taxY = ev.filter(e => e.ev === 'taxa' && inY(e)).reduce((t, e) => t + e.sats, 0);
@@ -2227,8 +2252,14 @@ function pageIR() {
   // por mês: total vendido (para a isenção de R$ 35 mil) e, à parte, o que saiu da carteira (venda direta, P2P), que acima do
   // limite do mês vai para o informe mensal da Receita (DeCripto desde julho de 2026; antes, IN 1.888)
   const byM = {}; for (const a of salesY) { const k = a.date.slice(0, 7), inf = Lall.info[a.id] || { cost: 0 }, o = byM[k] || (byM[k] = { v: 0, c: 0, n: 0, p: 0 }); o.v += a.fiat; o.c += inf.cost; o.n++; if (a.src === 'self') o.p += a.fiat; }
-  const sales = Object.keys(byM).sort().map(k => { const o = byM[k], g = o.v - o.c, tax = o.v > 35000 && g > 0, lim = decriptoLim(k); return `<div class="io"><span class="k">${Cap(fmtYM(k))} · vendido ${M(o.v)}<small>custo ${S().hide ? '••••' : esc(fmtMoney(o.c, 'BRL'))} · ${g >= 0 ? 'ganho' : 'perda'} ${S().hide ? '••••' : esc(fmtMoney(Math.abs(g), 'BRL'))}${o.p > 0 ? ` · da carteira (P2P) ${S().hide ? '••••' : esc(fmtMoney(o.p, 'BRL'))}` : ''}</small></span><span class="v ${tax ? 'warn' : 'pos'}">${tax ? 'tributável' : 'isento'}${tax ? `<small>15% ≈ ${S().hide ? '••••' : esc(fmtMoney(g * 0.15, 'BRL'))}</small>` : ''}</span></div>${o.p > lim.v ? `<p class="small warn" style="margin:2px 0 10px;font-weight:600">Vendas da carteira acima de ${esc(fmtMoney(lim.v, 'BRL', 0))} em ${esc(fmtYM(k))}: informe à Receita ${lim.nome === 'a DeCripto' ? 'na DeCripto' : 'na declaração mensal da IN 1.888'}, pelo e-CAC.</p>` : ''}`; }).join('');
+  const sales = Object.keys(byM).sort().map(k => { const o = byM[k], g = o.v - o.c, tax = o.v > 35000 && g > 0; return `<div class="io"><span class="k">${Cap(fmtYM(k))} · vendido ${M(o.v)}<small>custo ${S().hide ? '••••' : esc(fmtMoney(o.c, 'BRL'))} · ${g >= 0 ? 'ganho' : 'perda'} ${S().hide ? '••••' : esc(fmtMoney(Math.abs(g), 'BRL'))}${o.p > 0 ? ` · da carteira (P2P) ${S().hide ? '••••' : esc(fmtMoney(o.p, 'BRL'))}` : ''}</small></span><span class="v ${tax ? 'warn' : 'pos'}">${tax ? 'tributável' : 'isento'}${tax ? `<small>15% ≈ ${S().hide ? '••••' : esc(fmtMoney(g * 0.15, 'BRL'))}</small>` : ''}</span></div>`; }).join('');
   const temP2P = salesY.some(a => a.src === 'self');
+  // 1.8.39: informe mensal (DeCripto; antes de 07/2026, IN 1.888): por mês, vendas da carteira (P2P), envios para terceiros e
+  // envios para corretora no exterior. Acima do limite, a própria pessoa informa pelo e-CAC (obrigação de informar, não imposto).
+  const dcMeses = [];
+  for (let m = 1; m <= 12; m++) { const k = `${y}-${pad2(m)}`; if (k > nowYM()) break; const o = opsCarteiraMes(k), v = (byM[k] || {}).p || 0, tot = v + o.envios + o.depositos, lim = decriptoLim(k); if (tot > lim.v) dcMeses.push({ k, v, o, tot, lim }); }
+  const dcParte = (v, t) => v > 0 ? `${t} ${S().hide ? '••••' : esc(fmtMoney(v, 'BRL', 0))}` : '';
+  const dc = dcMeses.length ? `<h3>Informe mensal da Receita</h3><p class="small" style="margin:0 0 8px">Nestes meses, as operações sem corretora no Brasil passaram do limite: você mesmo informa à Receita, pelo e-CAC, até o último dia útil do mês seguinte. É obrigação de informar, não imposto.</p>${dcMeses.map(d => `<div class="io"><span class="k">${Cap(fmtYM(d.k))} · ${d.lim.nome === 'a DeCripto' ? 'DeCripto' : 'declaração mensal da IN 1.888'}<small>${[dcParte(d.v, 'vendas da carteira'), dcParte(d.o.envios, 'envios para terceiros'), dcParte(d.o.depositos, 'envios para corretora no exterior')].filter(Boolean).join(' · ')}</small></span><span class="v warn">${M(d.tot)}</span></div>`).join('')}<p class="hint">Envios e depósitos entram pela cotação média do mês. Transferências entre carteiras suas ficam fora da soma: a IN RFB 2.291/2025 não as exclui de forma expressa; na dúvida, confirme com um contador.</p>` : '';
   const yrs = []; for (let k = fy; k <= cy; k++) yrs.push(k);
   return `${pageHead('Relatório para o IR')}<div class="article">
     ${fxOn() ? '<p class="note" style="margin:0 0 14px">O relatório do IR fica sempre em reais, como pede a Receita, mesmo com os valores do app em dólar.</p>' : ''}
@@ -2247,6 +2278,7 @@ function pageIR() {
     <p class="small ${custoY >= 5000 ? 'warn' : 'muted'}" style="margin:8px 0 0;font-weight:600">${custoY >= 5000 ? 'Item obrigatório na declaração: o custo de aquisição chegou a R$ 5 mil.' : 'Custo abaixo de R$ 5 mil: informar este item na declaração é opcional.'}</p></div>
     ${disc ? `<div class="field" style="margin-top:16px"><label for="ir-d">Discriminação sugerida</label><textarea class="inp" id="ir-d" rows="6" readonly>${esc(disc)}</textarea></div><button class="btn btn-q btn-s" data-act="copy-ir">Copiar discriminação</button>` : ''}
     ${sales ? `<h3>Vendas em ${y}</h3>${sales}<p class="hint">Custo pelo custo médio. Vendas de até R$ 35 mil no mês em plataformas no Brasil têm o ganho isento. Acima disso, o ganho paga de 15% a 22,5%, com DARF até o último dia útil do mês seguinte (código 1897 para vendas desde maio de 2026; antes, 4600). No exterior não há isenção: 15% na declaração anual.${temP2P ? ' Venda direta da carteira (P2P), sem corretora no Brasil: quando as operações assim passam de R$ 35 mil no mês, você mesmo informa a Receita na DeCripto, pelo e-CAC (desde julho de 2026; antes, a IN 1.888 pedia acima de R$ 30 mil). É obrigação de informar, não imposto.' : ''}</p>` : ''}
+    ${dc}
     ${envY.length || taxY ? `<p class="hint">Envio sem venda (presente, doação) sai pelo custo médio, sem ganho: é a doação pelo valor da sua declaração; por um valor maior, a diferença é ganho de capital. Pagamento com bitcoin é venda: marque a saída como Venda. As taxas de saque e de rede, pagas em bitcoin, tiram sats e ficam no custo de aquisição do que sobrou.</p>` : ''}
     <div class="tip">Informe sempre o <b>custo de aquisição</b>, não o valor de mercado. Ele já inclui as taxas informadas nos aportes; nas vendas, o valor recebido é líquido da taxa. O app calcula o custo das vendas pelo custo médio. Trocas por outra criptomoeda e gastos também contam como venda. Isto não é aconselhamento tributário: confirme com um contador.</div>
     <button class="link-btn" data-act="lesson" data-id="ir">Ler a lição sobre Imposto de Renda</button></div>`;
@@ -2354,7 +2386,7 @@ const histDepth = () => { try { const s = history.state; return s && s.hb100 ? s
 function backLevels() {
   if (ui.locked) return 0;
   let n = ui.tab !== 'home' ? 1 : 0;
-  if (ui.page) n += 1 + ui.stack.length;
+  if (ui.page) n += 1 + ui.stack.length + (ui.page === 'mapa' && ui.mapaPop ? 1 : 0);   // o balão do Mapa dos sats é um nível
   if (ui.sheet && $('#ov .sheet-x')) n += ui.sheet.back ? 2 : 1;
   return n;
 }
@@ -2369,6 +2401,7 @@ function histSync() {
 function histQueue() { if (hist.q) return; hist.q = true; queueMicrotask(() => { hist.q = false; histSync(); }); }
 function goBack() {
   if (ui.sheet) { const x = $('#ov .sheet-x'), fn = x && ACT[x.dataset.act]; if (fn) fn(x); return; }
+  if (ui.page === 'mapa' && ui.mapaPop) { mapaPopFecha(); return; }
   if (ui.page) { ACT.back(); return; }
   if (ui.tab !== 'home') { ACT.tab({ dataset: { tab: 'home' } }); window.scrollTo(0, ui.tabTop.home || 0); }   // M1 (1.8.22): volta à rolagem do Início
 }
@@ -2612,10 +2645,22 @@ function vendaConta(sats, fiat, fee, date, excludeId, daCarteira, o = {}) {
    É obrigação de informar, não imposto. O app soma as vendas da carteira do mês; só em reais. */
 const decriptoLim = ym => ym < '2026-07' ? { v: 30000, nome: 'a declaração mensal da IN 1.888' } : { v: 35000, nome: 'a DeCripto' };
 const vendasCarteiraMes = (ym, excludeId) => state.aportes.filter(a => isSale(a) && a.src === 'self' && a.id !== excludeId && a.date.slice(0, 7) === ym).reduce((t, a) => t + a.fiat, 0);
+/* 1.8.39 (IN RFB 2.291/2025, art. 5º, II e § 3º, e art. 6º, IV e VI): também contam os envios para terceiros e os envios para
+   corretora no exterior. Valem pela cotação média do mês (no mês corrente, a de hoje); exclTx deixa de fora a transação que
+   está sendo editada. Transferências entre carteiras suas ficam fora (a norma não as exclui de forma expressa; a tela diz). */
+function opsCarteiraMes(ym, exclTx) {
+  const p = histPrice(ym, 'BRL') || priceNow('BRL'); let env = 0, dep = 0;
+  for (const sp of state.spends) { if (sp.id === exclTx || sp.date.slice(0, 7) !== ym) continue; const sv = saidaVenda(sp); for (const o of sp.outputs) { if (o.kind === 'ext' && o !== sv) env += o.sats; else if (o.kind === 'ex' && o.fora) dep += o.sats; } }
+  return { envios: env / 1e8 * p, depositos: dep / 1e8 * p };
+}
+function decriptoAviso(ym, tot) {
+  const L = decriptoLim(ym);
+  return tot > L.v ? `<br><span class="warn">Operações da carteira em ${esc(fmtYM(ym))}: ${esc(fmtMoney(tot, 'BRL'))}. Acima de ${esc(fmtMoney(L.v, 'BRL', 0))} no mês, as operações sem corretora no Brasil (vendas da carteira, envios para terceiros e para corretora no exterior) vão para ${L.nome}, que você mesmo entrega à Receita pelo e-CAC. Não é imposto.</span>` : '';
+}
 function decriptoLinha(date, fiat, excludeId) {
   if (cur() !== 'BRL' || !(fiat > 0)) return '';
-  const ym = date.slice(0, 7), tot = vendasCarteiraMes(ym, excludeId) + fiat, L = decriptoLim(ym);
-  return tot > L.v ? `<br><span class="warn">Vendas da carteira em ${esc(fmtYM(ym))}: ${esc(fmtMoney(tot))}. Acima de ${esc(fmtMoney(L.v, 'BRL', 0))} no mês, as operações sem corretora no Brasil vão para ${L.nome}, que você mesmo entrega à Receita pelo e-CAC.</span>` : '';
+  const ym = date.slice(0, 7), o = opsCarteiraMes(ym);
+  return decriptoAviso(ym, vendasCarteiraMes(ym, excludeId) + fiat + o.envios + o.depositos);
 }
 function ensureWallet(sel, newName) {
   if (sel && sel !== '__new' && byId(state.wallets, sel)) return sel;
@@ -2930,7 +2975,7 @@ function aportesCSV() {
    ordem (a importação por CSV continua lendo o arquivo); depois vêm taxa_sats (taxa de saque ou da rede), carteira e txid.
    Coluna sats: o que entrou (+) ou saiu (−) do patrimônio; nos saques e nas transações entre carteiras suas, a
    quantidade movimentada (o que chegou ao destino). */
-const TIPO_CARTEIRA = /^(saque|entrada|recebido|consolida|transfer|envio|moviment|venda da carteira)/;   // tipos que a importação por CSV deixa de fora
+const TIPO_CARTEIRA = /^(saque|entrada|recebido|consolida|transfer|envio|moviment|venda da carteira|para a corretora)/;   // tipos que a importação por CSV deixa de fora
 function movimentos() {
   const L = [], wn = id => id ? walletName(id) : '';
   for (const a of state.aportes) {
@@ -2949,9 +2994,16 @@ function movimentos() {
   }
   for (const sp of state.spends) {
     const ins = sp.inputs.map(id => byId(state.utxos, id)).filter(Boolean), src = ins.length ? ins[0].wallet : '', ext = sp.outputs.some(o => o.kind === 'ext');
+    const dep = txDep(sp), depL = fee => ({ date: sp.date, ord: 3, tipo: 'para a corretora', sats: dep, ex: [...new Set(sp.outputs.filter(o => o.kind === 'ex').map(o => (o.ex || 'Corretora') + (o.fora ? ' (no exterior)' : '')))].join(', '), local: 'carteira › corretora', note: sp.note || '', fee, wallet: wn(src), txid: sp.txid || '' });
     if (sp.saleId && byId(state.aportes, sp.saleId)) {   // a venda da carteira já está na linha da venda; outro envio na mesma transação vira linha própria
       const so = saidaVenda(sp), resto = sp.outputs.filter(o => o.kind === 'ext' && o !== so).reduce((t, o) => t + o.sats, 0);
       if (resto > 0) L.push({ date: sp.date, ord: 3, tipo: 'envio', sats: -resto, ex: '', local: 'carteira › terceiros', note: sp.note || '', fee: null, wallet: wn(src), txid: sp.txid || '' });
+      if (dep > 0) L.push(depL(null));
+      continue;
+    }
+    if (dep > 0) {   // 1.8.39: envio para a corretora, o espelho do saque (a taxa da rede vai nesta linha)
+      L.push(depL(sp.fee));
+      if (ext) L.push({ date: sp.date, ord: 3, tipo: 'envio', sats: -txSent(sp), ex: '', local: 'carteira › terceiros', note: sp.note || '', fee: null, wallet: wn(src), txid: sp.txid || '' });
       continue;
     }
     const outW = [...new Set(sp.outputs.filter(o => o.kind === 'own').map(o => (byId(state.utxos, o.utxo) || {}).wallet).filter(w => w && w !== src))];
@@ -3839,6 +3891,7 @@ document.addEventListener('keydown', e => {
     e.preventDefault(); const n = grafDados().length, i = ui.grafSel != null && ui.grafSel < n ? ui.grafSel : n - 1;
     grafVai(e.key === 'Home' ? 0 : e.key === 'End' ? n - 1 : i + (e.key === 'ArrowLeft' ? -1 : 1));
   }
+  if (!ui.locked && !ui.sheet && ui.page === 'mapa') mapaTecla(e);   // Mapa dos sats (1.8.38)
 });
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) { ui.hiddenAt = Date.now(); clearTimeout(saveTimer); persist(); if (S().pin) document.documentElement.classList.add('fundo-oculto'); return; }   // M10 (1.8.22): miniatura de apps recentes sem saldo
@@ -3919,6 +3972,7 @@ const addrKey = s => /^bc1/i.test(s) ? s.toLowerCase() : s;
 function findAddrByString(s, exceptId) { s = (s || '').trim(); if (!s) return null; const k = addrKey(s); return state.addresses.find(a => a.id !== exceptId && a.addr && addrKey(a.addr) === k) || null; }
 function txKind(sp) {
   if (sp.saleId) return 'Venda da carteira';
+  if (sp.outputs.some(o => o.kind === 'ex')) return 'Para a corretora';   // 1.8.39
   if (sp.outputs.some(o => o.kind === 'ext')) return 'Envio';
   const ins = sp.inputs.map(id => byId(state.utxos, id)).filter(Boolean), wIn = new Set(ins.map(u => u.wallet));
   const cross = sp.outputs.some(o => { const u = byId(state.utxos, o.utxo); return u && !wIn.has(u.wallet); });
@@ -3927,6 +3981,9 @@ function txKind(sp) {
   return 'Movimentação entre endereços';
 }
 const txSent = sp => sp.outputs.filter(o => o.kind === 'ext').reduce((t, o) => t + o.sats, 0);
+/* 1.8.39: saída "Para a corretora" (kind 'ex', com ex = nome e fora = corretora no exterior), o espelho do saque: os sats voltam
+   para o saldo da corretora (holdAt, calc), não é venda nem envio, e a pilha só perde a taxa da rede */
+const txDep = sp => sp.outputs.filter(o => o.kind === 'ex').reduce((t, o) => t + o.sats, 0);
 /* A saída do comprador numa venda da carteira: a marcada (sale: true) ou, num registro sem a marca, a saída para terceiros
    com a quantidade da venda (ou a primeira para terceiros). Sem venda ligada, nenhuma. */
 function saidaVenda(sp) {
@@ -3935,7 +3992,7 @@ function saidaVenda(sp) {
   return ext.find(o => o.sale) || ext.find(o => o.sats === sale.sats) || ext[0] || null;
 }
 const txOwnOut = sp => sp.outputs.filter(o => o.kind === 'own').reduce((t, o) => t + o.sats, 0);
-function outTypeOf(o, st = state) { if (o.kind === 'ext') return typeFromAddr(o.addr) || 'p2wpkh'; const u = byId(st.utxos, o.utxo); return u ? u.type : 'p2wpkh'; }
+function outTypeOf(o, st = state) { if (o.kind === 'ext' || o.kind === 'ex') return typeFromAddr(o.addr) || 'p2wpkh'; const u = byId(st.utxos, o.utxo); return u ? u.type : 'p2wpkh'; }
 function estimateVsize(sp, st = state) { let vb = VB.ovh; for (const id of sp.inputs) { const u = byId(st.utxos, id); vb += VB.in[u ? u.type : 'p2wpkh'] || 68; } for (const o of sp.outputs) vb += VB.out[outTypeOf(o, st)] || 31; return Math.ceil(vb); }
 function reestimateSpends() { for (const sp of state.spends) if (!sp.vsizeReal) sp.vsize = estimateVsize(sp); }
 function migrateV2(o) {
@@ -4155,8 +4212,8 @@ function sheetEditUtxo(id) {
   ui.form = { kind: 'utxo-edit', id, kyc: !!u.kyc, frozen: !!u.frozen };
   const onAddr = ui.page === 'addr' && ui.arg === u.address;
   openSheet('utxo-edit', () => `<h2>◈ ${AMT(u.sats)}</h2><p class="sub">${esc(src.t)} · recebido em ${fmtDate(u.date)}${u.spent ? ` · gasto em ${fmtDate(u.spentAt || u.date)}` : ''}</p>
-    <div class="btn-row" style="margin-bottom:14px">${sp ? `<button class="btn btn-q btn-s" data-act="open-tx" data-id="${sp.id}">Transação que gastou</button>` : ''}${!u.spent ? `<button class="btn btn-q btn-s" data-act="tx-from-utxo" data-id="${u.id}" data-k="move">Transferir</button><button class="btn btn-q btn-s" data-act="tx-from-utxo" data-id="${u.id}" data-k="send">Enviar</button><button class="btn btn-q btn-s" data-act="tx-from-utxo" data-id="${u.id}" data-k="sale">Vender</button>` : ''}${onAddr ? '' : `<button class="btn btn-q btn-s" data-act="open-addr" data-id="${u.address}" data-hl="${u.id}">Ver o endereço</button>`}<button class="btn btn-q btn-s" data-act="mapa-utxo" data-id="${u.id}">Ver no mapa</button></div>
-    ${kycDif ? `<p class="note warn" style="margin:0 0 12px">O KYC deste UTXO não bate com o das entradas da transação que o criou (${kycDif.para ? 'uma delas tem KYC' : 'nenhuma tem KYC'}). O Mapa dos sats mostra e oferece corrigir.</p>` : ''}
+    <div class="btn-row" style="margin-bottom:14px">${sp ? `<button class="btn btn-q btn-s" data-act="open-tx" data-id="${sp.id}">Transação que gastou</button>` : ''}${!u.spent ? `<button class="btn btn-q btn-s" data-act="tx-from-utxo" data-id="${u.id}" data-k="move">Transferir</button><button class="btn btn-q btn-s" data-act="tx-from-utxo" data-id="${u.id}" data-k="send">Enviar</button><button class="btn btn-q btn-s" data-act="tx-from-utxo" data-id="${u.id}" data-k="sale">Vender</button><button class="btn btn-q btn-s" data-act="tx-from-utxo" data-id="${u.id}" data-k="dep">Para a corretora</button>` : ''}${onAddr ? '' : `<button class="btn btn-q btn-s" data-act="open-addr" data-id="${u.address}" data-hl="${u.id}">Ver o endereço</button>`}<button class="btn btn-q btn-s" data-act="mapa-utxo" data-id="${u.id}">Ver no mapa</button></div>
+    ${kycDif ? `<p class="note warn" style="margin:0 0 12px">O KYC deste UTXO não bate com o das entradas da transação que o criou (${kycDif.para ? 'uma delas tem KYC' : 'nenhuma tem KYC'}). <button class="link-btn" data-act="utxo-kyc">Corrigir o KYC</button></p>` : ''}
     ${origemHTML(u)}
     <div class="field"><label for="e-l">Etiqueta</label><input class="inp" id="e-l" name="label" autocomplete="off" value="${esc(u.label)}" placeholder="${esc(a ? a.label : '')}"></div>
     ${u.origin === 'externo' ? `<div class="field"><label for="e-s">Valor (${unitName()})</label><input class="inp" id="e-s" name="sats" ${amtAttrs()} value="${amtIn(u.sats)}"></div>
@@ -4259,10 +4316,10 @@ function bip329() {
 function txNew(preset) {
   const us = selectedUtxos(); if (!us.length) return toast('Selecione os UTXOs primeiro.');
   if (new Set(us.map(u => u.wallet)).size > 1) return openSheet('info', () => `<h2>Carteiras diferentes</h2><p class="sub">Uma transação gasta moedas de uma carteira só, que tem as mesmas chaves. Selecione UTXOs de uma carteira e escolha o destino depois: pode ser outra carteira sua.</p><button class="btn btn-q block" data-act="close-sheet">Entendi</button>`, { label: 'Aviso' });
-  const w = us[0].wallet, free = unusedChange(w), ext = preset === 'send' || preset === 'sale';
-  const first = ext ? { key: uid(), kind: 'ext', sale: preset === 'sale', extAddr: '', sats: '' } : { key: uid(), kind: 'own', wallet: w, address: '__new', newLabel: '', newAddr: '', newWallet: '', sats: '' };
-  ui.form = { kind: 'tx', tx: { mode: 'new', preset, simple: !ext, inputs: us.map(u => u.id), outputs: [first], change: { key: uid(), utxo: null, address: free ? free.id : '__new', newLabel: '', newAddr: '' }, feeMode: 'rate', rate: String(S().feeRate), fee: '', vsizeReal: null, date: todayISO(), txid: '', note: '', sv: txSvVazio() } };
-  openSheet('tx', ui.form.tx.simple ? consSheetHTML : txSheetHTML, { label: ui.form.tx.simple ? 'Consolidação' : preset === 'sale' ? 'Venda' : 'Envio', onOpen: txRefresh });
+  const w = us[0].wallet, free = unusedChange(w), ext = preset === 'send' || preset === 'sale', dep = preset === 'dep';
+  const first = dep ? { key: uid(), kind: 'ex', ex: exLembrada(), fora: false, depAddr: '', sats: '' } : ext ? { key: uid(), kind: 'ext', sale: preset === 'sale', extAddr: '', sats: '' } : { key: uid(), kind: 'own', wallet: w, address: '__new', newLabel: '', newAddr: '', newWallet: '', sats: '' };
+  ui.form = { kind: 'tx', tx: { mode: 'new', preset, simple: !ext && !dep, inputs: us.map(u => u.id), outputs: [first], change: { key: uid(), utxo: null, address: free ? free.id : '__new', newLabel: '', newAddr: '' }, feeMode: 'rate', rate: String(S().feeRate), fee: '', vsizeReal: null, date: todayISO(), txid: '', note: '', sv: txSvVazio() } };
+  openSheet('tx', ui.form.tx.simple ? consSheetHTML : txSheetHTML, { label: ui.form.tx.simple ? 'Consolidação' : preset === 'sale' ? 'Venda' : dep ? 'Para a corretora' : 'Envio', onOpen: txRefresh });
 }
 /* Dados da venda numa saída para terceiros (uma por transação): valor recebido, taxa da operação e onde vendeu */
 const txSvVazio = () => ({ fiat: '', fee: '', feeU: 'fiat', ex: '' });
@@ -4277,13 +4334,13 @@ function txEdit(id, opts = {}) {
   const sp = byId(state.spends, id); if (!sp) return;
   const src = (byId(state.utxos, sp.inputs[0]) || {}).wallet, sale = sp.saleId ? byId(state.aportes, sp.saleId) : null;
   const sv0 = saidaVenda(sp);
-  const form = o => { if (o.kind === 'ext') return { key: o.key || uid(), kind: 'ext', extAddr: o.addr || '', sats: amtIn(o.sats), sale: o === sv0 }; const u = byId(state.utxos, o.utxo); return { key: o.key || uid(), kind: 'own', utxo: o.utxo, wallet: u ? u.wallet : src, address: u ? u.address : '__new', newLabel: '', newAddr: '', newWallet: '', sats: amtIn(o.sats) }; };
+  const form = o => { if (o.kind === 'ex') return { key: o.key || uid(), kind: 'ex', ex: o.ex || '', fora: !!o.fora, depAddr: o.addr || '', sats: amtIn(o.sats) }; if (o.kind === 'ext') return { key: o.key || uid(), kind: 'ext', extAddr: o.addr || '', sats: amtIn(o.sats), sale: o === sv0 }; const u = byId(state.utxos, o.utxo); return { key: o.key || uid(), kind: 'own', utxo: o.utxo, wallet: u ? u.wallet : src, address: u ? u.address : '__new', newLabel: '', newAddr: '', newWallet: '', sats: amtIn(o.sats) }; };
   const ch = sp.outputs.find(o => isChangeOut(sp, o)), cu = ch ? byId(state.utxos, ch.utxo) : null;
-  const outputs = sp.outputs.filter(o => o !== ch).map(o => { const f = form(o); if (!sale && opts.venda != null && o === sp.outputs[opts.venda] && o.kind === 'ext') f.sale = true; return f; });
+  const outputs = sp.outputs.filter(o => o !== ch).map(o => { const f = form(o); if (!sale && opts.venda != null && o === sp.outputs[opts.venda] && o.kind === 'ext') f.sale = true; if (opts.corretora != null && o === sp.outputs[opts.corretora] && o.kind === 'ext' && o !== sv0) Object.assign(f, { kind: 'ex', sale: false, ex: exLembrada(), fora: false, depAddr: o.addr || '' }); return f; });
   const sv = sale ? { fiat: fmtInput(sale.fiat), fee: sale.fee > 0 ? fmtInput(sale.fee) : '', feeU: 'fiat', ex: isDefEx(sale.ex) ? '' : sale.ex } : txSvVazio();
   ui.form = { kind: 'tx', tx: { mode: 'edit', id, inputs: [...sp.inputs], outputs, change: { key: ch ? (ch.key || uid()) : uid(), utxo: cu ? cu.id : null, address: cu ? cu.address : ((unusedChange(src) || {}).id || '__new'), newLabel: '', newAddr: '' }, feeMode: 'sats', rate: fmtRate(sp.fee / sp.vsize), fee: fmtSats(sp.fee), vsizeReal: sp.vsizeReal ? sp.vsize : null, date: sp.date, txid: sp.txid || '', note: sp.note || '', sv } };
   ui.form.tx.simple = sp.outputs.length === 1 && sp.outputs[0].kind === 'own' && !sp.outputs[0].rem;
-  openSheet('tx', ui.form.tx.simple ? consSheetHTML : txSheetHTML, { label: outputs.some(f => f.sale) ? 'Editar venda' : 'Editar transação', onOpen: txRefresh });
+  openSheet('tx', ui.form.tx.simple ? consSheetHTML : txSheetHTML, { label: outputs.some(f => f.sale) ? 'Editar venda' : outputs.some(f => f.kind === 'ex') ? 'Editar envio para a corretora' : 'Editar transação', onOpen: txRefresh });
 }
 const txInputs = () => ui.form.tx.inputs.map(id => byId(state.utxos, id)).filter(Boolean);
 /* Carteira nova digitada numa saída ("+ Nova carteira…"): vira opção nas outras saídas antes mesmo de gravar */
@@ -4304,6 +4361,7 @@ function txNormDrafts() {
 const txSrcWallet = () => (txInputs()[0] || {}).wallet;
 function txOutType(o) {
   if (o.kind === 'ext') return typeFromAddr(o.extAddr) || 'p2wpkh';
+  if (o.kind === 'ex') return typeFromAddr(o.depAddr) || 'p2wpkh';
   if (o.address && o.address !== '__new') { const a = addrById(o.address); if (a) return a.type; }
   const t = typeFromAddr(o.newAddr); if (t) return t;
   const ex = findAddrByString(o.newAddr); if (ex) return ex.type;
@@ -4316,13 +4374,14 @@ function txChangeType() {
 }
 function txSheetHTML() {
   txNormDrafts();
-  const t = ui.form.tx, ins = txInputs(), tot = sumSats(ins), edit = t.mode === 'edit', venda = t.outputs.some(o => o.kind === 'ext' && o.sale);
+  const t = ui.form.tx, ins = txInputs(), tot = sumSats(ins), edit = t.mode === 'edit', venda = t.outputs.some(o => o.kind === 'ext' && o.sale), dep = t.outputs.some(o => o.kind === 'ex');
   const mix = ins.some(u => u.kyc) && ins.some(u => !u.kyc), frozen = ins.filter(u => u.frozen).length;
   // 1.8.36: "Consolidar só uma parte" chega aqui com a saída Para mim pronta; o título acompanha enquanto ela for a única
   const parte = !edit && t.parte && t.outputs.length === 1 && t.outputs[0].kind === 'own', many = ins.length > 1;
-  const title = edit ? (venda ? 'Editar venda' : 'Editar transação') : venda ? 'Vender' : parte ? (many ? 'Consolidar uma parte' : 'Transferir uma parte') : 'Enviar';
-  return `<h2>${title}</h2><p class="sub">${edit ? 'As entradas ficam como estão. Ajuste valores e taxa: o troco e o que depende dele são recalculados.' : venda ? 'Venda direta (P2P): os sats saem desta carteira para a do comprador, sem passar pela corretora. Informe quanto foi para ele e quanto você recebeu. O que sobrar das entradas, depois da taxa, volta como troco.' : parte ? `Uma parte ${many ? 'das entradas vai, num UTXO só,' : 'do UTXO vai'} para um endereço seu: informe quanto. O que sobrar, depois da taxa, volta como troco para a carteira de origem. <button class="link-btn small" data-act="tx-tudo">${many ? 'Consolidar tudo' : 'Transferir tudo'}</button>` : 'Pague alguém ou mande uma parte para outra carteira sua: informe o valor exato de cada saída. O que sobrar das entradas, depois da taxa, volta como troco.'}</p>
+  const title = edit ? (venda ? 'Editar venda' : dep ? 'Editar envio para a corretora' : 'Editar transação') : venda ? 'Vender' : dep ? 'Para a corretora' : parte ? (many ? 'Consolidar uma parte' : 'Transferir uma parte') : 'Enviar';
+  return `<h2>${title}</h2><p class="sub">${edit ? 'As entradas ficam como estão. Ajuste valores e taxa: o troco e o que depende dele são recalculados.' : venda ? 'Venda direta (P2P): os sats saem desta carteira para a do comprador, sem passar pela corretora. Informe quanto foi para ele e quanto você recebeu. O que sobrar das entradas, depois da taxa, volta como troco.' : dep ? 'Os sats saem desta carteira para a sua conta na corretora. Não é venda: não há imposto, e a pilha só paga a taxa da rede. O que sobrar das entradas, depois da taxa, volta como troco.' : parte ? `Uma parte ${many ? 'das entradas vai, num UTXO só,' : 'do UTXO vai'} para um endereço seu: informe quanto. O que sobrar, depois da taxa, volta como troco para a carteira de origem. <button class="link-btn small" data-act="tx-tudo">${many ? 'Consolidar tudo' : 'Transferir tudo'}</button>` : 'Pague alguém ou mande uma parte para outra carteira sua: informe o valor exato de cada saída. O que sobrar das entradas, depois da taxa, volta como troco.'}</p>
     ${mix ? `<p class="note warn" style="margin-bottom:12px">${MIX_KYC}</p>` : ''}
+    ${dep && ins.some(u => !u.kyc) ? `<p class="note warn" style="margin-bottom:12px">${DEP_KYC}</p>` : ''}
     ${frozen && !edit ? `<p class="note" style="margin-bottom:12px">${frozen === 1 ? 'Um UTXO selecionado está congelado.' : `${frozen} UTXOs selecionados estão congelados.`}</p>` : ''}
     <h3 class="mini">Entradas</h3>
     <ul class="receipt">${ins.map(u => `<li><span class="k">◈ ${esc(u.label || (addrById(u.address) || {}).label || 'UTXO')}</span><span class="dots"></span><span class="v">${AMT(u.sats)}</span></li>`).join('')}<li><span class="k"><b>Total</b></span><span class="dots"></span><span class="v">${AMT(tot)}</span></li></ul>
@@ -4338,7 +4397,7 @@ function txSheetHTML() {
     <div class="two"><div class="field"><label for="tx-d">Data</label><input class="inp" id="tx-d" name="date" type="date" value="${t.date}" max="${todayISO()}" data-inp="tx"></div><div class="field"><label for="tx-n">Nota</label><input class="inp" id="tx-n" name="note" autocomplete="off" value="${esc(t.note || '')}" placeholder="Opcional"></div></div>
     <div class="field"><label for="tx-t">TXID (opcional)</label><input class="inp mono" id="tx-t" name="txid" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(t.txid || '')}"></div>
     <p class="err form" hidden></p>
-    <button class="btn btn-p block" data-act="save-tx">${edit ? 'Salvar alterações' : venda ? 'Registrar venda' : 'Registrar transação'}</button>
+    <button class="btn btn-p block" data-act="save-tx">${edit ? 'Salvar alterações' : venda ? 'Registrar venda' : dep ? 'Registrar envio' : 'Registrar transação'}</button>
     ${edit ? `<button class="btn btn-d block" style="margin-top:10px" data-act="tx-undo" data-id="${t.id}">Desfazer transação</button>` : ''}`;
 }
 /* ---------- consolidar / transferir tudo: tela simples ----------
@@ -4399,24 +4458,33 @@ function consSave() {
 }
 /* Cada saída diz o que foi: Para mim (outra carteira ou endereço seu), Venda (para o comprador, com o valor recebido)
    ou Envio (pagamento, presente ou doação, sem venda). Uma venda por transação: a escolha fica travada nas outras saídas. */
-const TX_OUT_KINDS = [['own', 'Para mim'], ['sale', 'Venda'], ['ext', 'Envio']];
-const txOutKind = o => o.kind === 'own' ? 'own' : o.sale ? 'sale' : 'ext';
+const TX_OUT_KINDS = [['own', 'Para mim'], ['dep', 'Corretora'], ['sale', 'Venda'], ['ext', 'Envio']];
+const txOutKind = o => o.kind === 'own' ? 'own' : o.kind === 'ex' ? 'dep' : o.sale ? 'sale' : 'ext';
 function txKindHint(k, outra) {
   if (k === 'own') return 'Para outra carteira ou endereço seu. A pilha não muda, só paga a taxa.';
+  if (k === 'dep') return 'Para a sua conta numa corretora, o caminho de volta do saque. Não é venda: não há imposto, e a pilha só paga a taxa. Os sats voltam para o saldo da corretora.';
   if (k === 'sale') return 'Venda direta (P2P): os sats vão para o comprador, e o app registra a venda e o lucro.';
   return `Pagamento, presente ou doação: os sats saem da pilha, sem venda.${outra >= 0 ? ` A saída ${outra + 1} já é a venda desta transação (uma por transação).` : ' Pagou uma compra com bitcoin? Para a Receita, também é venda: marque Venda, com o valor da compra.'}`;
 }
 function txOutBlock(o, i, total) {
-  const p = `o${i}_`, ext = o.kind === 'ext', k = txOutKind(o), sale = k === 'sale';
+  const p = `o${i}_`, ext = o.kind === 'ext', k = txOutKind(o), sale = k === 'sale', dep = k === 'dep';
   const outra = ui.form.tx.outputs.findIndex((x, j) => j !== i && x.kind === 'ext' && x.sale);
   const head = `<div class="out-head"><b>Saída ${i + 1}</b>${total > 1 ? `<button class="link-btn small" data-act="tx-del" data-i="${i}">Remover</button>` : ''}</div>`;
   const kind = `<div class="seg" role="group" aria-label="O que foi a saída ${i + 1}" style="margin:0 0 6px">${TX_OUT_KINDS.map(([v, t]) => `<button class="${k === v ? 'on' : ''}" data-act="tx-kind" data-i="${i}" data-k="${v}" aria-pressed="${k === v}"${v === 'sale' && outra >= 0 ? ' disabled' : ''}>${t}</button>`).join('')}</div><p class="hint" style="margin:0 0 12px">${txKindHint(k, outra)}</p>`;
-  const where = ext ? txExtField(o, i) : `${addrPicker(p, o.wallet, o.address, { addrLabel: 'Endereço de destino', newLabel: o.newLabel, newAddr: o.newAddr, newWallet: o.newWallet, exclude: o.utxo || '', drafts: txDrafts(i) })}<div id="${p}merge"></div>`;
-  return `<div class="out${sale ? ' venda' : ''}">${head}${kind}${where}<div class="field"><label for="${p}s">Valor ${sale ? 'vendido' : ext ? 'enviado' : 'transferido'} (${unitName()})</label><input class="inp big" id="${p}s" name="${p}sats" ${amtAttrs()} autocomplete="off" placeholder="Obrigatório" value="${esc(o.sats || '')}" data-inp="tx">${total === 1 ? `<p class="hint" style="margin:6px 0 0"><button class="link-btn small" data-act="tx-max">Usar o máximo</button> <span id="tx-maxv"></span></p>` : ''}</div>${sale ? txSaleBlock() : ''}</div>`;
+  const where = ext ? txExtField(o, i) : dep ? txDepField(o, i) : `${addrPicker(p, o.wallet, o.address, { addrLabel: 'Endereço de destino', newLabel: o.newLabel, newAddr: o.newAddr, newWallet: o.newWallet, exclude: o.utxo || '', drafts: txDrafts(i) })}<div id="${p}merge"></div>`;
+  return `<div class="out${sale ? ' venda' : ''}">${head}${kind}${where}<div class="field"><label for="${p}s">Valor ${sale ? 'vendido' : ext ? 'enviado' : dep ? 'enviado à corretora' : 'transferido'} (${unitName()})</label><input class="inp big" id="${p}s" name="${p}sats" ${amtAttrs()} autocomplete="off" placeholder="Obrigatório" value="${esc(o.sats || '')}" data-inp="tx">${total === 1 ? `<p class="hint" style="margin:6px 0 0"><button class="link-btn small" data-act="tx-max">Usar o máximo</button> <span id="tx-maxv"></span></p>` : ''}</div>${sale ? txSaleBlock() : ''}</div>`;
 }
 function txExtField(o, i) {
   const p = `o${i}_`, sale = !!o.sale;
   return `<div class="field"><label for="${p}x">${sale ? 'Comprador: endereço ou descrição (opcional)' : 'Endereço ou descrição'}</label><input class="inp" id="${p}x" name="${p}ext" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(o.extAddr || '')}" placeholder="${sale ? 'bc1q… do comprador ou nome' : 'bc1q… ou Pagamento da loja'}" data-inp="tx-ext" data-i="${i}"><p class="hint" id="${p}xh">${extHint(o.extAddr, i)}</p></div>`;
+}
+/* 1.8.39: saída para a sua conta numa corretora: o nome (sugere as que você já usou), o endereço de depósito (opcional) e se ela
+   fica no exterior (sem CNPJ no Brasil), o que só muda o informe mensal da Receita (DeCripto) e a custódia no IR */
+function txDepField(o, i) {
+  const p = `o${i}_`, nomes = [...new Set([...exNames(), ...state.saques.map(w => w.ex).filter(Boolean), ...state.spends.flatMap(x => x.outputs.filter(y => y.kind === 'ex' && y.ex).map(y => y.ex))])];
+  return `<div class="field"><label for="${p}dx">Corretora</label><input class="inp" id="${p}dx" name="${p}dex" list="${p}dl" autocomplete="off" placeholder="Nome da corretora" value="${esc(o.ex || '')}"><datalist id="${p}dl">${nomes.map(e => `<option value="${esc(e)}">`).join('')}</datalist></div>
+    <div class="field"><label for="${p}da">Endereço de depósito (opcional)</label><input class="inp mono" id="${p}da" name="${p}daddr" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(o.depAddr || '')}" placeholder="bc1q… que a corretora mostrou"></div>
+    <div class="switch"><span><span class="t">Corretora no exterior</span><br><span class="d">Sem CNPJ no Brasil. Envios para ela contam no informe mensal da Receita (DeCripto) quando as operações do mês passam do limite.</span></span><button class="tog ${o.fora ? 'on' : ''}" data-act="tx-fora" data-i="${i}" aria-pressed="${!!o.fora}" aria-label="Corretora no exterior"></button></div>`;
 }
 /* Bloco da venda dentro da saída marcada: os mesmos campos do formulário de venda (valor recebido, taxa da operação e onde
    vendeu) e a conta do lucro pelo custo médio. Os campos ficam em ui.form.tx.sv: trocar a venda de saída não os perde. */
@@ -4442,7 +4510,7 @@ function txSaleRefresh() {
   if (!(n.sats > 0)) { el.innerHTML = `Informe o valor vendido, em ${esc(unitName())}.`; return; }
   if (!(n.fiat > 0)) { el.innerHTML = 'Informe o valor recebido: o app calcula o lucro pelo custo médio.'; return; }
   const t = ui.form.tx, sp = t.mode === 'edit' ? byId(state.spends, t.id) : null;
-  el.innerHTML = `Cotação efetiva: <b>${esc(fmtMoney(n.price, cur(), 0))}</b>${vendaConta(n.sats, n.fiat, n.fee, n.date, sp ? sp.saleId : null, true)}`;
+  el.innerHTML = `Cotação efetiva: <b>${esc(fmtMoney(n.price, cur(), 0))}</b>${vendaConta(n.sats, n.fiat, n.fee, n.date, sp ? sp.saleId : null, !txOutrasDeCripto(t))}`;
 }
 function txChangeBlock(t) {
   const w = txSrcWallet(), c = t.change;
@@ -4461,6 +4529,7 @@ function txRead() {
   t.outputs.forEach((o, i) => {
     const p = `o${i}_`;
     if (o.kind === 'ext') o.extAddr = fv(p + 'ext').trim();
+    else if (o.kind === 'ex') { o.ex = fv(p + 'dex'); o.depAddr = fv(p + 'daddr').trim(); }
     else { o.wallet = fv(p + 'wallet') || o.wallet; o.address = fv(p + 'address') || o.address; o.newWallet = fv(p + 'newWallet'); o.newLabel = fv(p + 'newLabel'); o.newAddr = fv(p + 'newAddr').trim(); if (String(o.wallet).startsWith('__draft:')) { const d = txDrafts(i).find(x => x.id === o.wallet); if (d) o.draftName = d.name; } }
     o.sats = fv(p + 'sats');
   });
@@ -4512,6 +4581,7 @@ function taxaAltaPede(alvo, n) { if (!taxaAlta(n) || alvo.taxaOk === n.fee) retu
 /* Sobra que vai para a taxa (toFee): abaixo do limite de poeira, ou, com taxas altas, uma sobra que não paga a própria saída
    de troco e ficaria abaixo do limite depois dela (1.8.36: antes, a mensagem dizia "abaixo do limite" nos dois casos) */
 const sobraTxt = n => n.toFee < n.dust ? `abaixo do limite de poeira (${fmtSats(n.dust)} sats) para virar troco` : `mas com a taxa da própria saída o troco ficaria abaixo do limite de poeira (${fmtSats(n.dust)} sats)`;
+const DEP_KYC = '<b>Privacidade:</b> moedas sem KYC indo para a corretora. Lá elas ficam ligadas ao seu cadastro, e o troco desta transação também passa a ter KYC.';
 const MIX_KYC = '<b>Privacidade:</b> você está juntando moedas com e sem KYC. Na blockchain elas passam a ficar ligadas.';
 function txCalc() {
   const t = ui.form.tx;
@@ -4542,6 +4612,7 @@ function txRefresh() {
   else if (n.fee <= 0) h = troco ? '<span class="neg">O troco não deixa nada para a taxa da rede. Diminua o troco.</span>' : 'Informe a taxa em sat/vB ou em sats.';
   else if (n.change < 0) h = `<span class="neg">Faltam ${A(-n.change)} para cobrir as saídas e a taxa.</span>`;
   else h = `Entradas <b>${A(n.tot)}</b> · saídas <b>${A(n.fixed)}</b> · troco <b>${A(n.change)}</b> · taxa <b>${F(n.fee)} sats</b><br>${esc(fmtRate(n.rate))} sat/vB · ${F(n.vsize)} vB ${t.vsizeReal ? 'informado' : 'estimado'} · ${taxaPct(n)}% do valor${n.rate < 1 ? '<br><span class="warn">Abaixo de 1 sat/vB a confirmação pode demorar.</span>' : ''}${taxaAltaAviso(n)}`;
+  if (!n.bad && isFinite(n.fee)) h += txDeCripto();
   $('#tx-sum').innerHTML = h;
   const inW = (n.ins[0] || {}).wallet;
   t.outputs.forEach((o, i) => {
@@ -4550,6 +4621,15 @@ function txRefresh() {
     el.innerHTML = extra.length ? `<div class="note" style="margin:-4px 0 14px">No bitcoin os UTXOs não se somam: esta saída vira mais um UTXO no endereço. Para ficar com <b>um UTXO só</b>, inclua ${extra.length === 1 ? 'o UTXO que já está aqui' : `os ${extra.length} UTXOs que já estão aqui`} (${F(sumSats(extra))} sats) nas entradas e use o máximo.<br><button class="btn btn-q btn-s" style="margin-top:8px" data-act="tx-merge" data-i="${i}">Incluir nas entradas</button></div>` : '';
   });
   txSaleRefresh();
+}
+// 1.8.39: envio para terceiros ou para corretora no exterior que leva as operações do mês acima do limite da DeCripto
+const txOutrasDeCripto = t => t.outputs.some(o => (o.kind === 'ext' && !o.sale) || (o.kind === 'ex' && o.fora));   // com elas, o aviso vai no resumo, com o total
+function txDeCripto() {
+  const t = ui.form.tx; if (cur() !== 'BRL' || !/^\d{4}-\d{2}-\d{2}$/.test(t.date || '')) return '';
+  let s = 0; for (const o of t.outputs) if ((o.kind === 'ext' && !o.sale) || (o.kind === 'ex' && o.fora)) s += parseAmt(o.sats) || 0;
+  if (!(s > 0)) return '';
+  const ym = t.date.slice(0, 7), sp0 = t.mode === 'edit' ? byId(state.spends, t.id) : null, o = opsCarteiraMes(ym, sp0 ? sp0.id : null), sv = txSaleVals();
+  return decriptoAviso(ym, vendasCarteiraMes(ym, sp0 ? sp0.saleId : null) + (sv && sv.fiat > 0 ? sv.fiat : 0) + o.envios + o.depositos + s / 1e8 * (histPrice(ym, 'BRL') || priceNow('BRL')));
 }
 function txRerender() { const sh = $('.sheet'), top = sh ? sh.scrollTop : 0; $('#sheet-body').innerHTML = (ui.form.tx.simple ? consSheetHTML : txSheetHTML)(); txRefresh(); if (sh) sh.scrollTop = top; }
 function txSave() {
@@ -4565,6 +4645,8 @@ function txSave() {
   if (!validTxid(t.txid)) return formErr('O TXID tem 64 caracteres (0-9 e a-f).');
   for (const [i, o] of t.outputs.entries()) {
     if (o.kind === 'ext' && looksAddr(o.extAddr) && !validAddr(o.extAddr)) return formErr(`O endereço da saída ${i + 1} não é válido.`);
+    if (o.kind === 'ex' && looksAddr(o.depAddr) && !validAddr(o.depAddr)) return formErr(`O endereço de depósito da saída ${i + 1} não é válido.`);
+    if (o.kind === 'ex' && looksAddr(o.depAddr) && findAddrByString(o.depAddr)) return formErr('Esse endereço é de uma carteira sua. Para a corretora, use o endereço de depósito que ela mostrou.');
     if (o.kind === 'own' && (!o.address || o.address === '__new') && o.newAddr && !validAddr(o.newAddr)) return formErr(`O endereço da saída ${i + 1} não é válido.`);
   }
   if (n.change > 0 && (!t.change.address || t.change.address === '__new') && t.change.newAddr) {
@@ -4584,13 +4666,17 @@ function txSave() {
     t.saleDelOk = true; if (saveBtn) saveBtn.textContent = 'Salvar e apagar a venda';
     return formErr(`Nenhuma saída está marcada como venda. Ao salvar, a venda de ${fmtDate(sale0.date)} (${fmtMoney(sale0.fiat)}) sai dos registros, e o lucro dela também. Toque de novo em salvar para confirmar.`);
   }
+  // 1.8.39: moedas sem KYC indo para a corretora ficam ligadas ao cadastro (e o troco também): aviso e confirmação, uma vez
+  const depOut = t.outputs.some(o => o.kind === 'ex');
+  if (depOut && n.ins.some(u => !u.kyc) && !t.depKycOk) { t.depKycOk = true; if (saveBtn) saveBtn.textContent = 'Registrar mesmo assim'; return formErr('Moedas sem KYC indo para a corretora: lá elas ficam ligadas ao seu cadastro, e o troco desta transação também passa a ter KYC. Toque de novo para registrar.'); }
   const L0 = ledger();   // para só travar uma venda descoberta que esta transação criar (1.8.29)
   const ok = attempt(() => {
-    const sid = edit ? sp0.id : uid(), kyc = n.ins.some(u => u.kyc), outs = [], ym = fmtYM(t.date.slice(0, 7)), made = {};
+    const sid = edit ? sp0.id : uid(), kyc = n.ins.some(u => u.kyc) || depOut, outs = [], ym = fmtYM(t.date.slice(0, 7)), made = {};
     for (const o of t.outputs) if (o.kind === 'own' && o.wallet === '__new' && !(o.newAddr && findAddrByString(o.newAddr))) made[o.key] = ensureWallet('__new', o.newWallet);
     const walletFor = o => o.wallet === '__new' ? made[o.key] : String(o.wallet).startsWith('__draft:') ? (made[o.wallet.slice(8)] || ensureWallet('__new', o.draftName)) : undefined;
     t.outputs.forEach((o, i) => {
       const sats = parseAmt(o.sats);
+      if (o.kind === 'ex') { outs.push({ key: o.key || uid(), kind: 'ex', ex: ((o.ex || '').trim() || 'Corretora').slice(0, 60), fora: !!o.fora, addr: (o.depAddr || '').trim(), sats, rem: false }); return; }
       if (o.kind === 'ext') { const sale = !!sv && i === sv.i; outs.push({ key: o.key || uid(), kind: 'ext', addr: o.extAddr || (sale ? `Venda${sv.ex && !isDefEx(sv.ex) ? ' · ' + sv.ex : ''}` : ''), sats, rem: false, sale }); return; }
       const r = resolvePicker(`o${i}_`, n.ins.length > 1 ? `Consolidação ${ym}` : `Transferência ${ym}`, 'recebimento', { wallet: walletFor(o) }); if (r.err) throw new Error(r.err);
       const a = addrById(r.aid); let u = o.utxo ? byId(state.utxos, o.utxo) : null;
@@ -4628,7 +4714,7 @@ function txSave() {
   if (!ok) return false;
   ui.sel.clear(); ui.selMode = false; save(); closeSheet(); render();
   if (sv && !sale0) toastRegistro('Venda e transação registradas');
-  else toast(edit ? (sv ? 'Venda atualizada' : sale0 ? 'Transação atualizada; a venda saiu dos registros' : 'Transação atualizada') : t.simple || (t.parte && t.outputs.length === 1 && t.outputs[0].kind === 'own') ? (n.ins.length > 1 ? 'Consolidação registrada' : 'Transferência registrada') : 'Transação registrada');
+  else toast(edit ? (sv ? 'Venda atualizada' : sale0 ? 'Transação atualizada; a venda saiu dos registros' : 'Transação atualizada') : t.simple || (t.parte && t.outputs.length === 1 && t.outputs[0].kind === 'own') ? (n.ins.length > 1 ? 'Consolidação registrada' : 'Transferência registrada') : depOut ? 'Envio para a corretora registrado' : 'Transação registrada');
   if (sv) fxSync();
 }
 
@@ -4657,7 +4743,7 @@ function addrEvents(aid) {
   for (const e of ev) { bal += e.type === 'in' ? e.sats : -e.sats; e.bal = bal; if (e.type === 'in') { e.reuse = seen; seen = true; } }
   return ev.reverse();
 }
-function destText(sp) { const parts = [...new Set(sp.outputs.map(o => o.kind === 'ext' ? 'fora' : ((addrById((byId(state.utxos, o.utxo) || {}).address) || {}).label || 'endereço')))]; return parts.length ? ' · para ' + esc(parts.slice(0, 2).join(', ')) + (parts.length > 2 ? '…' : '') : ''; }
+function destText(sp) { const parts = [...new Set(sp.outputs.map(o => o.kind === 'ext' ? 'fora' : o.kind === 'ex' ? (o.ex || 'corretora') : ((addrById((byId(state.utxos, o.utxo) || {}).address) || {}).label || 'endereço')))]; return parts.length ? ' · para ' + esc(parts.slice(0, 2).join(', ')) + (parts.length > 2 ? '…' : '') : ''; }
 function evRow(e) {
   if (e.type === 'in') { const s = e.src; return `<button class="ev" data-act="${s.act}" data-id="${esc(s.id)}"><span class="evi in" aria-hidden="true">${I.down}</span><span class="evt">Recebido · ${esc(s.t)}${e.reuse ? ' <span class="tag r">reutilização</span>' : ''}</span><span class="eva pos">+${AMT(e.sats)}</span><span class="evd">${fmtDate(e.date)}${s.d ? ' · ' + s.d : ''}${e.u.txid ? ` · <span class="mono">${esc(shortTx(e.u.txid, e.u.vout))}</span>` : ''}</span><span class="evb">saldo ${AMT(e.bal)}</span></button>`; }
   const sp = e.sp;
@@ -4688,7 +4774,8 @@ function pageTx() {
   const sale = sp.saleId ? byId(state.aportes, sp.saleId) : null, sv0 = saidaVenda(sp);
   // saída para terceiros: venda (ligada ao registro) ou envio; sem venda na transação, cada envio oferece registrar a venda
   const outRow = (o, j) => {
-    if (o.kind === 'ext') { const v = o === sv0; return `<div class="io"><span class="k">${v ? 'Venda · para o comprador' : 'Envio para terceiros'}${o.addr ? `<small class="mono">${esc(shortAddr(o.addr))}</small>` : ''}${!sale ? `<small><button class="link-btn small" data-act="tx-venda" data-id="${sp.id}" data-i="${j}">Foi uma venda? Registrar</button></small>` : ''}</span><span class="v">${AMT(o.sats)}</span></div>`; }
+    if (o.kind === 'ex') return `<div class="io"><span class="k">Para a corretora · ${esc(o.ex || 'Corretora')}${o.fora ? ' <span class="tag">no exterior</span>' : ''}${o.addr ? `<small class="mono">${esc(shortAddr(o.addr))}</small>` : ''}</span><span class="v">${AMT(o.sats)}</span></div>`;
+    if (o.kind === 'ext') { const v = o === sv0; return `<div class="io"><span class="k">${v ? 'Venda · para o comprador' : 'Envio para terceiros'}${o.addr ? `<small class="mono">${esc(shortAddr(o.addr))}</small>` : ''}${!sale ? `<small><button class="link-btn small" data-act="tx-venda" data-id="${sp.id}" data-i="${j}">Foi uma venda? Registrar</button></small>` : ''}${!v ? `<small><button class="link-btn small" data-act="tx-corretora" data-id="${sp.id}" data-i="${j}">Foi para a corretora? Registrar</button></small>` : ''}</span><span class="v">${AMT(o.sats)}</span></div>`; }
     const u = byId(state.utxos, o.utxo), a = u ? addrById(u.address) : null;
     return `<button class="io" data-act="open-addr" data-id="${u ? u.address : ''}" data-hl="${o.utxo}"><span class="k">${esc(a ? a.label : 'Endereço')}${o.rem ? ' · troco' : ''}${a && addrInfo(a).reused ? ' <span class="tag r">reutilizado</span>' : ''}<small>${esc(u ? walletName(u.wallet) : '')}${u && u.spent ? ` · gasto em ${fmtDate(u.spentAt)}` : ' · disponível'}</small></span><span class="v">${AMT(o.sats)}</span></button>`;
   };
@@ -4729,12 +4816,16 @@ function pageWallet() {
     ${!info.length ? '<p class="muted">Nenhum endereço ainda.</p>' : ''}</div>`;
 }
 
-/* ======================= MAPA DOS SATS (1.8.37, item 5 do plano de 23/11/2026) =======================
-   Onde os sats estavam depois de cada movimento, em ordem de data: a corretora (compras menos vendas e saques, a conta do
-   calc e do holdAt), os UTXOs vivos de cada carteira e o que saiu (vendido, enviado e taxas). Aportes seguidos na corretora
-   ficam num passo só. Sem campo novo: a origem sai de origin, saqueId, aporteId, txId e spends[].inputs/outputs. O KYC de
-   cada UTXO é o de hoje (o registro não guarda o histórico dele); a corretora tem cadastro, então tem KYC. */
-const MAPA = { W: 340, P: 12, LH: 26, G: 6, R: 50, RMIN: 3, SVG: 'http://www.w3.org/2000/svg' };
+/* ======================= MAPA DOS SATS (fluxo contínuo, 1.8.38; pedido do Nicolas de 23/11/2026) =======================
+   Os sats no tempo, num fluxo como o do mempool.space: da primeira compra (esquerda) até hoje (direita). A corretora é um
+   rio só, em índigo (todas somadas, com KYC; a espessura em cada data é o saldo do holdAt). Cada carteira tem as suas
+   trilhas em laranja: um UTXO por trilha, da bolha em que nasce até a transação que o gasta. O que sai vai para as margens:
+   vendas na corretora em cima; envios, vendas pela carteira e gastos sem transação embaixo; taxas num ramo fino.
+   Espessura proporcional aos sats, numa escala única. Sem campo novo: tudo sai de aportes, saques, utxos e spends; o KYC de
+   cada UTXO é o de hoje. 1º toque numa bolha: acende o caminho dela (o que veio antes e o que veio depois); 2º toque: o
+   balão com os detalhes; toque no fundo: limpa. A corretora mistura os saldos: o caminho que passa por ela fica em meia-luz
+   e não atravessa um saldo zero. */
+const MAPA = { HF: 230, PADL: 96, PADR: 34, CW: 12, NW: 8, LBL: 22, AX: 34, TETO: 120 };
 // transações em ordem de data; se uma gasta a saída de outra, a de origem vem antes, mesmo com as datas trocadas
 function spendsEmOrdem() {
   const pai = new Map();
@@ -4748,71 +4839,448 @@ function spendsEmOrdem() {
   state.spends.map((sp, i) => [sp, i]).sort((a, b) => a[0].date.localeCompare(b[0].date) || a[1] - b[1]).forEach(([sp]) => visita(sp));
   return ord;
 }
-/* Os passos. Cada um guarda a foto depois dele (snap: corretora, vivos, vendido, enviado e taxas), o que nasceu e o que foi
-   gasto nele e as linhas do texto, com os valores à parte ({ s: sats }) para o olho de ocultar valores. Uma entrada que ainda
-   não tinha aparecido (datas trocadas à mão) entra na transação que a gasta; gasto sem a transação registrada sai na data do
-   gasto, como enviado. */
-function mapaPassos() {
-  const U = new Map(state.utxos.map(u => [u.id, u])), SP = new Map(state.spends.map(sp => [sp.id, sp]));
+/* Os movimentos em ordem: data, depois compra › venda › saque › entrada › transação › gasto sem transação. A venda da
+   carteira vem pela transação e a compra direto na carteira, pelo UTXO. */
+function mapaEventos() {
   const naTx = new Set(), gastoNaTx = new Set(), doSaque = new Set(state.saques.map(w => w.utxoId).filter(Boolean)), ev = [];
   for (const sp of state.spends) { for (const o of sp.outputs) if (o.kind === 'own' && o.utxo) naTx.add(o.utxo); for (const id of sp.inputs) gastoNaTx.add(id); }
   for (const a of state.aportes) {
-    if (isSale(a)) { if (a.src !== 'self') ev.push({ d: a.date, o: 1, t: 'venda', a }); }   // a venda da carteira vem pela transação
-    else if (a.dest !== 'self') ev.push({ d: a.date, o: 0, t: 'compra', a });             // a compra direto na carteira vem pelo UTXO
+    if (isSale(a)) { if (a.src !== 'self') ev.push({ d: a.date, o: 1, t: 'venda', a }); }
+    else if (a.dest !== 'self') ev.push({ d: a.date, o: 0, t: 'compra', a });
   }
   for (const w of state.saques) ev.push({ d: w.date, o: 2, t: 'saque', w });
   for (const u of state.utxos) if (!naTx.has(u.id) && !doSaque.has(u.id)) ev.push({ d: u.date, o: 3, t: 'entrada', u });
   spendsEmOrdem().forEach((sp, i) => ev.push({ d: sp.date, o: 4, i, t: 'tx', sp }));
   for (const u of state.utxos) if (u.spent && !gastoNaTx.has(u.id)) ev.push({ d: u.spentAt || u.date, o: 5, t: 'sumiu', u });
   ev.sort((x, y) => x.d.localeCompare(y.d) || x.o - y.o || (x.i || 0) - (y.i || 0));
-  const vivos = new Map(), nasceu = new Set(), passos = [], kycT = u => u.kyc ? 'com KYC' : 'sem KYC';
-  let ex = 0, vend = 0, env = 0, tax = 0;
-  const entra = u => { if (!u || nasceu.has(u.id)) return; nasceu.add(u.id); vivos.set(u.id, { id: u.id, w: u.wallet, sats: u.sats, kyc: !!u.kyc }); };
-  const foto = () => ({ ex, vend, env, tax, vivos: [...vivos.values()] });
-  for (const e of ev) {
-    const ult = passos[passos.length - 1];
-    if (e.t === 'compra') {
-      ex += e.a.sats;
-      if (ult && ult.t === 'aportes') { ult.n++; ult.sats += e.a.sats; ult.d = e.d; ult.snap = foto(); }
-      else passos.push({ t: 'aportes', d0: e.d, d: e.d, n: 1, sats: e.a.sats, snap: foto() });
-    } else if (e.t === 'venda') {
-      ex -= e.a.sats; vend += e.a.sats;
-      passos.push({ t: 'venda', d: e.d, titulo: 'Venda na corretora', linhas: [[{ s: e.a.sats }, ' vendidos na corretora']], snap: foto() });
-    } else if (e.t === 'saque') {
-      const w = e.w, u = U.get(w.utxoId), fee = w.fee || 0; ex -= w.sats + fee; tax += fee; entra(u);
-      passos.push({ t: 'saque', d: e.d, novos: u ? [u.id] : [], titulo: u ? `Saque para a ${walletName(u.wallet)}` : 'Saque',
-        linhas: [[{ s: w.sats }, ` saíram da corretora${u ? ` para um UTXO ${kycT(u)}` : ''}`], ...(fee ? [[`Taxa de saque: ${fmtSats(fee)} sats`]] : [])], snap: foto() });
-    } else if (e.t === 'entrada') {
-      const u = e.u, ap = u.origin === 'aporte' ? byId(state.aportes, u.aporteId) : null; entra(u);
-      const nome = u.origin === 'aporte' ? (ap && ap.entrada ? 'Compra de terceiros' : 'Compra direto na carteira') : u.origin === 'externo' ? 'Entrada de terceiros' : u.origin === 'saque' ? 'Saque' : 'Entrada';
-      passos.push({ t: 'entrada', d: e.d, novos: [u.id], titulo: `${nome} · ${walletName(u.wallet)}`, linhas: [[{ s: u.sats }, ` ${kycT(u)}`]], snap: foto() });
-    } else if (e.t === 'tx') {
-      const sp = e.sp, ins = sp.inputs.map(id => U.get(id)).filter(Boolean), sv = saidaVenda(sp), novos = [];
-      for (const u of ins) { entra(u); vivos.delete(u.id); }
-      const linhas = [[`${ins.length} ${ins.length === 1 ? 'entrada' : 'entradas'}: `, { s: sumSats(ins) }]];
-      for (const o of sp.outputs) {
-        if (o.kind === 'own') { const u = U.get(o.utxo); if (u) { entra(u); novos.push(u.id); linhas.push([{ s: o.sats }, ` para a ${walletName(u.wallet)}${o.rem ? ' (troco)' : ''}`]); } }
-        else if (o === sv) { vend += o.sats; linhas.push([{ s: o.sats }, ' vendidos']); }
-        else { env += o.sats; linhas.push([{ s: o.sats }, ' enviados para terceiros']); }
+  return ev;
+}
+// uma coluna por movimento; aportes seguidos na corretora, no mesmo mês e sem outro movimento entre eles, ficam numa só
+function mapaColunas() {
+  const cols = [];
+  for (const e of mapaEventos()) {
+    const ult = cols[cols.length - 1];
+    if (e.t === 'compra' && ult && ult.t === 'aportes' && ult.d.slice(0, 7) === e.d.slice(0, 7)) { ult.aps.push(e.a); ult.d = e.d; continue; }
+    cols.push(e.t === 'compra' ? { t: 'aportes', d0: e.d, d: e.d, aps: [e.a] } : { t: e.t, d: e.d, a: e.a, w: e.w, u: e.u, sp: e.sp });
+  }
+  return cols;
+}
+const mapaN = v => (Math.round(v * 10) / 10).toString();
+// faixa curva de (x0, y0) a (x1, y1) com altura h: as bordas são curvas de Bézier de tangente horizontal (a forma do Sankey)
+function mapaFita(x0, y0, x1, y1, h) {
+  const m = mapaN((x0 + x1) / 2), a = mapaN(x0), b = mapaN(x1);
+  return `M${a} ${mapaN(y0)}C${m} ${mapaN(y0)} ${m} ${mapaN(y1)} ${b} ${mapaN(y1)}L${b} ${mapaN(y1 + h)}C${m} ${mapaN(y1 + h)} ${m} ${mapaN(y0 + h)} ${a} ${mapaN(y0 + h)}Z`;
+}
+const mapaReta = (x0, x1, y, h) => `M${mapaN(x0)} ${mapaN(y)}H${mapaN(x1)}V${mapaN(y + h)}H${mapaN(x0)}Z`;
+// ponta de seta no fim de uma saída (x, y: canto de cima do fim da faixa) e cauda de seta no começo de uma entrada
+function mapaPonta(x, y, h) { const a = Math.max(h, 8), t = y + h / 2 - a / 2, p = Math.min(10, a / 2 + 3); return `M${mapaN(x)} ${mapaN(t)}L${mapaN(x + p)} ${mapaN(t + a / 2)}L${mapaN(x)} ${mapaN(t + a)}Z`; }
+function mapaCauda(x, y, h, L = 12) { const a = Math.max(h, 8), t = y + h / 2 - a / 2, p = Math.min(6, a / 2); return `M${mapaN(x)} ${mapaN(t)}H${mapaN(x + L)}V${mapaN(t + a)}H${mapaN(x)}L${mapaN(x + p)} ${mapaN(t + a / 2)}Z`; }
+
+/* O grafo e o desenho. Cada coluna ganha um x; cada UTXO, uma trilha (altura fixa) na faixa da carteira dele; cada pedaço do
+   desenho guarda as duas pontas no grafo (data-a, data-b) para o destaque do caminho. */
+function mapaGrafo() {
+  const U = new Map(state.utxos.map(u => [u.id, u])), cols = mapaColunas(), N = cols.length, vida = new Map();
+  const nasce = (u, i, como) => { if (!u || vida.has(u.id)) return null; const v = { u, b: i, d: null, como, fim: null, y: null, h: 0, cx: null, cy: 0 }; vida.set(u.id, v); return v; };
+  // 1. o saldo da corretora e a vida de cada UTXO (nasce numa coluna, morre na transação que o gasta). Uma entrada que só
+  // aparece depois do gasto (datas trocadas à mão) entra direto na transação que a gasta ('tardia').
+  let ex = 0;
+  cols.forEach((c, i) => {
+    c.exIn = ex; c.A = 0; c.V = 0; c.S = 0; c.F = 0;
+    if (c.t === 'aportes') { c.A = c.aps.reduce((t, a) => t + a.sats, 0); ex += c.A; }
+    else if (c.t === 'venda') { c.V = c.a.sats; ex -= c.V; }
+    else if (c.t === 'saque') { c.S = c.w.sats; c.F = c.w.fee || 0; ex -= c.S + c.F; c.uv = nasce(U.get(c.w.utxoId), i, 'saque'); }
+    else if (c.t === 'entrada') c.uv = nasce(c.u, i, 'entrada');
+    else if (c.t === 'tx') {
+      const sv = saidaVenda(c.sp); c.ins = []; c.outs = []; c.fee = c.sp.fee || 0;
+      for (const id of c.sp.inputs) { const u = U.get(id); if (!u) continue; const v = vida.get(id) || nasce(u, i, 'tardia'); if (v.d == null) { v.d = i; v.fim = 'tx'; c.ins.push(v); } }
+      for (const o of c.sp.outputs) {
+        if (o.kind === 'own') { const v = nasce(U.get(o.utxo), i, 'tx'); if (v) c.outs.push({ k: 'own', o, v }); }
+        else c.outs.push({ k: o.kind === 'ex' ? 'dep' : o === sv ? 'venda' : 'env', o });
       }
-      tax += sp.fee || 0; if (sp.fee) linhas.push([`Taxa da rede: ${fmtSats(sp.fee)} sats`]);
-      passos.push({ t: 'tx', d: e.d, tx: sp.id, novos, foram: ins.map(u => u.id), mix: ins.some(u => u.kyc) && ins.some(u => !u.kyc), titulo: sp.saleId ? 'Venda pela carteira' : txKind(sp), linhas, snap: foto() });
-    } else if (e.t === 'sumiu') {
-      entra(e.u); vivos.delete(e.u.id); env += e.u.sats;
-      passos.push({ t: 'sumiu', d: e.d, foram: [e.u.id], titulo: 'Gasto sem a transação registrada', linhas: [[{ s: e.u.sats }, ` saíram da ${walletName(e.u.wallet)}`]], snap: foto() });
+      c.mix = c.ins.some(v => v.u.kyc) && c.ins.some(v => !v.u.kyc);
+      c.D = c.outs.reduce((t, s) => t + (s.k === 'dep' ? s.o.sats : 0), 0); ex += c.D;   // 1.8.39: para a corretora, volta ao rio
+    } else if (c.t === 'sumiu') { const v = vida.get(c.u.id) || nasce(c.u, i, 'tardia'); if (v.d == null) { v.d = i; v.fim = 'sumiu'; } c.uv = v; }
+    c.exOut = ex;
+  });
+  // 2. a escala: o rio no ponto mais cheio, o pico de cada carteira e as maiores saídas cabem em MAPA.HF px.
+  // Com mais de 40 UTXOs vivos numa carteira, faixas e folgas mais finas.
+  // carteiras na ordem dos saques (a que mais recebe da corretora fica logo abaixo dela), depois na de aparecimento
+  const carteiras = [], nSaq = new Map(); for (const v of vida.values()) { if (!carteiras.includes(v.u.wallet)) carteiras.push(v.u.wallet); if (v.como === 'saque') nSaq.set(v.u.wallet, (nSaq.get(v.u.wallet) || 0) + 1); }
+  carteiras.sort((p, q) => (nSaq.get(q) || 0) - (nSaq.get(p) || 0));   // sort estável: o empate fica na ordem de aparecimento
+  const nasceEm = cols.map(() => []), morreEm = cols.map(() => []);
+  for (const v of vida.values()) if (v.como !== 'tardia') { nasceEm[v.b].push(v); if (v.d != null) morreEm[v.d].push(v); }
+  const soma = new Map(), qtd = new Map(), pico = new Map(); let picoQtd = 0;
+  for (let i = 0; i < N; i++) {
+    for (const v of morreEm[i]) { const w = v.u.wallet; soma.set(w, (soma.get(w) || 0) - v.u.sats); qtd.set(w, (qtd.get(w) || 0) - 1); }
+    for (const v of nasceEm[i]) { const w = v.u.wallet; soma.set(w, (soma.get(w) || 0) + v.u.sats); qtd.set(w, (qtd.get(w) || 0) + 1); pico.set(w, Math.max(pico.get(w) || 0, soma.get(w))); picoQtd = Math.max(picoQtd, qtd.get(w)); }
+  }
+  const denso = picoQtd > 40, MIN = denso ? 1 : 1.6, GAP = denso ? 1.5 : 5, CAP = denso ? 6 : 10;
+  let maxNo = 0, maxV = 0, maxSai = 0, picos = 0;
+  for (const c of cols) {
+    maxNo = Math.max(maxNo, c.exIn + c.A, c.exOut); maxV = Math.max(maxV, c.V);
+    if (c.t === 'tx') maxSai = Math.max(maxSai, c.outs.reduce((t, s) => t + (s.k === 'own' || s.k === 'dep' ? 0 : s.o.sats), 0));
+    if (c.t === 'sumiu') maxSai = Math.max(maxSai, c.u.sats);
+  }
+  for (const p of pico.values()) picos += p;
+  const k = MAPA.HF / Math.max(1, maxNo + picos + maxV + maxSai), th = s => s > 0 ? Math.max(MIN, s * k) : 0;
+  // 3. as trilhas: em cada carteira, a altura livre mais perto do alvo, num tempo em fatias (três por coluna: a chegada das
+  // entradas, o tronco da transação e as bolhas que nascem). Uma trilha fica do nascimento até o gasto, sem zigue-zague.
+  // A altura conta de baixo para cima: os UTXOs antigos assentam embaixo e os novos nascem em cima, perto da corretora.
+  const pista = new Map(carteiras.map(w => [w, []])), ordW = w => carteiras.indexOf(w);
+  const topoVivo = (w, t) => pista.get(w).reduce((m, r) => r.t1 >= t && r.t0 <= t ? Math.max(m, r.y1 + GAP) : m, 0);
+  const lugar = (w, t0, t1, h, alvo) => {
+    const ps = pista.get(w), proib = [];
+    for (const r of ps) if (r.t1 >= t0 && r.t0 <= t1) proib.push([r.y0 - GAP - h, r.y1 + GAP]);
+    proib.sort((a, b) => a[0] - b[0]);
+    let y = 0, melhor = 0, dist = Infinity;
+    const testa = (a, b) => { const c = Math.min(Math.max(alvo, a), b), d = Math.abs(c - alvo); if (d < dist) { dist = d; melhor = c; } };
+    for (const [a, b] of proib) { if (b <= y) continue; if (a > y) testa(y, a); y = Math.max(y, b); }
+    testa(y, Infinity);
+    ps.push({ t0, t1, y0: melhor, y1: melhor + h });
+    return melhor;
+  };
+  const fimT = v => v.d != null ? 3 * v.d : 3 * N + 2;
+  cols.forEach((c, i) => {
+    if ((c.t === 'saque' || c.t === 'entrada') && c.uv) { const v = c.uv; v.h = th(v.u.sats); v.y = lugar(v.u.wallet, 3 * i + 2, fimT(v), v.h, topoVivo(v.u.wallet, 3 * i + 2)); return; }
+    if (c.t !== 'tx') return;
+    for (const v of c.ins) if (!v.h) v.h = th(v.u.sats);
+    c.ins.sort((a, b) => (a.y == null ? 1 : 0) - (b.y == null ? 1 : 0) || ordW(a.u.wallet) - ordW(b.u.wallet) || (b.y || 0) - (a.y || 0));   // de cima para baixo na tela
+    const prop = c.outs.find(s => s.k === 'own');
+    c.lane = c.ins.length ? c.ins[0].u.wallet : prop ? prop.v.u.wallet : carteiras[0];
+    if (!c.lane) return;
+    for (const s of c.outs) s.h = th(s.k === 'own' ? s.v.u.sats : s.o.sats);
+    c.feeH = th(c.fee);
+    c.nh = Math.max(c.ins.reduce((t, v) => t + v.h, 0), c.outs.reduce((t, s) => t + s.h, 0) + c.feeH, MIN);
+    // o tronco fica na altura das entradas da mesma carteira (média pesada pelos sats)
+    const mesmas = c.ins.filter(v => v.y != null && v.u.wallet === c.lane), peso = mesmas.reduce((t, v) => t + v.h, 0);
+    const alvo = peso ? mesmas.reduce((t, v) => t + (v.y + v.h / 2) * v.h, 0) / peso - c.nh / 2 : topoVivo(c.lane, 3 * i + 1);
+    c.ny = lugar(c.lane, 3 * i + 1, 3 * i + 1, c.nh, Math.max(0, alvo));
+    // saídas, de cima para baixo no tronco: o envio para a corretora (ele sobe para o rio), as próprias, cada uma numa trilha
+    // perto da sua vaga, depois as de fora e a taxa. Numa carteira de baixo, a saída nasce no alto dela; numa de cima, embaixo.
+    let topo = c.ny + c.nh;
+    for (const s of c.outs) if (s.k === 'dep') { s.vaga = topo - s.h; topo -= s.h; }
+    for (const s of c.outs) if (s.k === 'own') {
+      const v = s.v; v.h = s.h; s.vaga = topo - s.h; topo -= s.h;
+      v.y = lugar(v.u.wallet, 3 * i + 2, fimT(v), v.h, v.u.wallet === c.lane ? s.vaga : ordW(v.u.wallet) > ordW(c.lane) ? topoVivo(v.u.wallet, 3 * i + 2) : 0);
+    }
+    for (const s of c.outs) if (s.k !== 'own' && s.k !== 'dep') { s.vaga = topo - s.h; topo -= s.h; }
+    c.feeVaga = topo - c.feeH;
+  });
+  // 4. as alturas na tela: margem de cima (vendas na corretora), rio, uma faixa por carteira, margem de baixo e o eixo
+  const temEx = cols.some(c => c.t === 'aportes' || c.t === 'venda' || c.t === 'saque' || c.D > 0);
+  let y = maxV > 0 ? Math.max(28, th(maxV) + 18) : 10, rio = null;
+  if (temEx) {
+    let alt = MIN; for (const c of cols) alt = Math.max(alt, th(c.exIn) + th(c.A), th(c.V) + th(c.exOut) + th(c.S) + th(c.F));
+    rio = { top: y, yB: y + MAPA.LBL + alt }; y = rio.yB + 16;
+  }
+  const faixas = carteiras.map(w => { const f = { w, top: y, y0: y + MAPA.LBL }; f.yb = f.y0 + pista.get(w).reduce((m, r) => Math.max(m, r.y1), MIN); y = f.yb + 16; return f; });
+  let baixo = 0;
+  for (const c of cols) {
+    if (c.t === 'tx' && c.lane) { let s = 0, n = 0; for (const o of c.outs) if (o.k !== 'own' && o.k !== 'dep') { s += o.h; n++; } baixo = Math.max(baixo, s + 3 * Math.max(0, n - 1)); }
+    if (c.t === 'sumiu') baixo = Math.max(baixo, th(c.u.sats));
+  }
+  const base = y, ySai = base + 8, H0 = base + (baixo > 0 ? Math.max(30, baixo + 20) : 26), H = H0 + MAPA.AX;
+  const fx = new Map(faixas.map(f => [f.w, f])), gy = v => fx.get(v.u.wallet).yb - v.y - v.h;   // topo da trilha na tela
+  // 5. o x de cada coluna: o espaço que as formas pedem dos dois lados e a distância no tempo (raiz dos dias, com teto;
+  // acima do teto, uma pausa "⋯" no eixo)
+  const lim = (v, a, b) => Math.max(a, Math.min(b, v));
+  for (const c of cols) {
+    c.esq = 6; c.dir = 6;
+    if (c.t === 'aportes') c.esq = 46;
+    else if (c.t === 'entrada') { c.esq = MAPA.CW / 2 + 22; c.dir = MAPA.CW / 2 + 6; }
+    else if (c.t === 'saque' && rio) { const ys = rio.yB - th(c.F) - th(c.S); c.Ls = lim(0.45 * Math.abs((c.uv ? gy(c.uv) : ys + 34) - ys), 28, 72); c.dir = c.Ls + MAPA.CW + 6; }
+    else if (c.t === 'venda' && rio) { c.Lv = lim(0.5 * (rio.yB - th(c.exOut) - th(c.V) - 6), 22, 56); c.dir = c.Lv + 14; }
+    else if (c.t === 'tx' && c.lane) {
+      const yb = fx.get(c.lane).yb; c.gy = yb - c.ny - c.nh;
+      let off = c.gy, din = 0, tarde = false, dout = 0, sai = false, ddep = -1;
+      for (const v of c.ins) { v.vaga = off; off += v.h; if (v.y != null) din = Math.max(din, Math.abs(gy(v) - v.vaga)); else tarde = true; }
+      for (const s of c.outs) { s.gv = yb - s.vaga - s.h; if (s.k === 'own') dout = Math.max(dout, Math.abs(gy(s.v) - s.gv)); else if (s.k === 'dep') ddep = Math.max(ddep, Math.abs(s.gv - (rio ? rio.yB : 0))); else sai = true; }
+      c.gfee = yb - c.feeVaga - c.feeH;
+      c.Lin = lim(0.5 * din, 18, 56); c.Lout = lim(0.5 * dout, 18, 60); c.Lx = lim(0.45 * Math.abs(ySai - c.gfee), 24, 64); c.Ld = ddep < 0 ? 0 : lim(0.45 * ddep, 28, 72);
+      c.esq = MAPA.NW / 2 + c.Lin + (tarde ? 20 : 0);
+      c.dir = MAPA.NW / 2 + Math.max(c.outs.some(s => s.k === 'own') ? c.Lout + MAPA.CW + 4 : 0, sai ? c.Lx + 12 : 0, c.Ld ? c.Ld + 8 : 0, c.fee ? 20 : 0, 4);
+    } else if (c.t === 'sumiu' && c.uv && c.uv.y != null) { c.Lx = lim(0.45 * Math.abs(ySai - gy(c.uv)), 24, 64); c.dir = c.Lx + 12; }
+  }
+  const dias = (a, b) => Math.max(0, (Date.parse(b) - Date.parse(a)) / 864e5), pT = d => 18 + 9 * Math.sqrt(d);
+  let x = MAPA.PADL + (N ? cols[0].esq : 0);
+  cols.forEach((c, i) => { if (i) { const p = cols[i - 1], d = pT(dias(p.d, c.d)); x += Math.max(p.dir + c.esq + 10, Math.min(MAPA.TETO, d)); c.pausa = d > MAPA.TETO; } c.x = x; });
+  const hoje = todayISO(), ult = cols[N - 1], dFim = N ? pT(dias(ult.d, hoje)) : 0;
+  let xFim = N ? ult.x + Math.max(ult.dir + 28, Math.min(MAPA.TETO, dFim)) : MAPA.PADL + 60;
+  // pouco movimento: as colunas se espalham pela largura da tela
+  const tela = Math.min(Math.max(320, document.documentElement.clientWidth || 390), 760) - 42;
+  if (N && xFim + MAPA.PADR < tela) { const f = Math.min(3, (tela - MAPA.PADR - MAPA.PADL) / Math.max(1, xFim - MAPA.PADL)); for (const c of cols) c.x = MAPA.PADL + (c.x - MAPA.PADL) * f; xFim = MAPA.PADL + (xFim - MAPA.PADL) * f; }
+  const W = Math.ceil(xFim + MAPA.PADR);
+  // 6. o desenho, em camadas (rio, fitas, trilhas, bolhas, pontas e taxas) e o grafo do caminho
+  const hide = S().hide, qt = s => hide ? '' : `, ${amtTxt(s)}`, difs = new Set(kycDifs().map(d => d.id));
+  const camada = { rio: [], fita: [], banda: [], bolha: [], topo: [] }, nos = new Map(), dn = new Map(), up = new Map();
+  // ligação no grafo. 'in': entra no rio; 'out': sai do rio; 'rr': o rio que segue. O rio mistura os saldos: atravessá-lo
+  // deixa o caminho fraco (meia-luz) dali em diante
+  const liga = (a, b, tipo) => {
+    const fd = tipo === 'out' || tipo === 'rr', fu = tipo === 'in' || tipo === 'rr';
+    if (!dn.has(a)) dn.set(a, []); if (!up.has(b)) up.set(b, []);
+    dn.get(a).push([b, fd]); up.get(b).push([a, fu]);
+  };
+  // um pedaço do desenho: a e b são as pontas no grafo (ele acende quando as duas estão no caminho); kk, a chave do toque;
+  // rot, o nome para o leitor de tela (só na âncora de cada nó, a que recebe o foco e o balão)
+  const poe = (cam, cls, d, a, b, kk, rot) => camada[cam].push(`<path class="el ${cls}${rot ? ' an' : ''}" d="${d}" data-a="${a}" data-b="${b || a}"${kk ? ` data-act="mapa-b" data-k="${kk}"` : ''}${rot ? ` tabindex="-1" role="button" aria-label="${esc(rot)}"` : ''}/>`);
+  // bolha (cápsula), com área de toque de pelo menos 26 px; o tronco da transação usa a mesma forma, com a altura exata
+  const bolhas = [];
+  const bolha = (cx, cy, h, w, cls, kk, rot, exato, extra = '') => {
+    const a = exato ? h : Math.max(h + 4, CAP), t = Math.max(a, 26);
+    bolhas.push({ cx, cy, a, w });
+    camada.bolha.push(`<g class="el bo an ${cls}" data-a="${kk}" data-b="${kk}" data-act="mapa-b" data-k="${kk}" tabindex="-1" role="button" aria-label="${esc(rot)}"><rect class="alvo" x="${mapaN(cx - 13)}" y="${mapaN(cy - t / 2)}" width="26" height="${mapaN(t)}"/><rect class="c" x="${mapaN(cx - w / 2)}" y="${mapaN(cy - a / 2)}" width="${w}" height="${mapaN(a)}" rx="${mapaN(Math.min(w, a) / 2)}" ry="${mapaN(Math.min(w, a) / 2)}"/>${extra}</g>`);
+  };
+  const taxa = (x0, y0, kk) => camada.topo.push(`<path class="el tf" d="M${mapaN(x0)} ${mapaN(y0)}C${mapaN(x0 + 9)} ${mapaN(y0)} ${mapaN(x0 + 12)} ${mapaN(y0 + 6)} ${mapaN(x0 + 13)} ${mapaN(y0 + 16)}" data-a="${kk}" data-b="${kk}"/><ellipse class="el tp" cx="${mapaN(x0 + 13)}" cy="${mapaN(y0 + 18.5)}" rx="2.3" ry="2.3" data-a="${kk}" data-b="${kk}"/>`);
+  const rotU = u => `UTXO de ${fmtDate(u.date)}, ${walletName(u.wallet)}${qt(u.sats)}, ${u.kyc ? 'com' : 'sem'} KYC`;
+  // o rio: um trecho por movimento da corretora, deitado no leito (yB); depois de um saque, desce até o leito
+  const segs = []; let atual = null;
+  if (rio) cols.forEach((c, i) => {
+    const dep = c.t === 'tx' && c.D > 0;
+    if (c.t !== 'aportes' && c.t !== 'venda' && c.t !== 'saque' && !dep) return;
+    const x0 = dep && c.lane ? c.x + MAPA.NW / 2 : c.x, de = atual; if (de) { de.x1 = x0; de.d1 = c.d; }
+    const novo = c.exOut > 0 ? { s: segs.length, c: i, x0, x1: 0, d0: c.d, d1: null, sats: c.exOut } : null;
+    if (novo) segs.push(novo);
+    if (c.t === 'aportes' && novo) liga('a:' + i, 'r:' + novo.s, 'in');
+    if (dep && novo && c.lane) liga('t:' + c.sp.id, 'r:' + novo.s, 'in');   // 1.8.39: o envio para a corretora entra no rio
+    if (c.t === 'venda' && de) liga('r:' + de.s, 'v:' + c.a.id, 'out');
+    if (c.t === 'saque' && de) liga('r:' + de.s, 'w:' + c.w.id, 'out');
+    if (de && novo) liga('r:' + de.s, 'r:' + novo.s, 'rr');
+    c.seg = novo; atual = novo;
+  });
+  if (atual) atual.x1 = xFim;
+  for (const g of segs) {
+    const c = cols[g.c], h = th(g.sats), yb = rio.yB - h, kk = 'r:' + g.s;
+    let L, d;
+    if (c.t === 'tx') {   // 1.8.39: depois de um envio para a corretora, o rio sobe e o envio entra por baixo dele
+      const h0 = th(c.exIn); L = Math.min(c.Ld || 0, g.x1 - g.x0);
+      d = (L && h0 ? mapaFita(g.x0 - 0.3, rio.yB - h0, g.x0 + L, yb, h0) : '') + mapaReta(g.x0 + L - 0.3, g.x1 + 0.3, yb, h);
+    } else {
+      const yo = yb - th(c.F) - th(c.S); L = yo < yb - 0.05 ? Math.min(c.Ls || 30, g.x1 - g.x0) : 0;
+      d = (L ? mapaFita(g.x0 - 0.3, yo, g.x0 + L, yb, h) : '') + mapaReta(g.x0 + L - 0.3, g.x1 + 0.3, yb, h);
+    }
+    poe('rio', 'rio', d, kk, kk, kk, `Corretora de ${fmtDate(g.d0)} ${g.d1 ? 'a ' + fmtDate(g.d1) : 'até hoje'}${qt(g.sats)}`);
+    nos.set(kk, { tp: 'r', g, x: g.x0 + Math.min(L + 30, (g.x1 - g.x0) / 2), y: yb + h / 2 });
+  }
+  cols.forEach((c, i) => {
+    if (c.t === 'aportes' && rio) {
+      const kk = 'a:' + i, h = th(c.A), ys = rio.yB - th(c.exIn) - h, cx = c.x - 26;
+      poe('rio', 'ap', mapaCauda(cx - MAPA.CW / 2 - 15, ys, h), kk, kk, kk);
+      poe('rio', 'ap', mapaReta(cx, c.x + 0.3, ys, h), kk, c.seg ? 'r:' + c.seg.s : kk, kk);
+      bolha(cx, ys + h / 2, h, MAPA.CW, 'ap', kk, c.aps.length === 1 ? `Aporte na corretora em ${fmtDate(c.d)}${qt(c.A)}` : `${c.aps.length} aportes na corretora, de ${fmtDate(c.d0)} a ${fmtDate(c.d)}${qt(c.A)}`);
+      nos.set(kk, { tp: 'a', c, x: cx, y: ys + h / 2 });
+    } else if (c.t === 'venda' && rio) {
+      const kk = 'v:' + c.a.id, h = th(c.V), yv = rio.yB - th(c.exOut) - h, x1 = c.x + c.Lv;
+      poe('rio', 'vx', mapaFita(c.x - 0.3, yv, x1, 6, h), kk, kk, kk);
+      poe('topo', 'pv', mapaPonta(x1 - 0.3, 6, h), kk, kk, kk, `Venda na corretora em ${fmtDate(c.d)}${qt(c.V)}`);
+      nos.set(kk, { tp: 'v', c, x: x1, y: 6 + h / 2 });
+    } else if (c.t === 'saque' && rio) {
+      const kk = 'w:' + c.w.id, h = th(c.S), ys = rio.yB - th(c.F) - h, v = c.uv, rot = `Saque de ${fmtDate(c.d)}${qt(c.S)}`, yf = v ? gy(v) : ys + 34;
+      if (v) {
+        v.cx = c.x + c.Ls + MAPA.CW / 2; v.cy = gy(v) + v.h / 2;
+        poe('fita', 'saq', mapaFita(c.x - 0.3, ys, v.cx, gy(v), h), kk, kk, kk, rot); liga(kk, 'u:' + v.u.id, 'n');
+      } else {   // UTXO que aparece antes do saque (datas trocadas) ou saque sem UTXO
+        const x1 = c.x + c.Ls, y1 = ys + 34, u = U.get(c.w.utxoId);
+        poe('fita', 'saq', mapaFita(c.x - 0.3, ys, x1, y1, h), kk, kk, kk, rot); poe('topo', 'pe tr', mapaPonta(x1 - 0.3, y1, h), kk, kk, kk);
+        if (u) liga(kk, 'u:' + u.id, 'n');
+      }
+      if (c.F) taxa(c.x, rio.yB - th(c.F) / 2, kk);
+      nos.set(kk, { tp: 'w', c, x: c.x + c.Ls / 2, y: (ys + yf + h) / 2 });
+    } else if (c.t === 'entrada' && c.uv) {
+      const v = c.uv; v.cx = c.x; v.cy = gy(v) + v.h / 2;
+      poe('fita', 'ut' + (v.u.kyc ? ' k' : ''), mapaCauda(c.x - MAPA.CW / 2 - 17, gy(v), v.h), 'u:' + v.u.id, 'u:' + v.u.id, 'u:' + v.u.id);
+    } else if (c.t === 'tx' && c.lane) {
+      const kk = 't:' + c.sp.id, xl = c.x - MAPA.NW / 2, xr = c.x + MAPA.NW / 2;
+      for (const v of c.ins) {   // as entradas convergem no tronco
+        const ku = 'u:' + v.u.id, cl = 'ut' + (v.u.kyc ? ' k' : '');
+        if (v.y != null) poe('fita', cl, mapaFita(xl - c.Lin - 0.3, gy(v), xl + 0.3, v.vaga, v.h), ku, kk, ku);
+        else { v.cx = xl - 22; v.cy = v.vaga + v.h / 2; poe('fita', cl, mapaCauda(v.cx - 6, v.vaga, v.h, 10) + mapaReta(v.cx + 4, xl + 0.3, v.vaga, v.h), ku, kk, ku, rotU(v.u)); nos.set(ku, { tp: 'u', v, x: v.cx, y: v.cy }); }
+        liga(ku, kk, 'n');
+      }
+      // os envios para a corretora entram por baixo do rio, na ordem em que saem do tronco (sem se cruzar)
+      let yx = ySai, yd = (rio ? rio.yB : 0) - c.outs.reduce((t, s) => t + (s.k === 'dep' ? s.h : 0), 0);
+      for (const s of c.outs) {   // e o tronco se abre nas saídas
+        if (s.k === 'dep') { poe('fita', 'dx', mapaFita(xr - 0.3, s.gv, xr + c.Ld + 0.3, yd, s.h), kk, c.seg ? 'r:' + c.seg.s : kk, kk); yd += s.h; }
+        else if (s.k === 'own') {
+          const v = s.v, ku = 'u:' + v.u.id; v.cx = xr + c.Lout + MAPA.CW / 2; v.cy = gy(v) + v.h / 2;
+          poe('fita', 'ut' + (v.u.kyc ? ' k' : ''), mapaFita(xr - 0.3, s.gv, v.cx, gy(v), v.h), kk, ku, ku); liga(kk, ku, 'n');
+        } else {
+          const x1 = xr + c.Lx, cl = s.k === 'venda' ? 'v' : 'e';
+          poe('fita', 's' + cl, mapaFita(xr - 0.3, s.gv, x1, yx, s.h), kk, kk, kk); poe('topo', 'p' + cl, mapaPonta(x1 - 0.3, yx, s.h), kk, kk, kk); yx += s.h + 3;
+        }
+      }
+      if (c.fee) taxa(xr, c.gfee + c.feeH / 2, kk);
+      const sats = c.ins.reduce((t, v) => t + v.u.sats, 0);
+      bolha(c.x, c.gy + c.nh / 2, c.nh + 2, MAPA.NW, 'no' + (c.mix ? ' mix' : ''), kk, `${c.sp.saleId ? 'Venda pela carteira' : txKind(c.sp)} de ${fmtDate(c.d)}${qt(sats)}${c.mix ? ', com mistura de KYC' : ''}`, true);
+      nos.set(kk, { tp: 't', c, x: c.x, y: c.gy + c.nh / 2 });
+    }
+  });
+  // as trilhas dos UTXOs e as bolhas em que eles nascem (o ponto vermelho marca o KYC que não acompanhou as entradas)
+  for (const v of vida.values()) {
+    if (v.y == null || v.cx == null) continue;
+    const u = v.u, ku = 'u:' + u.id, cl = 'ut' + (u.kyc ? ' k' : ''), y0 = gy(v);
+    let x1 = xFim;
+    if (v.d != null) { const c = cols[v.d]; x1 = v.fim === 'tx' ? c.x - MAPA.NW / 2 - c.Lin : c.x; }
+    if (x1 > v.cx) poe('banda', cl, mapaReta(v.cx, x1 + 0.3, y0, v.h), ku, ku, ku);
+    if (v.fim === 'sumiu') { const c = cols[v.d], x2 = c.x + c.Lx; poe('fita', 'se', mapaFita(c.x - 0.3, y0, x2, ySai, v.h), ku, ku, ku); poe('topo', 'pe tr', mapaPonta(x2 - 0.3, ySai, v.h), ku, ku, ku); }
+    const dif = difs.has(u.id), a = Math.max(v.h + 4, CAP);
+    bolha(v.cx, v.cy, v.h, MAPA.CW, cl + (dif ? ' dif' : ''), ku, rotU(u) + (dif ? ', KYC diferente do das entradas' : ''), false, dif ? `<ellipse class="av" cx="${mapaN(v.cx + MAPA.CW / 2)}" cy="${mapaN(v.cy - a / 2)}" rx="3.6" ry="3.6"/>` : '');
+    nos.set(ku, { tp: 'u', v, x: v.cx, y: v.cy });
+  }
+  // fundo: separação das faixas e a linha de hoje; o eixo com os meses (posição proporcional à data entre duas colunas)
+  const fundo = [];
+  for (const f of faixas) if (f.top > 14) fundo.push(`<line class="sep" x1="0" x2="${W}" y1="${mapaN(f.top - 8)}" y2="${mapaN(f.top - 8)}"/>`);
+  if (N) fundo.push(`<line class="sep" x1="0" x2="${W}" y1="${mapaN(base - 8)}" y2="${mapaN(base - 8)}"/>`);
+  fundo.push(`<line class="hoje" x1="${mapaN(xFim)}" x2="${mapaN(xFim)}" y1="${mapaN(rio ? rio.top : faixas.length ? faixas[0].top : 0)}" y2="${mapaN(H0)}"/>`);
+  const marcas = [];
+  if (N) marcas.push({ x: cols[0].x, txt: `${MONTHS[+cols[0].d.slice(5, 7) - 1]} ${cols[0].d.slice(0, 4)}`, ano: true, ini: true });
+  const pts = cols.map(c => [c.x, Date.parse(c.d)]); pts.push([xFim, Date.parse(hoje)]);
+  for (let j = 0; j + 1 < pts.length; j++) {
+    const [xa, ta] = pts[j], [xb, tb] = pts[j + 1]; if (!(tb > ta)) continue;
+    const d0 = new Date(ta);
+    for (let m = new Date(Date.UTC(d0.getUTCFullYear(), d0.getUTCMonth() + 1, 1)); m.getTime() <= tb; m = new Date(Date.UTC(m.getUTCFullYear(), m.getUTCMonth() + 1, 1))) {
+      const mes = m.getUTCMonth();
+      marcas.push({ x: xa + (xb - xa) * (m.getTime() - ta) / (tb - ta), txt: mes ? MONTHS[mes] : String(m.getUTCFullYear()), ano: !mes });
     }
   }
-  for (const p of passos) if (p.t === 'aportes') { p.titulo = p.n === 1 ? 'Aporte na corretora' : `${p.n} aportes na corretora`; p.linhas = [['+', { s: p.sats }, ' na corretora']]; }
-  return passos;
+  const pausas = []; cols.forEach((c, i) => { if (c.pausa) pausas.push((cols[i - 1].x + c.x) / 2); });
+  if (N && dFim > MAPA.TETO) pausas.push((ult.x + xFim) / 2);
+  const eixo = { marcas, pausas, x0: MAPA.PADL - 12, xFim };
+  const defs = `<defs>${['x', 'u'].map(t => `<pattern id="mp-h${t}" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect class="pb-${t}" width="6" height="6"/><rect class="ps" width="2.2" height="6"/></pattern>`).join('')}${[['gxu', 'x', 'u'], ['gxv', 'x', 'v'], ['gue', 'u', 'e'], ['guv', 'u', 'v'], ['gux', 'u', 'x']].map(([id, a, b]) => `<linearGradient id="mp-${id}"><stop offset="0" class="s-${a}"/><stop offset="1" class="s-${b}"/></linearGradient>`).join('')}</defs>`;
+  const resumo = N ? `Mapa dos sats de ${fmtDate(cols[0].d)} até hoje, com ${N} ${N === 1 ? 'movimento' : 'movimentos'}. Toque numa bolha para destacar o caminho dela e toque de novo para ver os detalhes.` : '';
+  const Hs = Math.ceil(H0 + 2);   // o SVG vai até a linha de hoje; o eixo dos meses fica embaixo, em HTML (MAPA.AX px)
+  const svg = `<svg id="mapa-svg" width="${W}" height="${Hs}" viewBox="0 0 ${W} ${Hs}" preserveAspectRatio="none" role="group" aria-label="${esc(resumo)}">${defs}${fundo.join('')}${camada.rio.join('')}${camada.fita.join('')}${camada.banda.join('')}${camada.bolha.join('')}${camada.topo.join('')}</svg>`;
+  const rots = [...(rio ? [{ y: rio.top + 3, t: 'Corretora' }] : []), ...faixas.map(f => ({ y: f.top + 3, t: walletName(f.w) })), ...(N ? [{ y: base - 2, t: 'Saiu' }] : [])];
+  const ordem = [...nos.entries()].sort((p, q) => p[1].x - q[1].x).map(e => e[0]);
+  return { cols, vida, segs, nos, dn, up, ordem, W, H: Hs + MAPA.AX, Hs, k, MIN, rio, faixas, base, xFim, svg, rots, eixo, bolhas, els: null, lv: null };
+}
+
+/* O caminho de um nó: tudo o que veio antes (subindo) e tudo o que veio depois (descendo). Nível 2: caminho exato (UTXOs e
+   transações, e o rio logo antes de um saque ou logo depois de um aporte); nível 1: o que passa pela mistura da corretora. */
+function mapaLinhagem(k) {
+  const M = ui.mapa, lv = new Map();
+  for (const adj of [M.up, M.dn]) {
+    const nv = new Map([[k, 2]]); let fila = [k];
+    while (fila.length) { const n = fila.pop(); for (const [to, fraca] of adj.get(n) || []) if (!fraca && !nv.has(to)) { nv.set(to, 2); fila.push(to); } }
+    fila = [...nv.keys()];
+    while (fila.length) { const n = fila.pop(); for (const [to] of adj.get(n) || []) if (!nv.has(to)) { nv.set(to, 1); fila.push(to); } }
+    for (const [n, l] of nv) lv.set(n, Math.max(lv.get(n) || 0, l));
+  }
+  return lv;
+}
+// acende o caminho do escolhido (só troca classes; o desenho não é refeito)
+function mapaFoco() {
+  const M = ui.mapa, svg = $('#mapa-svg'); if (!M || !svg) return;
+  if (!M.els) M.els = [...svg.querySelectorAll('[data-a]')].map(el => [el, el.dataset.a, el.dataset.b, el.dataset.k || '', el.classList.contains('an')]);
+  const k = ui.mapaSel, lv = k && M.nos.has(k) ? mapaLinhagem(k) : null;
+  M.lv = lv; svg.classList.toggle('foco', !!lv);
+  for (const [el, a, b, kk, an] of M.els) {
+    const l = lv ? Math.min(lv.get(a) || 0, lv.get(b) || 0) : 0;
+    el.classList.toggle('l2', l === 2); el.classList.toggle('l1', l === 1);
+    if (an) { const s = !!lv && kk === k; el.classList.toggle('sel', s); el.setAttribute('aria-pressed', String(s)); }
+  }
+}
+const mapaAncora = k => k ? document.querySelector(`#mapa-svg .an[data-k="${k}"]`) : null;
+// foco do teclado num nó só (tabindex 0 nele, -1 nos outros)
+function mapaTab(k) {
+  const a = mapaAncora(k); if (!a) return;
+  for (const el of $$('#mapa-svg .an[tabindex="0"]')) if (el !== a) el.setAttribute('tabindex', '-1');
+  a.setAttribute('tabindex', '0');
+}
+function mapaVoz(t) { const v = $('#mapa-voz'); if (v) v.textContent = t; }
+// traz o nó para o meio do mapa, nos dois eixos (perto: "Ver no mapa", que chega a pelo menos 1:1), e o mapa para a tela
+function mapaCentra(k, suave = true, perto = false) {
+  const M = ui.mapa, r = $('#mapa-rola'), n = M && M.nos.get(k); if (!r || !n || !M.esc) return;
+  if (perto && ui.mapaZ.u < 0) mapaAplica(0);
+  const e = M.esc, vh = Math.max(40, r.clientHeight - MAPA.AX), calmo = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const L = Math.max(0, n.x * e.sx - r.clientWidth / 2), T = Math.max(0, n.y * e.sy - vh / 2);
+  if (suave && !calmo && r.scrollTo) r.scrollTo({ left: L, top: T, behavior: 'smooth' }); else { r.scrollLeft = L; r.scrollTop = T; }
+  ui.mapaX = r.scrollLeft; ui.mapaY = r.scrollTop;
+  const p = $('.mapa-palco'), tab = $('.tabs'); if (!p) return;
+  const b = p.getBoundingClientRect(), fim = innerHeight - (tab ? tab.offsetHeight : 0);
+  if (b.top < 0 || b.bottom > fim + 1) window.scrollBy(0, b.top < 0 ? b.top - 8 : Math.min(b.top - 8, b.bottom - fim + 8));
+}
+function mapaEscolhe(k) {
+  const M = ui.mapa; if (!M || !M.nos.has(k)) return;
+  if (ui.mapaPop) mapaPopFecha();
+  ui.mapaSel = k; mapaFoco(); mapaTab(k);
+  const a = mapaAncora(k); mapaVoz(`${a ? a.getAttribute('aria-label') : ''}: caminho destacado. Toque de novo para ver os detalhes.`);
+}
+function mapaLimpa() {
+  if (!ui.mapaSel && !ui.mapaPop) return;
+  if (ui.mapaPop) mapaPopFecha();
+  ui.mapaSel = null; mapaFoco(); mapaVoz('Destaque limpo.');
+}
+// o balão dos detalhes: abre no 2º toque; fecha no fundo, num 3º toque, no Esc e no Voltar (é um nível no backLevels)
+function mapaPopAbre() { if (!ui.mapaSel) return; ui.mapaPop = true; mapaPopMostra(); histQueue(); mapaVoz('Detalhes abertos.'); }
+function mapaPopMostra() {
+  const p = $('#mapa-pop'); if (!p) return;
+  const h = mapaPopHTML(ui.mapaSel); if (!h) { ui.mapaPop = false; p.hidden = true; return; }
+  p.innerHTML = h; p.hidden = false; mapaPopPos();
+}
+function mapaPopFecha() { ui.mapaPop = false; const p = $('#mapa-pop'); if (p) { p.hidden = true; p.innerHTML = ''; } histQueue(); }
+// ao lado da bolha (embaixo se ela está na metade de cima do mapa; em cima, se na de baixo), sempre dentro do mapa, nos dois
+// eixos. A bolha saiu da parte visível (a rolagem ou o zoom): o balão some até ela voltar
+function mapaPopPos() {
+  const p = $('#mapa-pop'), palco = $('.mapa-palco'), r = $('#mapa-rola'), a = mapaAncora(ui.mapaSel); if (!p || p.hidden || !palco || !r || !a) return;
+  const b = a.getBoundingClientRect(), q = palco.getBoundingClientRect(), v = r.getBoundingClientRect(), w = p.offsetWidth, h = p.offsetHeight;
+  const e = Math.max(b.left, v.left), d = Math.min(b.right, v.left + r.clientWidth), t = Math.max(b.top, v.top), u = Math.min(b.bottom, v.top + Math.max(0, r.clientHeight - MAPA.AX));
+  const vis = e < d && t < u; p.style.visibility = vis ? '' : 'hidden'; if (!vis) return;
+  const W = palco.clientWidth, H = palco.clientHeight, cx = (e + d) / 2 - q.left, topo = t - q.top, pe = u - q.top;
+  const x = Math.max(6, Math.min(W - w - 6, cx - w / 2)), y = Math.max(6, Math.min(H - h - 6, (topo + pe) / 2 > H / 2 ? topo - h - 10 : pe + 10));
+  p.style.left = Math.round(x) + 'px'; p.style.top = Math.round(y) + 'px';
+}
+function mapaPopHTML(k) {
+  const M = ui.mapa, n = M && M.nos.get(k); if (!n) return '';
+  const tag = kyc => kyc ? '<span class="tag k">KYC</span>' : '<span class="tag">sem KYC</span>', lin = t => `<p>${t}</p>`;
+  const bt = (act, id, txt, p) => `<button class="btn ${p ? 'btn-p' : 'btn-q'} btn-s" data-act="${act}"${id ? ` data-id="${id}"` : ''}>${txt}</button>`;
+  const emSats = s => `${S().hide ? OCULTO : esc(fmtSats(s))} sats`;   // taxas sempre em sats
+  if (n.tp === 'u') {
+    const u = n.v.u, sp = u.spendId ? byId(state.spends, u.spendId) : null, dif = kycDifs().some(x => x.id === u.id), nome = u.label || (addrById(u.address) || {}).label || '';
+    const gasto = !u.spent ? 'Ainda não foi gasto' : sp ? `Gasto em ${fmtDate(sp.date)} · <button class="link-btn small" data-act="open-tx" data-id="${sp.id}">${esc(sp.saleId ? 'Venda pela carteira' : txKind(sp))}</button>` : `Gasto em ${fmtDate(u.spentAt || u.date)}, sem a transação registrada`;
+    const tx = u.origin === 'tx' && u.txId && byId(state.spends, u.txId) ? u.txId : sp ? sp.id : '';
+    return `<p class="mp-t"><b>${AMT(u.sats)}</b> ${tag(u.kyc)}</p>${lin(esc(walletName(u.wallet)) + (nome ? ' · ' + esc(nome) : ''))}${lin(`Nasceu em ${fmtDate(u.date)} · ${esc(utxoSource(u).t)}`)}${lin(gasto)}
+      ${dif ? '<p class="mp-av">O KYC deste UTXO não acompanhou o das entradas da transação que o criou.</p>' : ''}
+      <div class="mp-bt">${bt('edit-utxo', u.id, 'Abrir UTXO')}${tx ? bt('open-tx', tx, 'Ver transação') : ''}${dif ? bt('mapa-kyc', '', 'Corrigir o KYC', true) : ''}</div>`;
+  }
+  if (n.tp === 't') {
+    const c = n.c, sp = c.sp, sv = saidaVenda(sp), own = sp.outputs.filter(o => o.kind === 'own');
+    const troco = own.filter(o => o.rem).reduce((t, o) => t + o.sats, 0), para = own.reduce((t, o) => t + o.sats, 0) - troco, env = sp.outputs.filter(o => o.kind === 'ext' && o !== sv).reduce((t, o) => t + o.sats, 0);
+    const ls = [`${c.ins.length} ${c.ins.length === 1 ? 'entrada' : 'entradas'}: ${AMT(c.ins.reduce((t, v) => t + v.u.sats, 0))}`];
+    const dep = sp.outputs.filter(o => o.kind === 'ex'), depN = [...new Set(dep.map(o => o.ex || 'Corretora'))].join(', ');
+    if (dep.length) ls.push(`Para a corretora (${esc(depN)}): ${AMT(dep.reduce((t, o) => t + o.sats, 0))}`);
+    if (para) ls.push(`Para mim: ${AMT(para)}`); if (troco) ls.push(`Troco: ${AMT(troco)}`); if (sv) ls.push(`Vendido: ${AMT(sv.sats)}`); if (env) ls.push(`Enviado: ${AMT(env)}`);
+    ls.push(`Taxa da rede: ${emSats(sp.fee || 0)}`);
+    return `<p class="mp-t"><b>${esc(sp.saleId ? 'Venda pela carteira' : txKind(sp))}</b></p>${lin(fmtDate(sp.date))}${ls.map(lin).join('')}
+      ${c.mix ? '<p class="mp-av">Mistura de KYC: moedas com e sem KYC se juntaram aqui. Na blockchain elas ficam ligadas, e as saídas ficam com KYC.</p>' : ''}
+      ${dep.length && c.ins.some(v => !v.u.kyc) ? '<p class="mp-av">Moedas sem KYC foram para a corretora: lá ficam ligadas ao seu cadastro, e o troco passa a ter KYC.</p>' : ''}
+      <div class="mp-bt">${bt('open-tx', sp.id, 'Ver transação')}</div>`;
+  }
+  if (n.tp === 'a') {
+    const c = n.c, um = c.aps.length === 1;
+    return `<p class="mp-t"><b>${AMT(c.A)}</b> ${tag(true)}</p>${lin(um ? `Aporte na corretora em ${fmtDate(c.d)}` : `${c.aps.length} aportes na corretora, de ${fmtDate(c.d0)} a ${fmtDate(c.d)}`)}${lin('A corretora tem o seu cadastro: o saldo dela tem KYC.')}${um ? `<div class="mp-bt">${bt('edit-aporte', c.aps[0].id, 'Abrir aporte')}</div>` : ''}`;
+  }
+  if (n.tp === 'r') {
+    const g = n.g;
+    return `<p class="mp-t"><b>${AMT(g.sats)}</b> ${tag(true)}</p>${lin(`Na corretora de ${fmtDate(g.d0)} ${g.d1 ? 'a ' + fmtDate(g.d1) : 'até hoje'}`)}${lin('A corretora mistura os saldos: o caminho em meia-luz mostra de onde eles podem ter vindo e para onde podem ter ido.')}`;
+  }
+  if (n.tp === 'w') {
+    const w = n.c.w, u = w.utxoId ? byId(state.utxos, w.utxoId) : null;
+    return `<p class="mp-t"><b>${AMT(w.sats)}</b></p>${lin(`Saque${w.ex ? ' da ' + esc(w.ex) : ''} em ${fmtDate(w.date)}`)}${lin(`Taxa de saque: ${emSats(w.fee || 0)}`)}${n.c.uv ? '' : lin(u ? 'O UTXO deste saque aparece antes da data dele: confira as datas.' : 'Saque sem UTXO registrado.')}<div class="mp-bt">${bt('edit-saque', w.id, 'Abrir saque')}${u ? bt('edit-utxo', u.id, 'Abrir UTXO') : ''}</div>`;
+  }
+  if (n.tp === 'v') {
+    const a = n.c.a;
+    return `<p class="mp-t"><b>${AMT(a.sats)}</b></p>${lin(`Venda na corretora em ${fmtDate(a.date)}${a.ex && !isDefEx(a.ex) ? ' · ' + esc(a.ex) : ''}`)}<div class="mp-bt">${bt('edit-aporte', a.id, 'Abrir venda')}</div>`;
+  }
+  return '';
 }
 /* KYC que não acompanhou as entradas: em ordem, o KYC de cada saída própria é o OU das entradas (a regra do txSave), já com
    as correções de antes. A diferença aparece quando o KYC de uma entrada muda depois da transação (a cascata refaz só os
-   valores) ou quando a saída foi editada; o mapa mostra e oferece corrigir. */
+   valores) ou quando a saída foi editada; o mapa marca a bolha e o balão dela (e a folha do UTXO) oferecem corrigir. */
 function kycDifs() {
   const k = new Map(state.utxos.map(u => [u.id, !!u.kyc])), difs = [];
   for (const sp of spendsEmOrdem()) {
     const ins = sp.inputs.filter(id => k.has(id)); if (!ins.length) continue;
-    const esp = ins.some(id => k.get(id));
+    const esp = ins.some(id => k.get(id)) || sp.outputs.some(o => o.kind === 'ex');   // 1.8.39: para a corretora, a transação fica ligada ao cadastro
     for (const o of sp.outputs) if (o.kind === 'own' && o.utxo && k.has(o.utxo) && k.get(o.utxo) !== esp) { difs.push({ id: o.utxo, para: esp, tx: sp.id }); k.set(o.utxo, esp); }
   }
   return difs;
@@ -4823,142 +5291,192 @@ function kycCorrige() {
   for (const d of difs) { const u = byId(state.utxos, d.id); if (u) u.kyc = d.para; }
   save(); render(); toastDesfazer(`KYC corrigido em ${difs.length === 1 ? '1 UTXO' : difs.length + ' UTXOs'}`, snap);
 }
-// geometria única para todos os passos: a maior bolha de todos tem R, e as faixas têm a altura do passo mais cheio
-function mapaFila(itens, raio) {
-  const larg = MAPA.W - 2 * MAPA.P, pos = []; let x = 0, y = 0, alt = 0, linha = [];
-  const fecha = () => { for (const o of linha) o.y = y + alt / 2; y += alt + MAPA.G; x = 0; alt = 0; linha = []; };
-  for (const v of itens) { const r = raio(v.sats), d = 2 * r; if (linha.length && x + d > larg) fecha(); const o = { v, x: MAPA.P + x + r, r }; pos.push(o); linha.push(o); x += d + MAPA.G; alt = Math.max(alt, d); }
-  if (linha.length) { for (const o of linha) o.y = y + alt / 2; y += alt; }
-  return { pos, h: y };
-}
-function mapaGeo(passos) {
-  let max = 1;
-  for (const p of passos) { const s = p.snap; max = Math.max(max, s.ex, s.vend, s.env, s.tax); for (const v of s.vivos) if (v.sats > max) max = v.sats; }
-  const raio = v => v > 0 ? Math.max(MAPA.RMIN, MAPA.R * Math.sqrt(v / max)) : 0;
-  const ids = new Set(); for (const p of passos) for (const v of p.snap.vivos) ids.add(v.w);
-  const ws = [...state.wallets.filter(w => ids.has(w.id)).map(w => ({ id: w.id, nome: w.name })), ...[...ids].filter(id => !byId(state.wallets, id)).map(id => ({ id, nome: 'Carteira apagada' }))];
-  const maior = f => passos.reduce((m, p) => Math.max(m, f(p)), 0);   // sem espalhar arrays grandes em Math.max
-  const rEx = maior(p => raio(p.snap.ex)), rSai = maior(p => Math.max(raio(p.snap.vend), raio(p.snap.env), raio(p.snap.tax)));
-  const faixas = []; let y = 0;
-  const faixa = (k, nome, h) => { faixas.push({ k, nome, y, h }); y += h; };
-  faixa('ex', 'Corretora', MAPA.LH + Math.max(2 * rEx, 10) + 10);
-  for (const w of ws) faixa('w:' + w.id, w.nome, MAPA.LH + Math.max(10, maior(p => mapaFila(p.snap.vivos.filter(v => v.w === w.id), raio).h)) + 10);
-  faixa('sai', 'Saiu', MAPA.LH + Math.max(2 * rSai, 10) + 40);
-  return { raio, ws, rEx, rSai, faixas, H: Math.ceil(y) };
-}
-const mapaSai = [['v', 'vendido', 'vend'], ['e', 'enviado', 'env'], ['t', 'taxas', 'tax']];
-function mapaBolhas(k) {
-  const M = ui.mapa, g = M.geo, s = M.passos[k].snap, fx = Object.fromEntries(g.faixas.map(f => [f.k, f])), bs = [];
-  if (s.ex > 0) bs.push({ k: 'ex', cls: 'ex', kyc: true, cx: MAPA.P + g.rEx, cy: fx.ex.y + MAPA.LH + g.rEx, r: g.raio(s.ex) });
-  for (const w of g.ws) {
-    const f = fx['w:' + w.id];
-    for (const o of mapaFila(s.vivos.filter(v => v.w === w.id), g.raio).pos) bs.push({ k: 'u:' + o.v.id, cls: 'ut', kyc: o.v.kyc, cx: o.x, cy: f.y + MAPA.LH + o.y, r: o.r });
-  }
-  const larg = MAPA.W - 2 * MAPA.P;
-  mapaSai.forEach(([c, , campo], i) => { if (s[campo] > 0) bs.push({ k: 'o:' + c, cls: 'sai ' + c, kyc: false, cx: MAPA.P + larg * (2 * i + 1) / 6, cy: fx.sai.y + MAPA.LH + g.rSai, r: g.raio(s[campo]) }); });
-  return bs;
-}
-const mapaN = v => (Math.round(v * 10) / 10).toString();
-const mapaGeoAttr = (b, r) => `cx="${mapaN(b.cx)}" cy="${mapaN(b.cy)}" r="${mapaN(r)}" style="cx:${mapaN(b.cx)}px;cy:${mapaN(b.cy)}px;r:${mapaN(r)}px"`;
-const mapaBolhaSVG = b => `<g class="b ${b.cls}${b.kyc ? ' kyc' : ''}${ui.mapaSel === b.k ? ' sel' : ''}" data-k="${b.k}" data-act="mapa-b"><circle class="alvo" ${mapaGeoAttr(b, Math.max(b.r, 12))}/><circle class="c" ${mapaGeoAttr(b, b.r)}/>${b.kyc ? `<circle class="h" ${mapaGeoAttr(b, b.r)}/>` : ''}</g>`;
-function mapaPoe(el, b) {
-  for (const c of el.querySelectorAll('circle')) {
-    const r = !b ? 0 : c.classList.contains('alvo') ? Math.max(b.r, 12) : b.r;
-    if (b) { c.setAttribute('cx', mapaN(b.cx)); c.setAttribute('cy', mapaN(b.cy)); c.style.cx = mapaN(b.cx) + 'px'; c.style.cy = mapaN(b.cy) + 'px'; }
-    c.setAttribute('r', mapaN(r)); c.style.r = mapaN(r) + 'px';
-  }
-}
-// textos do palco (valores com o olho de ocultar valores) e o resumo para leitor de tela
-const mapaAmt = v => S().hide ? `•••• ${unitName()}` : amtTxt(v);
-function mapaTotais(k) {
-  const M = ui.mapa, s = M.passos[k].snap, t = { ex: mapaAmt(s.ex), sai: mapaAmt(s.vend + s.env + s.tax) };
-  for (const w of M.geo.ws) { const vs = s.vivos.filter(v => v.w === w.id); t['w:' + w.id] = vs.length ? `${vs.length} ${vs.length === 1 ? 'UTXO' : 'UTXOs'} · ${mapaAmt(sumSats(vs))}` : 'sem UTXOs'; }
-  return t;
-}
-function mapaRotulo(k) {
-  const M = ui.mapa, p = M.passos[k], s = p.snap, t = mapaTotais(k);
-  return `Passo ${k + 1} de ${M.passos.length}, ${mapaQuando(p)}: ${p.titulo}. Corretora: ${t.ex}. ${M.geo.ws.map(w => `${w.nome}: ${t['w:' + w.id]}`).join('. ')}. Vendido: ${mapaAmt(s.vend)}; enviado: ${mapaAmt(s.env)}; taxas: ${mapaAmt(s.tax)}.`;
-}
-const mapaQuando = p => p.t === 'aportes' && p.n > 1 && p.d0 !== p.d ? `${fmtDate(p.d0)} a ${fmtDate(p.d)}` : fmtDate(p.d);
-function mapaSVG(k) {
-  const M = ui.mapa, g = M.geo, W = MAPA.W, t = mapaTotais(k), s = M.passos[k].snap, curto = n => n.length > 20 ? n.slice(0, 19) + '…' : n;
-  let h = `<svg id="mapa-svg" viewBox="0 0 ${W} ${g.H}" role="img" aria-label="${esc(mapaRotulo(k))}"><defs><pattern id="mapa-hach" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect class="hb" width="2" height="5"/></pattern></defs>`;
-  g.faixas.forEach((f, i) => { h += `${i ? `<line class="sep" x1="${MAPA.P}" x2="${W - MAPA.P}" y1="${f.y}" y2="${f.y}"/>` : ''}<text class="fn" x="${MAPA.P}" y="${f.y + 18}">${esc(curto(f.nome))}</text><text class="ft" x="${W - MAPA.P}" y="${f.y + 18}" text-anchor="end" data-t="${f.k}">${esc(t[f.k])}</text>`; });
-  h += `<g class="bolhas">${mapaBolhas(k).map(mapaBolhaSVG).join('')}</g>`;
-  const fs = g.faixas[g.faixas.length - 1], larg = W - 2 * MAPA.P, yl = fs.y + MAPA.LH + 2 * g.rSai + 18;
-  mapaSai.forEach(([c, nome, campo], i) => { const x = mapaN(MAPA.P + larg * (2 * i + 1) / 6); h += `<text class="sl" x="${x}" y="${yl}" text-anchor="middle">${nome}</text><text class="sv" x="${x}" y="${yl + 15}" text-anchor="middle" data-t="o:${c}">${esc(mapaAmt(s[campo]))}</text>`; });
-  return h + '</svg>';
-}
-const mapaParte = x => typeof x === 'object' ? AMT(x.s) : esc(x);
-function mapaInfo(k) {
-  const M = ui.mapa, p = M.passos[k];
-  return `<p class="mapa-n">Passo ${k + 1} de ${M.passos.length} · ${mapaQuando(p)}</p><h3 class="mapa-tt">${esc(p.titulo)}</h3>
-    <ul class="mapa-l">${p.linhas.map(l => `<li>${l.map(mapaParte).join('')}</li>`).join('')}</ul>
-    ${p.mix ? `<p class="note warn" style="margin:0 0 10px"><b>Mistura de KYC:</b> moedas com e sem KYC se juntaram nesta transação. Na blockchain elas passam a ficar ligadas, e as saídas ficam com KYC.</p>` : ''}
-    ${p.tx ? `<p style="margin:0 0 6px"><button class="link-btn small" data-act="open-tx" data-id="${p.tx}">Abrir a transação</button></p>` : ''}`;
-}
-function mapaSelHTML() {
-  const M = ui.mapa, key = ui.mapaSel; if (!M || !key) return '';
-  const k = ui.mapaPasso, s = M.passos[k].snap;
-  if (key === 'ex') return `<div class="mapa-card"><b>Corretora · ${AMT(s.ex)}</b> <span class="tag k">KYC</span><p class="small muted" style="margin:4px 0 0">Saldo na corretora depois deste passo. A corretora tem o seu cadastro: o saldo tem KYC.</p></div>`;
-  if (key.startsWith('o:')) { const [, nome, campo] = mapaSai.find(x => x[0] === key[2]) || []; return nome ? `<div class="mapa-card"><b>${nome[0].toUpperCase() + nome.slice(1)} até aqui · ${AMT(s[campo])}</b><p class="small muted" style="margin:4px 0 0">${campo === 'vend' ? 'Sats vendidos, na corretora e pela carteira.' : campo === 'env' ? 'Sats que saíram para terceiros sem venda (pagamento, presente ou envio).' : 'Taxas de saque e da rede.'}</p></div>` : ''; }
-  const id = key.slice(2), u = byId(state.utxos, id); if (!u) return '';
-  const vivo = s.vivos.some(v => v.id === id), nasce = M.passos.findIndex(p => (p.novos || []).includes(id)), gasto = M.passos.findIndex(p => (p.foram || []).includes(id));
-  return `<div class="mapa-card"><b>◈ ${AMT(u.sats)}</b> ${u.kyc ? '<span class="tag k">KYC</span>' : '<span class="tag">sem KYC</span>'}
-    <p class="small muted" style="margin:4px 0 0">${(nm => nm ? esc(nm) + ' · ' : '')(u.label || (addrById(u.address) || {}).label || '')}${esc(walletName(u.wallet))} · ${esc(utxoSource(u).t)} em ${fmtDate(u.date)}${vivo ? '' : ` · <b>fora deste passo</b> (${nasce > k ? 'ainda não existia' : 'já tinha sido gasto'})`}</p>
-    <div class="btn-row" style="margin-top:10px">${nasce >= 0 && nasce !== k ? `<button class="btn btn-q btn-s" data-act="mapa-ir" data-k="${nasce}">Quando nasceu</button>` : ''}${gasto >= 0 && gasto !== k ? `<button class="btn btn-q btn-s" data-act="mapa-ir" data-k="${gasto}">Quando foi gasto</button>` : ''}<button class="btn btn-q btn-s" data-act="edit-utxo" data-id="${id}">Abrir UTXO</button></div></div>`;
-}
 function pageMapa() {
   const head = pageHead('Mapa dos sats');
   if (!S().utxo) return `${head}<div class="article"><p class="ls">O mapa usa a gestão de UTXOs. Ative na aba Carteira.</p></div>`;
-  const passos = mapaPassos();
-  if (!passos.length) return `${head}<div class="article"><p class="ls">Ainda não há movimentos para mostrar. Registre um aporte, um saque ou um UTXO.</p></div>`;
-  ui.mapa = { passos, geo: mapaGeo(passos) };
-  // aberto por um UTXO (u:id) ou por uma transação (t:id): começa no passo em que ele nasceu; pela aba, no último passo
+  const M = mapaGrafo(); ui.mapa = M;
+  if (!M.cols.length) return `${head}<div class="article"><p class="ls">Ainda não há movimentos para mostrar. Registre um aporte, um saque ou um UTXO.</p></div>`;
+  // aberto por "Ver no mapa" (u:id ou t:id): já com ele destacado e no centro; pela aba, no fim (hoje)
   const arg = ui.arg || '';
-  if (ui.mapaArg !== arg) {
-    ui.mapaArg = arg; ui.mapaSel = null; ui.mapaPasso = passos.length - 1;
-    const [t, id] = arg.split(':'), k = !id ? -1 : t === 't' ? passos.findIndex(p => p.tx === id) : passos.findIndex(p => (p.novos || []).includes(id));
-    if (k >= 0) ui.mapaPasso = k; if (t === 'u' && id) ui.mapaSel = arg;
-  }
-  if (!(ui.mapaPasso >= 0 && ui.mapaPasso < passos.length)) ui.mapaPasso = passos.length - 1;
-  const k = ui.mapaPasso, n = passos.length, difs = kycDifs(), mix = passos.map((p, i) => p.mix ? i : -1).filter(i => i >= 0);
-  const um = (q, a, b) => q === 1 ? a : b;
-  const kyc = difs.length ? `<div class="note warn mapa-kyc"><b>KYC que não acompanhou as entradas.</b> ${um(difs.length, 'Um UTXO tem', `${difs.length} UTXOs têm`)} o KYC diferente do que veio da transação que ${um(difs.length, 'o criou', 'os criou')}: uma entrada com KYC passa o KYC para as saídas. Acontece quando o KYC de uma entrada muda depois da transação.
-    <ul>${difs.slice(0, 5).map(d => { const u = byId(state.utxos, d.id); return `<li>${AMT(u.sats)} · ${esc(walletName(u.wallet))}: ${d.para ? 'sem KYC → com KYC' : 'com KYC → sem KYC'}</li>`; }).join('')}${difs.length > 5 ? `<li>e mais ${difs.length - 5}</li>` : ''}</ul>
-    <button class="btn btn-p btn-s" data-act="mapa-kyc">Corrigir ${um(difs.length, 'o UTXO', `os ${difs.length} UTXOs`)}</button></div>` : '';
-  const ym = d => fmtYM(d.slice(0, 7));
-  return `${head}<div class="article mapa">
-    <p class="ls">Onde estavam os seus sats depois de cada movimento, da primeira compra até hoje. A área de cada bolha é proporcional aos sats.</p>
-    <div class="mapa-leg"><span><i class="lg ex"></i>Corretora</span><span><i class="lg ut"></i>Seus UTXOs</span><span><i class="lg sai"></i>Saiu</span><span><i class="lg kyc"></i>Com KYC</span></div>
-    ${kyc}
-    ${mix.length ? `<p class="small mapa-mix">Moedas com e sem KYC se juntaram ${um(mix.length, 'num passo', `em ${mix.length} passos`)}: ${mix.map(i => `<button class="link-btn small" data-act="mapa-ir" data-k="${i}">passo ${i + 1}</button>`).join(' · ')}</p>` : ''}
-    <div class="mapa-palco">${mapaSVG(k)}</div>
-    <div class="mapa-ctl"><button class="icon-btn" data-act="mapa-ant" aria-label="Passo anterior"${k === 0 ? ' disabled' : ''}>‹</button><input class="range" type="range" id="mapa-r" min="0" max="${n - 1}" step="1" value="${k}" data-inp="mapa-passo" aria-label="Linha do tempo dos passos" aria-valuetext="${esc(`Passo ${k + 1} de ${n}, ${mapaQuando(passos[k])}: ${passos[k].titulo}`)}"${n === 1 ? ' disabled' : ''}><button class="icon-btn" data-act="mapa-prox" aria-label="Próximo passo"${k === n - 1 ? ' disabled' : ''}>›</button></div>
-    <div class="mapa-datas"><span>${ym(passos[0].t === 'aportes' ? passos[0].d0 : passos[0].d)}</span><span>${ym(passos[n - 1].d)}</span></div>
-    <div id="mapa-info">${mapaInfo(k)}</div>
-    <div id="mapa-sel">${mapaSelHTML()}</div>
-    <p class="hint">Toque numa bolha para ver de que é. O KYC de cada UTXO é o registrado hoje; numa transação, uma entrada com KYC passa o KYC para as saídas.</p></div>`;
+  if (ui.mapaArg !== arg) { ui.mapaArg = arg; ui.mapaSel = M.nos.has(arg) ? arg : null; ui.mapaPop = false; ui.mapaX = null; ui.mapaCentra = !!ui.mapaSel; }
+  if (ui.mapaSel && !M.nos.has(ui.mapaSel)) { ui.mapaSel = null; ui.mapaPop = false; }
+  const mix = M.cols.some(c => c.mix);
+  return `${head}<div class="article mapa" data-act="mapa-fundo">
+    <div class="mapa-leg"><span><i class="lg ex"></i>Corretora</span><span><i class="lg ut"></i>Carteira</span><span><i class="lg kyc"></i>Com KYC</span>${mix ? '<span><i class="lg mix"></i>Mistura de KYC</span>' : ''}<span class="dica">Toque numa bolha: uma vez, o caminho; de novo, os detalhes. Com dois dedos, aproxime ou afaste.</span></div>
+    <div class="mapa-ctl" role="toolbar" aria-label="Zoom do mapa"><button class="btn btn-q btn-s mz" id="mapa-zm" data-act="mapa-zoom" data-d="-1" aria-label="Afastar">−</button><button class="btn btn-q btn-s mz" id="mapa-zp" data-act="mapa-zoom" data-d="1" aria-label="Aproximar">+</button><button class="btn btn-q btn-s" id="mapa-aj" data-act="mapa-ajusta">Ajustar</button><span class="zv" id="mapa-zv"></span></div>
+    <div class="mapa-palco"><div class="mapa-rola" id="mapa-rola"><div class="mapa-cont" id="mapa-cont" style="width:${M.W}px"><div class="mapa-tela" id="mapa-tela"><div class="mapa-rot" id="mapa-rot" aria-hidden="true"></div>${M.svg}<div class="mapa-eixo" id="mapa-eixo" aria-hidden="true"></div></div></div></div><div class="mapa-pop" id="mapa-pop" data-act="mapa-pop" role="dialog" aria-label="Detalhes" hidden></div></div>
+    <p class="sr" id="mapa-voz" aria-live="polite"></p></div>`;
 }
-// passo a passo sem refazer a página: as bolhas que continuam crescem, encolhem ou andam; as novas nascem do zero e as gastas somem
-function mapaVai(k) {
-  const M = ui.mapa, svg = $('#mapa-svg'); if (!M || !svg) return;
-  k = Math.max(0, Math.min(M.passos.length - 1, k)); ui.mapaPasso = k;
-  const g = svg.querySelector('.bolhas'), velhas = new Map([...g.children].map(el => [el.dataset.k, el])), calmo = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  for (const b of mapaBolhas(k)) {
-    let el = velhas.get(b.k);
-    if (el) { velhas.delete(b.k); clearTimeout(el._sai); el.classList.remove('saindo'); }
-    else { const t = document.createElementNS(MAPA.SVG, 'g'); t.innerHTML = mapaBolhaSVG({ ...b, r: 0 }); el = t.firstElementChild; g.appendChild(el); el.getBoundingClientRect(); }
-    mapaPoe(el, b); el.classList.toggle('sel', ui.mapaSel === b.k);
+/* 1.8.39: zoom nos dois eixos (pedido do Nicolas de 23/11/2026). O desenho é feito uma vez, em 1:1 (W × Hs); o zoom só muda o
+   tamanho do SVG (viewBox fixo, preserveAspectRatio="none") com duas escalas, sx (o tempo) e sy (os sats). u = 0 é 1:1; acima,
+   uniforme até 4× (u = 2); abaixo, cada eixo encolhe até o próprio ajuste (fx, fy: o fluxo inteiro numa tela), e só nesse
+   trecho as escalas ficam diferentes. Traços sem escala (vector-effect), listras de KYC do mesmo tamanho (o padrão desfaz a
+   escala), bolhas com largura fixa na tela (de 3 ou 4 até 12 px) e os nomes das faixas e o eixo dos meses em HTML. A pinça
+   mostra uma prévia (transform) e só refaz o tamanho ao soltar. */
+const MZ = { MAX: 2, PASSO: 0.5 };
+const mapaEsc = (u, f) => u >= 0 ? { sx: 2 ** u, sy: 2 ** u } : { sx: Math.max(f.x, 2 ** u), sy: Math.max(f.y, 2 ** u) };
+// a altura do mapa (até a barra de abas) e o ajuste de cada eixo
+function mapaMede() {
+  const M = ui.mapa, r = $('#mapa-rola'); if (!M || !r) return;
+  const tab = $('.tabs'), topo = r.getBoundingClientRect().top + (window.scrollY || 0);
+  M.alt = Math.max(220, Math.floor(innerHeight - (tab ? tab.offsetHeight : 0) - topo - 12));
+  const fx = Math.min(1, r.offsetWidth / M.W), fy = Math.min(1, (M.alt - MAPA.AX) / M.Hs);
+  M.fit = { x: fx, y: fy, u: Math.min(0, Math.log2(Math.min(fx, fy))) };
+}
+// aplica o zoom u; (bx, by), em unidades do desenho, fica em (ax, ay), em px a partir do canto da área rolável
+function mapaAplica(u, bx, by, ax, ay) {
+  const M = ui.mapa, r = $('#mapa-rola'), svg = $('#mapa-svg'), cont = $('#mapa-cont'); if (!M || !r || !svg || !cont || !M.fit) return;
+  u = Math.max(M.fit.u, Math.min(MZ.MAX, u));
+  const e = mapaEsc(u, M.fit), W = M.W * e.sx, H = M.Hs * e.sy;
+  M.esc = e; ui.mapaZ = { u, fit: u <= M.fit.u + 1e-6 };
+  svg.setAttribute('width', mapaN(W)); svg.setAttribute('height', mapaN(H)); cont.style.width = mapaN(W) + 'px';
+  for (const p of svg.querySelectorAll('pattern')) p.setAttribute('patternTransform', `scale(${+(1 / e.sx).toFixed(4)} ${+(1 / e.sy).toFixed(4)}) rotate(45)`);
+  mapaBolhas(e); mapaSobre(e);
+  const alto = Math.ceil(H + MAPA.AX); r.style.height = Math.min(M.alt, alto) + 'px';
+  const sb = r.offsetHeight - r.clientHeight; if (sb > 0) r.style.height = Math.min(M.alt, alto + sb) + 'px';   // barra de rolagem de baixo (computador)
+  if (bx != null) { r.scrollLeft = bx * e.sx - ax; r.scrollTop = by * e.sy - ay; }
+  ui.mapaX = r.scrollLeft; ui.mapaY = r.scrollTop;
+  mapaZoomUI(); if (ui.mapaPop) mapaPopPos();
+}
+// zoom com um ponto fixo na tela (o meio, sem ponto)
+function mapaZoom(u, ax, ay) {
+  const M = ui.mapa, r = $('#mapa-rola'); if (!M || !r || !M.esc) return;
+  if (ax == null) { ax = r.clientWidth / 2; ay = Math.max(0, r.clientHeight - MAPA.AX) / 2; }
+  mapaAplica(u, (r.scrollLeft + ax) / M.esc.sx, (r.scrollTop + ay) / M.esc.sy, ax, ay);
+}
+const mapaU = () => ui.mapaZ.fit && ui.mapa.fit ? ui.mapa.fit.u : ui.mapaZ.u;
+const mapaZoomTxt = () => { const M = ui.mapa, z = ui.mapaZ; return z.fit && M.fit.u < -1e-6 ? 'Tudo na tela' : `${Math.round(2 ** z.u * 100)}%`; };
+// botões + e −: de meio em meio passo de log2 (×1,41), numa grade que passa pelo 1:1
+function mapaPasso(d) {
+  const M = ui.mapa; if (!M || !M.fit) return;
+  const u = mapaU(), g = u / MZ.PASSO, v = d > 0 ? (Math.floor(g + 1e-6) + 1) * MZ.PASSO : (Math.ceil(g - 1e-6) - 1) * MZ.PASSO;
+  mapaZoom(v); mapaVoz(`Zoom: ${mapaZoomTxt()}.`);
+}
+// Ajustar: o fluxo inteiro na tela; de novo (Padrão): volta a 1:1, com o nó escolhido no meio
+function mapaAjusta() {
+  const M = ui.mapa; if (!M || !M.fit) return;
+  if (ui.mapaZ.fit && M.fit.u < -1e-6) { mapaZoom(0); if (ui.mapaSel) mapaCentra(ui.mapaSel, false); }
+  else mapaAplica(M.fit.u, 0, 0, 0, 0);
+  mapaVoz(`Zoom: ${mapaZoomTxt()}.`);
+}
+function mapaZoomUI() {
+  const M = ui.mapa, z = ui.mapaZ, f = M && M.fit; if (!f) return;
+  const menos = $('#mapa-zm'), mais = $('#mapa-zp'), aj = $('#mapa-aj'), v = $('#mapa-zv'), cabe = f.u > -1e-6;
+  if (menos) menos.setAttribute('aria-disabled', String(z.u <= f.u + 1e-6));
+  if (mais) mais.setAttribute('aria-disabled', String(z.u >= MZ.MAX - 1e-6));
+  if (aj) { aj.textContent = z.fit && !cabe ? 'Padrão' : 'Ajustar'; aj.setAttribute('aria-disabled', String(cabe && Math.abs(z.u) < 1e-6)); }
+  if (v) v.textContent = mapaZoomTxt();
+}
+// as bolhas: largura fixa na tela (encolhe com o tempo só até 3 ou 4 px), altura com os sats; o alvo do toque tem 26 px em 1:1
+function mapaBolhas(e) {
+  const M = ui.mapa;
+  if (!M.bos) M.bos = [...document.querySelectorAll('#mapa-svg g.bo')].map((g, i) => [g.querySelector('.alvo'), g.querySelector('.c'), g.querySelector('.av'), M.bolhas[i]]);
+  for (const [al, c, av, b] of M.bos) {
+    if (!b || !c) continue;
+    const ws = Math.min(b.w, Math.max(b.w > 10 ? 4 : 3, b.w * e.sx)), wu = ws / e.sx, ra = Math.min(ws, b.a * e.sy) / 2;
+    const aw = Math.max(wu, 26 / Math.max(e.sx, 1)), ah = Math.max(b.a, 26 / Math.max(e.sy, 1));
+    if (al) { al.setAttribute('x', mapaN(b.cx - aw / 2)); al.setAttribute('width', mapaN(aw)); al.setAttribute('y', mapaN(b.cy - ah / 2)); al.setAttribute('height', mapaN(ah)); }
+    c.setAttribute('x', mapaN(b.cx - wu / 2)); c.setAttribute('width', mapaN(wu)); c.setAttribute('rx', mapaN(ra / e.sx)); c.setAttribute('ry', mapaN(ra / e.sy));
+    if (av) { av.setAttribute('cx', mapaN(b.cx + wu / 2)); av.setAttribute('rx', mapaN(3.6 / e.sx)); av.setAttribute('ry', mapaN(3.6 / e.sy)); }
   }
-  for (const el of velhas.values()) { if (el.classList.contains('saindo')) continue; el.classList.add('saindo'); mapaPoe(el, null); el._sai = setTimeout(() => el.remove(), calmo ? 0 : 400); }
-  const t = mapaTotais(k), s = M.passos[k].snap;
-  for (const el of svg.querySelectorAll('[data-t]')) { const c = el.dataset.t; el.textContent = c.startsWith('o:') ? mapaAmt(s[mapaSai.find(x => x[0] === c[2])[2]]) : t[c] || ''; }
-  svg.setAttribute('aria-label', mapaRotulo(k));
-  const p = M.passos[k], r = $('#mapa-r'); if (r) { if (+r.value !== k) r.value = k; r.setAttribute('aria-valuetext', `Passo ${k + 1} de ${M.passos.length}, ${mapaQuando(p)}: ${p.titulo}`); }
-  const a = $('[data-act="mapa-ant"]'), z = $('[data-act="mapa-prox"]'); if (a) a.disabled = k === 0; if (z) z.disabled = k === M.passos.length - 1;
-  const inf = $('#mapa-info'); if (inf) inf.innerHTML = mapaInfo(k);
-  const sel = $('#mapa-sel'); if (sel) sel.innerHTML = mapaSelHTML();
+  if (!M.tps) M.tps = [...document.querySelectorAll('#mapa-svg .tp')];
+  for (const t of M.tps) { t.setAttribute('rx', mapaN(2.3 / e.sx)); t.setAttribute('ry', mapaN(2.3 / e.sy)); }
+}
+// os nomes das faixas (presos à esquerda; um que encostaria no anterior fica de fora) e o eixo dos meses (preso embaixo)
+function mapaSobre(e) {
+  const M = ui.mapa, rot = $('#mapa-rot'), eixo = $('#mapa-eixo');
+  if (rot) { let ult = -99; rot.innerHTML = M.rots.map(o => { const y = o.y * e.sy; if (y - ult < 17) return ''; ult = y; return `<span style="top:${mapaN(y)}px">${esc(o.t)}</span>`; }).join(''); }
+  if (eixo) eixo.innerHTML = mapaEixoHTML(e);
+}
+function mapaEixoHTML(e) {
+  const X = ui.mapa.eixo, sx = e.sx, W = ui.mapa.W * sx, xf = X.xFim * sx, aceitas = []; let tq = '', ultT = -99;
+  for (const mk of X.marcas) {
+    const x = mk.x * sx;
+    if (x - ultT >= 5) { tq += `M${mapaN(x)} 4v4`; ultT = x; }
+    const ua = aceitas[aceitas.length - 1];
+    if (ua && x - ua.px < (ua.ini ? 72 : 34)) { if (mk.ano && !ua.ano && !ua.ini) aceitas[aceitas.length - 1] = { ...mk, px: x }; continue; }
+    aceitas.push({ ...mk, px: x });
+  }
+  while (aceitas.length && !aceitas[aceitas.length - 1].ini && xf - aceitas[aceitas.length - 1].px < 30) aceitas.pop();
+  const lab = (x, t, cls) => `<span class="${cls}" style="left:${mapaN(x)}px">${esc(t)}</span>`;
+  return `<svg class="mapa-ax" width="${mapaN(W)}" height="${MAPA.AX}"><line class="ax" x1="${mapaN(X.x0 * sx)}" x2="${mapaN(xf)}" y1="4" y2="4"/><path class="tk" d="${tq}"/></svg>`
+    + aceitas.map(mk => lab(mk.px, mk.txt, (mk.ano ? 'ty' : 'tl') + (mk.ini ? ' ini' : ''))).join('') + lab(xf, 'hoje', 'ty' + (xf > W - 16 ? ' fim' : ''))
+    + X.pausas.map(x => lab(x * sx, '⋯', 'pausa')).join('');
+}
+// a pinça (dois dedos): prévia com transform na tela do mapa; ao soltar, o zoom de verdade, com o ponto entre os dedos no lugar.
+// Ctrl + roda (e a pinça do touchpad, que chega assim) aproxima no ponteiro
+function mapaGestos(r) {
+  let p = null, roda = 0, rodaP = null, quadro = 0;
+  const tela = () => $('#mapa-tela'), meio = (t, q) => ({ x: (t[0].clientX + t[1].clientX) / 2 - q.left, y: (t[0].clientY + t[1].clientY) / 2 - q.top });
+  const dist = t => Math.max(1, Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY));
+  r.addEventListener('touchstart', ev => {
+    if (ev.touches.length !== 2 || !ui.mapa || !ui.mapa.esc) { if (ev.touches.length > 2) p = null; return; }
+    const q = r.getBoundingClientRect(), m = meio(ev.touches, q), t = tela();
+    p = { d0: dist(ev.touches), m0: m, m, u0: mapaU(), u: mapaU(), sl: r.scrollLeft, st: r.scrollTop, e0: ui.mapa.esc };
+    if (t) t.style.transformOrigin = `${mapaN(r.scrollLeft + m.x)}px ${mapaN(r.scrollTop + m.y)}px`;
+  }, { passive: true });
+  r.addEventListener('touchmove', ev => {
+    if (!p || ev.touches.length !== 2) return;
+    if (!ev.cancelable) { p = null; const t = tela(); if (t) t.style.transform = ''; return; }   // a rolagem nativa já começou
+    ev.preventDefault();
+    const q = r.getBoundingClientRect(), m = meio(ev.touches, q), M = ui.mapa, t = tela();
+    p.u = Math.max(M.fit.u, Math.min(MZ.MAX, p.u0 + Math.log2(dist(ev.touches) / p.d0))); p.m = m;
+    const e1 = mapaEsc(p.u, M.fit);
+    if (t) t.style.transform = `translate(${mapaN(m.x - p.m0.x)}px, ${mapaN(m.y - p.m0.y)}px) scale(${+(e1.sx / p.e0.sx).toFixed(4)}, ${+(e1.sy / p.e0.sy).toFixed(4)})`;
+  }, { passive: false });
+  const solta = ev => {
+    if (!p || ev.touches.length >= 2) return;
+    const t = tela(); if (t) { t.style.transform = ''; t.style.transformOrigin = ''; }
+    const z = p; p = null;
+    if (Math.abs(z.u - z.u0) < 0.01 && Math.hypot(z.m.x - z.m0.x, z.m.y - z.m0.y) < 2) return;
+    mapaAplica(z.u, (z.sl + z.m0.x) / z.e0.sx, (z.st + z.m0.y) / z.e0.sy, z.m.x, z.m.y);
+  };
+  r.addEventListener('touchend', solta); r.addEventListener('touchcancel', solta);
+  r.addEventListener('wheel', ev => {
+    if (!ev.ctrlKey || !ui.mapa || !ui.mapa.esc) return;
+    ev.preventDefault();
+    const q = r.getBoundingClientRect(); rodaP = { x: ev.clientX - q.left, y: ev.clientY - q.top };
+    roda += Math.max(-0.5, Math.min(0.5, -ev.deltaY * (ev.deltaMode === 1 ? 0.05 : 0.0025)));
+    if (!quadro) quadro = requestAnimationFrame(() => { quadro = 0; const d = roda; roda = 0; mapaZoom(mapaU() + d, rodaP.x, rodaP.y); });
+  }, { passive: false });
+}
+// a tela mudou de tamanho (girou, teclado): mede de novo e mantém o zoom (no ajuste, o novo ajuste)
+let mapaRz = 0;
+addEventListener('resize', () => {
+  if (ui.page !== 'mapa' || !ui.mapa || !$('#mapa-rola')) return;
+  cancelAnimationFrame(mapaRz);
+  mapaRz = requestAnimationFrame(() => { const M = ui.mapa; if (!M || !$('#mapa-rola')) return; const fit = ui.mapaZ.fit; mapaMede(); mapaZoom(fit ? M.fit.u : ui.mapaZ.u); });
+});
+// depois do render da página: o tamanho e o zoom, a rolagem (a guardada, o fim ou o nó pedido no centro), o destaque, o foco
+// e o balão
+function mapaDepois() {
+  const M = ui.mapa, r = $('#mapa-rola'); if (!M || !r) return;
+  M.els = null; M.bos = null; M.tps = null; M.esc = { sx: 1, sy: 1 };
+  if (!ui.mapaZ) ui.mapaZ = { u: 0, fit: false };
+  const qx = ui.mapaX, qy = ui.mapaY;   // a rolagem guardada (o mapaAplica regrava)
+  mapaMede(); mapaAplica(ui.mapaZ.fit ? M.fit.u : ui.mapaZ.u);
+  if (ui.mapaCentra && ui.mapaSel) { ui.mapaCentra = false; mapaCentra(ui.mapaSel, false, true); }
+  else { r.scrollLeft = qx == null ? r.scrollWidth : qx; r.scrollTop = qy == null ? 0 : qy; }
+  ui.mapaX = r.scrollLeft; ui.mapaY = r.scrollTop;
+  r.addEventListener('scroll', () => { ui.mapaX = r.scrollLeft; ui.mapaY = r.scrollTop; if (ui.mapaPop) mapaPopPos(); }, { passive: true });
+  mapaGestos(r);
+  mapaFoco(); mapaTab(ui.mapaSel || M.ordem[M.ordem.length - 1]);
+  if (ui.mapaPop && ui.mapaSel) mapaPopMostra(); else ui.mapaPop = false;
+}
+// teclado: ← → Home End andam pelos nós em ordem de data; Enter ou espaço = toque; Esc limpa
+function mapaTecla(e) {
+  const M = ui.mapa, t = e.target, a = t && t.closest ? t.closest('#mapa-svg .an') : null; if (!M) return;
+  if (e.key === 'Escape') { if (ui.mapaSel || ui.mapaPop) { e.preventDefault(); mapaLimpa(); } return; }
+  if (!e.ctrlKey && !e.metaKey && !e.altKey && /^[-+=0]$/.test(e.key) && !(t && t.closest && t.closest('input, textarea, select, [contenteditable="true"]'))) {
+    e.preventDefault(); if (e.key === '0') mapaAjusta(); else mapaPasso(e.key === '-' ? -1 : 1); return;
+  }
+  if (!a) return;
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ACT['mapa-b'](a); return; }
+  if (!/^(ArrowLeft|ArrowRight|Home|End)$/.test(e.key)) return;
+  e.preventDefault();
+  const L = M.ordem, i = L.indexOf(a.dataset.k), j = e.key === 'Home' ? 0 : e.key === 'End' ? L.length - 1 : Math.max(0, Math.min(L.length - 1, i + (e.key === 'ArrowLeft' ? -1 : 1)));
+  const b = mapaAncora(L[j]); if (!b) return;
+  mapaTab(L[j]); b.focus({ preventScroll: true }); mapaCentra(L[j], false); mapaVoz(b.getAttribute('aria-label') || '');
 }
 /* De onde vieram (na folha do UTXO): as entradas da transação que o criou e, de cada uma, as de antes, até a origem (saque,
    compra ou terceiros). Para em 6 níveis e 24 moedas. */
@@ -5019,7 +5537,7 @@ function viewCarteira() {
     <section class="sec" style="padding-top:0">${ksCard('kit')}</section>`;
   const c = calc(), fr = set.feeRate;
   let h = `<section class="sec"><div class="sec-head"><h1 class="sec-t" style="font-size:28px">Carteira</h1><button class="link-btn" data-act="utxo-settings">Ajustes</button></div>${splitBar(c, true)}
-    ${state.aportes.length || state.utxos.length ? `<button class="tool" style="margin:16px 0 0" data-act="mapa-abre" data-page="mapa"><b>Mapa dos sats</b><span>De onde vieram e para onde foram os seus sats, passo a passo, com o KYC de cada moeda</span><span class="chev" aria-hidden="true">›</span></button>` : ''}</section>`;
+    ${state.aportes.length || state.utxos.length ? `<button class="tool" style="margin:16px 0 0" data-act="mapa-abre" data-page="mapa"><b>Mapa dos sats</b><span>De onde vieram e para onde foram os seus sats, da primeira compra até hoje, com o KYC de cada moeda</span><span class="chev" aria-hidden="true">›</span></button>` : ''}</section>`;
   h += `<section class="sec">${withdrawPanel(c)}</section>`;
   const presets = state.fees ? [['Econômica', state.fees.economyFee], ['1 hora', state.fees.hourFee], ['30 min', state.fees.halfHourFee], ['Rápida', state.fees.fastestFee]] : [[null, 1], [null, 3], [null, 5], [null, 10], [null, 25], [null, 50], [null, 100]];
   h += `<section class="sec"><div class="sec-head"><h2 class="sec-t">Taxa da rede</h2><span class="num"><b id="fr-val" style="font-family:var(--fc);font-size:24px">${fr}</b> sat/vB</span></div>
@@ -5110,7 +5628,7 @@ function moveRow(m) {
     return `<button class="row-btn" data-act="${u ? 'open-addr' : 'edit-saque'}" data-id="${u ? u.address : w.id}" data-hl="${u ? u.id : ''}"><span class="a">Saque${w.ex ? ' · ' + esc(w.ex) : ''}</span><span class="r"><b>${AMT(w.sats)}</b></span><span class="b">${fmtDate(w.date)}${a ? ' · para ' + esc(a.label) : ''}</span><span class="r b">taxa ${esc(fmtSats(w.fee || 0))} sats</span></button>`;
   }
   const x = m.o, ext = x.outputs.some(o => o.kind === 'ext'), sale = x.saleId ? byId(state.aportes, x.saleId) : null;
-  return `<button class="row-btn" data-act="open-tx" data-id="${x.id}"><span class="a">${esc(txKind(x))}${x.note ? ' · ' + esc(x.note) : ''}</span><span class="r"><b>${AMT(ext ? txSent(x) : txOwnOut(x))}</b></span><span class="b">${fmtDate(x.date)}${sale ? ` · ${MV(toVa(sale, sale.fiat))} recebidos` : ''} · ${x.inputs.length} ${x.inputs.length === 1 ? 'entrada' : 'entradas'}, ${x.outputs.length} ${x.outputs.length === 1 ? 'saída' : 'saídas'}</span><span class="r b">taxa ${esc(fmtSats(x.fee))} sats · ${esc(fmtRate(x.fee / x.vsize))} sat/vB</span></button>`;
+  return `<button class="row-btn" data-act="open-tx" data-id="${x.id}"><span class="a">${esc(txKind(x))}${x.note ? ' · ' + esc(x.note) : ''}</span><span class="r"><b>${AMT(ext || txDep(x) ? txSent(x) + txDep(x) : txOwnOut(x))}</b></span><span class="b">${fmtDate(x.date)}${sale ? ` · ${MV(toVa(sale, sale.fiat))} recebidos` : ''} · ${x.inputs.length} ${x.inputs.length === 1 ? 'entrada' : 'entradas'}, ${x.outputs.length} ${x.outputs.length === 1 ? 'saída' : 'saídas'}</span><span class="r b">taxa ${esc(fmtSats(x.fee))} sats · ${esc(fmtRate(x.fee / x.vsize))} sat/vB</span></button>`;
 }
 
 /* ---------------- ajustes no módulo de transação ---------------- */
@@ -5184,7 +5702,7 @@ Object.assign(ACT, {
   'sale-edit-tx': el => { closeSheet(true); txEdit(el.dataset.id); },
   'consolidate': () => txNew(),
   'send': () => txNew('send'),
-  'tx-from-utxo': el => { const keep = ui.sel, k = el.dataset.k; ui.sel = new Set([el.dataset.id]); closeSheet(true); txNew(k === 'send' || k === 'sale' ? k : undefined); ui.sel = ui.selMode ? keep : new Set(); },
+  'tx-from-utxo': el => { const keep = ui.sel, k = el.dataset.k; ui.sel = new Set([el.dataset.id]); closeSheet(true); txNew(k === 'send' || k === 'sale' || k === 'dep' ? k : undefined); ui.sel = ui.selMode ? keep : new Set(); },
   'tx-merge': el => { txRead(); const t = ui.form.tx, o = t.outputs[+el.dataset.i], inW = (txInputs()[0] || {}).wallet; if (!o || !o.address || o.address === '__new') return; const extra = addrUtxos(o.address).filter(u => !u.spent && !t.inputs.includes(u.id) && u.wallet === inW); t.inputs.push(...extra.map(u => u.id)); txRerender(); toast(extra.length === 1 ? 'UTXO incluído nas entradas' : `${extra.length} UTXOs incluídos nas entradas`); },
   'tx-edit': el => { closeSheet(true); txEdit(el.dataset.id); },
   'tx-undo': el => txUndo(el.dataset.id),
@@ -5203,9 +5721,10 @@ Object.assign(ACT, {
     txRead(); const t = ui.form.tx, o = t.outputs[+el.dataset.i], k = el.dataset.k, w = txSrcWallet(); if (!o || txOutKind(o) === k) return;
     if (k === 'sale' && t.outputs.some(x => x !== o && x.kind === 'ext' && x.sale)) return;
     if (k === 'own') Object.assign(o, { kind: 'own', sale: false, wallet: o.wallet || w, address: o.address || '__new', newLabel: o.newLabel || '', newAddr: o.newAddr || '', newWallet: '' });
-    else Object.assign(o, { kind: 'ext', sale: k === 'sale', extAddr: o.extAddr || '' });
+    else if (k === 'dep') Object.assign(o, { kind: 'ex', sale: false, ex: o.ex || exLembrada(), fora: !!o.fora, depAddr: o.depAddr || o.extAddr || '' });   // 1.8.39
+    else Object.assign(o, { kind: 'ext', sale: k === 'sale', extAddr: o.extAddr || o.depAddr || '' });
     if (k === 'sale' && !t.sv) t.sv = txSvVazio();
-    t.saleDelOk = false; t.dustOk = false;
+    t.saleDelOk = false; t.dustOk = false; t.depKycOk = false;
     txRerender();
   },
   'sv-feeu': el => {
@@ -5215,6 +5734,9 @@ Object.assign(ACT, {
     txSaleRefresh();
   },
   'tx-venda': el => { closeSheet(true); txEdit(el.dataset.id, { venda: +el.dataset.i }); },
+  // 1.8.39: envio para a corretora (corretora no exterior liga e desliga) e o envio importado que, na verdade, foi para a corretora
+  'tx-fora': el => { txRead(); const o = ui.form.tx.outputs[+el.dataset.i]; if (!o) return; o.fora = !o.fora; txRerender(); },
+  'tx-corretora': el => { closeSheet(true); txEdit(el.dataset.id, { corretora: +el.dataset.i }); },
   'tx-max': () => {
     txRead(); const t = ui.form.tx; if (!t || t.outputs.length !== 1) return;
     // com o troco digitado, o máximo leva o troco para a saída e mantém a taxa em sats (1.8.36)
@@ -5233,15 +5755,18 @@ Object.assign(ACT, {
     t.simple = true; t.parte = false; t.outputs[0].sats = ''; if (t.feeMode === 'troco') t.feeMode = 'rate'; t.dustOk = false; t.taxaOk = null;
     txRerender();
   },
-  // Mapa dos sats (1.8.37)
-  'mapa-abre': el => { ui.mapaArg = null; ui.mapaPasso = null; ui.mapaSel = null; ACT.page(el); },
+  // Mapa dos sats (1.8.38): o 1º toque numa bolha destaca o caminho dela; o 2º abre o balão; o 3º fecha o balão; o fundo limpa
+  'mapa-abre': el => { ui.mapaArg = null; ui.mapaSel = null; ui.mapaPop = false; ui.mapaX = null; ui.mapaY = null; ACT.page(el); },
   'mapa-utxo': el => mapaDe('u:' + el.dataset.id),
   'mapa-tx': el => mapaDe('t:' + el.dataset.id),
-  'mapa-ant': () => mapaVai(ui.mapaPasso - 1),
-  'mapa-prox': () => mapaVai(ui.mapaPasso + 1),
-  'mapa-ir': el => { mapaVai(+el.dataset.k); const s = $('.mapa-palco'), t = s ? s.getBoundingClientRect().top : 0; if (s && (t < 80 || t > innerHeight - 160)) s.scrollIntoView({ block: 'start' }); },
-  'mapa-b': el => { const k = el.dataset.k; ui.mapaSel = ui.mapaSel === k ? null : k; for (const b of $$('#mapa-svg .b')) b.classList.toggle('sel', b.dataset.k === ui.mapaSel); const s = $('#mapa-sel'); if (s) s.innerHTML = mapaSelHTML(); },
+  'mapa-b': el => { const k = el.dataset.k; if (ui.mapaSel !== k) mapaEscolhe(k); else if (ui.mapaPop) mapaPopFecha(); else mapaPopAbre(); },
+  'mapa-fundo': () => mapaLimpa(),
+  'mapa-pop': () => { },   // toque dentro do balão (fora dos botões) não conta como fundo
   'mapa-kyc': () => kycCorrige(),
+  'mapa-zoom': el => mapaPasso(+el.dataset.d),   // 1.8.39
+  'mapa-ajusta': () => mapaAjusta(),
+  // na folha do UTXO: fecha a folha antes (o formulário ainda teria o KYC antigo) e corrige, com Desfazer
+  'utxo-kyc': () => { closeSheet(true, false); kycCorrige(); },
   'tx-ext-own': el => { txRead(); const t = ui.form.tx, i = +el.dataset.i, a = addrById(el.dataset.a); if (!a) return; const o = t.outputs[i]; t.outputs[i] = { key: o.key, kind: 'own', wallet: a.wallet, address: a.id, newLabel: '', newAddr: '', newWallet: '', rem: o.rem, sats: o.sats }; txRerender(); },
   'copy': el => copyText(el.dataset.v || ''),
   'del-wallet': el => {
@@ -5269,16 +5794,12 @@ Object.assign(ACT, {
 });
 
 /* ---------------- entradas de formulário ---------------- */
-// abre o mapa no passo em que o UTXO nasceu (ou o da transação); já no mapa, só anda até lá
+// "Ver no mapa": abre o mapa com o UTXO (u:id) ou a transação (t:id) destacada e no centro; já no mapa, só destaca e centraliza
 function mapaDe(arg) {
-  if (ui.page === 'mapa' && ui.mapa) {
-    const [t, id] = arg.split(':'), k = t === 't' ? ui.mapa.passos.findIndex(p => p.tx === id) : ui.mapa.passos.findIndex(p => (p.novos || []).includes(id));
-    closeSheet(true); if (t === 'u') ui.mapaSel = arg; if (k >= 0) mapaVai(k); else mapaVai(ui.mapaPasso); return;
-  }
+  if (ui.page === 'mapa' && ui.mapa) { closeSheet(true); if (ui.mapa.nos.has(arg)) { mapaEscolhe(arg); mapaCentra(arg, true, true); } return; }   // perto: pelo menos 1:1 (1.8.39)
   ui.mapaArg = null; openPage('mapa', arg);
 }
 const INP = {
-  'mapa-passo': el => mapaVai(+el.value),
   'sale-w': el => { const f = ui.form; f.sw = el.value; f.pick = new Set(); f.pickTouched = false; f.dustOk = false; apCapture(); const box = $('#sale-self'); if (box) box.innerHTML = saleSelfHTML(); updateSaleTx(); },
   'sale-rate': () => { ui.form.sfeeMode = 'rate'; ui.form.dustOk = false; updateSaleTx(); },
   'sale-fee': () => { ui.form.sfeeMode = 'sats'; ui.form.dustOk = false; updateSaleTx(); },
