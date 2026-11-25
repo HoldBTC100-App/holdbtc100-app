@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="App do Projeto Hold BTC 100: registre seus aportes mensais em bitcoin, acompanhe preço médio e resultado, gerencie UTXOs e aprenda autocustódia.">
 <title>Hold BTC 100</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-X8VPWcEaJhg6R9tsVyj5h3Q93IO5AMKPNciYUMjoEyM='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-SPmrjQ91L+dq98lCx4tH8jM2uhIaQ9wip/DHq5G5QyY='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -541,7 +541,9 @@ button.io:active{background:var(--surface-2)}
 .hero .btn-p:active{background:#2B2B2B}
 .hero .btn-o{border-color:#000;color:#000}
 .hero .link-btn{text-decoration-color:#000}
-.brand img{width:40px;height:40px;object-fit:contain;padding:4px;box-sizing:border-box;background:#000;border-radius:50%}
+/* logo do topo: contorno preto fino (~2 px), oval como a própria logo, só para separar o laranja dela do laranja do topo.
+   A imagem tem 194 × 175 e 2 px de margem transparente: no box de 40 × 36,4 com 1,5 px de recuo, a logo fica com 37 px */
+.brand img{width:40px;height:36.4px;object-fit:contain;padding:1.5px;box-sizing:border-box;background:#000;border-radius:50%}
 
 /* histórico de meses: cartão abaixo do topo, estados claros e dica por mês */
 .months-card{margin:14px 14px 0;padding:14px 14px 12px;background:var(--surface);border:1px solid var(--line);border-radius:18px}
@@ -1073,7 +1075,12 @@ const KS_CARDS = {
    Claude, sem PIN, também espelha num documento privado.
    ========================================================= */
 
-const APP_VERSION = '1.8.42';
+const APP_VERSION = '0.9.0';
+/* Numeração pública: 0.9.x no beta fechado (cada entrega sobe o último número) e 1.0.0 no lançamento público. A 1.0 a 1.8.42
+   foi a fase de desenvolvimento (série 1); APP_SERIE vai no backup para as duas numerações não se confundirem. */
+const APP_SERIE = 2;
+const APP_CANAL = 'beta';   // sai no lançamento público
+const versaoTxt = () => `Versão ${APP_VERSION}${APP_CANAL ? ' ' + APP_CANAL : ''}`;
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const HIST = {"start":"2015-01","usd":[269,236,249,240,233,247,274,257,233,275,346,404,400,404,427,433,490,602,649,600,593,655,724,855,967,1075,1126,1210,1817,2384,2684,3787,4520,5404,8338,12178,12166,10318,8680,8122,8372,6952,7096,7394,6818,6489,5192,3887,3595,3654,3979,4704,6942,9680,10459,9914,9056,8766,8345,7372,8268,8948,7481,7512,9050,9296,10232,11509,11218,12286,16730,24328,31072,39024,51906,58338,47486,36155,38354,44318,45439,52582,59166,51586,42365,40791,44360,41879,35044,25823,21591,21674,19744,19962,18841,16851,19838,23126,25804,28897,28234,28846,29858,27587,26456,30805,36179,39982,42444,51946,66244,65986,64146,65194,63729,61864,61188,66861,83364,95022,97976,93433,83444,88373,99394,105848,111410,111996,111124,111840,99685,88638,83198,72854,67640,72356,75048,66150,60768,70714,81095,80570],"brl":[708,663,783,731,714,768,883,904,911,1067,1307,1564,1620,1603,1583,1542,1734,2062,2125,1926,1930,2088,2418,2866,3091,3338,3522,3795,5832,7858,8605,11932,14171,17247,27175,40087,39062,33444,28462,27676,30443,26233,27169,29059,28068,24388,19662,15101,13451,13608,15305,18328,27776,37353,39528,39856,37326,35825,34676,30296,34306,38845,36536,40003,51073,48305,54030,62853,60569,69121,90640,125185,166425,211371,293069,324482,251253,181928,197777,232745,239904,291307,328780,291530,234452,211975,220398,199260,173644,130385,115903,111476,103397,104809,99381,88340,103169,119603,134475,145054,140682,139952,143345,135273,130613,156021,177216,195797,208587,257883,329902,338449,329261,351333,353186,343509,339079,376033,484100,579349,589992,538697,479536,511123,563308,587149,615933,610031,596450,602314,532408,483352,444108,378882,353863,364172,374017,339193,310759,364403,417209,413273]}; // médias mensais estimadas: {start:'2015-01', usd:[…], brl:[…]}
 const REF_PRICE = { BRL: 416900, USD: 75800, EUR: 68000, at: Date.UTC(2026, 10, 7, 18, 0), src: 'ref' }; // US$ do CoinLore × PTAX de 06/11/2026 (R$ 5,50; € 6,13)
@@ -3004,7 +3011,7 @@ function setResumo(k) {
   if (k === 'seg') return !s.pin ? 'Sem PIN' : `PIN ativo · ${cifrado() ? 'dados criptografados' : 'só trava a tela'}${s.bio ? ' · biometria' : ''}`;
   if (k === 'con') return s.offline ? 'Modo 100% offline: nenhuma conexão' : 'Online: cotação e taxas automáticas';
   if (k === 'dados') return s.bkAt ? `Último backup em ${fmtDate(isoDeTs(s.bkAt))}` : 'Nenhum backup registrado';
-  return `Versão ${APP_VERSION} · contato e privacidade`;
+  return `${versaoTxt()} · contato e privacidade`;
 }
 function setCorpo(k, s, seg) {
   if (k === 'exib') return `
@@ -3044,7 +3051,7 @@ function sheetSettings() {
       const on = ui.setSec === k;
       return `<div class="set-acc${on ? ' on' : ''}" id="set-${k}"><h3><button class="set-acc-h" id="set-${k}-h" data-act="set-sec" data-sec="${k}" aria-expanded="${on}" aria-controls="set-${k}-p"><span class="t">${t}</span><span class="d">${esc(setResumo(k))}</span><span class="chev">${I.chev}</span></button></h3><div class="set-acc-p" id="set-${k}-p" role="region" aria-labelledby="set-${k}-h"${on ? '' : ' hidden'}>${on ? setCorpo(k, s, seg) : ''}</div></div>`;
     }).join('');
-    return `<h2>Configurações</h2><p class="sub">Versão ${APP_VERSION} · dados guardados ${cloud.on && !s.offline ? 'neste aparelho e no seu espaço privado do Claude' : `neste aparelho (${storageMode})`}${s.offline ? ' · modo 100% offline' : ''}</p>
+    return `<h2>Configurações</h2><p class="sub">${versaoTxt()} · dados guardados ${cloud.on && !s.offline ? 'neste aparelho e no seu espaço privado do Claude' : `neste aparelho (${storageMode})`}${s.offline ? ' · modo 100% offline' : ''}</p>
     <div class="set-group"><h3>Aporte</h3>
       <div class="field"><span class="lbl">Moeda dos aportes</span>${locked ? `<p class="small muted" style="margin:0">${s.currency} · para trocar, exporte um backup e comece um registro novo.${fxPairOk() ? ` Para só ver os valores em ${s.currency === 'USD' ? 'R$' : 'US$'}, use Exibição › Moeda dos valores.` : ''}</p>` : seg('currency', [['BRL', 'R$'], ['USD', 'US$'], ['EUR', '€']])}</div>
       <div class="two"><div class="field"><label for="s-m">Valor mensal (${curSym()})</label><input placeholder="0,00" class="inp" id="s-m" inputmode="decimal" data-num="money" value="${fmtInput(s.monthly)}" data-chg="monthly"></div>
@@ -3221,7 +3228,7 @@ async function bkKey(pin, salt, iter) {
   return crypto.subtle.deriveKey({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations: iter }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
 }
 async function backupJSON(pin = '') {
-  const env = { app: 'holdbtc100', format: BK_FORMAT, version: APP_VERSION, exportedAt: new Date().toISOString() };
+  const env = { app: 'holdbtc100', format: BK_FORMAT, version: APP_VERSION, serie: APP_SERIE, exportedAt: new Date().toISOString() };
   if (!subtleOk()) { if (pin) throw new Error('sem-cripto'); return JSON.stringify({ ...env, format: 1, state: cloudPayload() }, null, 1); }   // página fora de https: formato antigo, sem assinatura
   if (pin) {
     const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
@@ -3350,7 +3357,8 @@ async function importBackupText(text) {
     if (fmt > BK_FORMAT) return formErr('Este backup foi feito por uma versão mais nova do app. Atualize o app e tente de novo.');
     const at = typeof obj.exportedAt === 'string' && !isNaN(Date.parse(obj.exportedAt)) ? new Date(obj.exportedAt) : null;
     const info = { fmt, at, ver: typeof obj.version === 'string' && /^\d{1,3}(\.\d{1,3}){2}$/.test(obj.version) ? obj.version : '', sig: fmt >= 2 ? await bkCheck(obj) : 'antigo' };
-    if (fmt === 1 && info.ver && verGE(info.ver, '1.8.18')) info.sig = 'rebaixado';   // 1.8.21, auditoria S7: a 1.8.18 em diante exporta assinado
+    // auditoria S7: quem exporta assinado não gera o formato 1 — na série 1, da 1.8.18 em diante; na série 2 (APP_SERIE), todas
+    if (fmt === 1 && ((obj.serie | 0) >= 2 || info.ver && verGE(info.ver, '1.8.18'))) info.sig = 'rebaixado';
     if (fmt >= 2 && obj.cifrado != null) return bkAskPin(obj, info);
     if (!obj.state || typeof obj.state !== 'object' || Array.isArray(obj.state)) return formErr('Este arquivo não é um backup do Hold BTC 100.');
     if (info.sig === 'falhou' || info.sig === 'ausente' || info.sig === 'rebaixado') return bkAltered(obj.state, info);
@@ -3398,7 +3406,7 @@ async function bkOpen() {
 }
 function bkAltered(st, info) {
   ui.form = { kind: 'import', bkForce: { st, info } };
-  $('#sheet-body').innerHTML = `<h2>Backup alterado</h2><p class="sub">${bkOrigem(info)}${info.sig === 'ausente' ? 'A assinatura do arquivo foi apagada ou está incompleta.' : info.sig === 'rebaixado' ? `O arquivo diz ter sido exportado na versão ${esc(info.ver)}, que exporta com assinatura, mas chegou no formato antigo, sem ela.` : 'A conferência SHA-256 não bateu: o arquivo mudou depois de exportado.'} Ele pode ter sido cortado ao copiar, editado ou montado por outra pessoa.</p>
+  $('#sheet-body').innerHTML = `<h2>Backup alterado</h2><p class="sub">${bkOrigem(info)}${info.sig === 'ausente' ? 'A assinatura do arquivo foi apagada ou está incompleta.' : info.sig === 'rebaixado' ? `O arquivo diz ter sido exportado ${info.ver ? `na versão ${esc(info.ver)}` : 'numa versão'}, que exporta com assinatura, mas chegou no formato antigo, sem ela.` : 'A conferência SHA-256 não bateu: o arquivo mudou depois de exportado.'} Ele pode ter sido cortado ao copiar, editado ou montado por outra pessoa.</p>
     <p class="note restore-warn">Restaure só se foi você quem editou o arquivo. Mesmo assim, cada campo passa pela validação do app antes de entrar.</p>
     <p class="err form" hidden></p><button class="btn btn-d block" data-act="bk-force">Restaurar mesmo assim</button><button class="btn btn-q block" style="margin-top:10px" data-act="close-sheet">Cancelar</button>`;
 }
