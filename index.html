@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="App do Projeto Hold BTC 100: registre seus aportes mensais em bitcoin, acompanhe preço médio e resultado, gerencie UTXOs e aprenda autocustódia.">
 <title>Hold BTC 100</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-CFzTVavwl2gqVzia+v0ybfS/oAZA2h6m9I0NTpwOiwE='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-itkL8HczxFCP1vClZL8D3hO9BWee5QM9CgdtIvkh/2g='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -740,6 +740,21 @@ h1,h2,h3,p,li,b,strong,small,label,.k,.v,.t,.d,.sub,.lead,.note,.hint,.tool b,.t
 @media (prefers-reduced-motion:reduce){.mapa .el{transition:none}}
 .orig{margin:0 0 14px} .orig-l,.orig-l ul{list-style:none;margin:0;padding:0} .orig-l ul{margin-left:8px;padding-left:12px;border-left:2px solid var(--line)}
 .orig-l .io{font-size:14.5px;padding:9px 0} .orig-l .io .v .tag{margin-left:6px;vertical-align:1px}
+/* Meta batida (1.8.40): a comemoração no meio da tela, com confete que cai uma vez (parado e invisível com menos movimento) */
+.ov.festa{align-items:center;padding:16px}
+.sheet.festa{position:relative;max-width:400px;border-radius:24px;padding-top:8px;text-align:center;box-shadow:0 0 0 1px var(--line),0 18px 50px rgba(0,0,0,.3);animation:pop .34s cubic-bezier(.2,.9,.3,1.2)}
+.sheet.festa .grab{display:none} .sheet.festa.closing{animation:popout .16s ease-in forwards}
+@keyframes pop{from{transform:scale(.86);opacity:0}to{transform:none;opacity:1}}
+@keyframes popout{to{transform:scale(.94);opacity:0}}
+.festa-emoji{font-size:52px;line-height:1;margin:18px 0 6px}
+.festa-dica{margin:16px 0 0;font-weight:700}
+.tip.festa-cit{text-align:left;margin:10px 0 18px} .festa-cit p{margin:0;font-size:16.5px;font-weight:600;font-style:italic}
+.festa-cit cite{display:block;margin-top:6px;font-size:13px;font-style:normal;color:var(--muted)}
+.sheet.festa .btn+.btn{margin-top:10px}
+.confete{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.confete i{position:absolute;top:-18px;left:var(--x);width:9px;height:14px;border-radius:2px;background:var(--c);opacity:0;animation:cai var(--t) cubic-bezier(.3,.6,.5,1) var(--d) forwards}
+.confete i:nth-child(3n){width:8px;height:8px;border-radius:50%}
+@keyframes cai{0%{opacity:1;transform:translate(0,0) rotate(var(--r))}80%{opacity:1}100%{opacity:0;transform:translate(-30px,105vh) rotate(calc(var(--r) + 540deg))}}
 
 .ic{display:block;width:24px;height:24px}
 </style>
@@ -1042,7 +1057,7 @@ const KS_CARDS = {
    Claude, sem PIN, também espelha num documento privado.
    ========================================================= */
 
-const APP_VERSION = '1.8.39';
+const APP_VERSION = '1.8.40';
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
 const HIST = {"start":"2015-01","usd":[269,236,249,240,233,247,274,257,233,275,346,404,400,404,427,433,490,602,649,600,593,655,724,855,967,1075,1126,1210,1817,2384,2684,3787,4520,5404,8338,12178,12166,10318,8680,8122,8372,6952,7096,7394,6818,6489,5192,3887,3595,3654,3979,4704,6942,9680,10459,9914,9056,8766,8345,7372,8268,8948,7481,7512,9050,9296,10232,11509,11218,12286,16730,24328,31072,39024,51906,58338,47486,36155,38354,44318,45439,52582,59166,51586,42365,40791,44360,41879,35044,25823,21591,21674,19744,19962,18841,16851,19838,23126,25804,28897,28234,28846,29858,27587,26456,30805,36179,39982,42444,51946,66244,65986,64146,65194,63729,61864,61188,66861,83364,95022,97976,93433,83444,88373,99394,105848,111410,111996,111124,111840,99685,88638,83198,72854,67640,72356,75048,66150,60768,70714,81095,80570],"brl":[708,663,783,731,714,768,883,904,911,1067,1307,1564,1620,1603,1583,1542,1734,2062,2125,1926,1930,2088,2418,2866,3091,3338,3522,3795,5832,7858,8605,11932,14171,17247,27175,40087,39062,33444,28462,27676,30443,26233,27169,29059,28068,24388,19662,15101,13451,13608,15305,18328,27776,37353,39528,39856,37326,35825,34676,30296,34306,38845,36536,40003,51073,48305,54030,62853,60569,69121,90640,125185,166425,211371,293069,324482,251253,181928,197777,232745,239904,291307,328780,291530,234452,211975,220398,199260,173644,130385,115903,111476,103397,104809,99381,88340,103169,119603,134475,145054,140682,139952,143345,135273,130613,156021,177216,195797,208587,257883,329902,338449,329261,351333,353186,343509,339079,376033,484100,579349,589992,538697,479536,511123,563308,587149,615933,610031,596450,602314,532408,483352,444108,378882,353863,364172,374017,339193,310759,364403,417209,413273]}; // médias mensais estimadas: {start:'2015-01', usd:[…], brl:[…]}
 const REF_PRICE = { BRL: 416900, USD: 75800, EUR: 68000, at: Date.UTC(2026, 10, 7, 18, 0), src: 'ref' }; // US$ do CoinLore × PTAX de 06/11/2026 (R$ 5,50; € 6,13)
@@ -1848,9 +1863,40 @@ function goalBlock(c) {
   const g = S().goalSats, pct = Math.min(1, Math.max(0, c.hold) / g);
   let txt;
   const rem = g - c.hold;
-  if (rem <= 0) txt = `Meta alcançada. <button class="link-btn small" data-act="open-settings" data-focus="goal">Definir a próxima</button>`;
+  if (rem <= 0) txt = `Meta alcançada. ${state.demo ? '' : '<button class="link-btn small" data-act="meta-festa">Dobrar a meta</button> · '}<button class="link-btn small" data-act="open-settings" data-focus="goal">Definir a próxima</button>`;   // 1.8.40: Dobrar a meta abre a comemoração
   else { const per = S().monthly / c.Pr * 1e8; const n = Math.ceil(rem / per); txt = `No preço de hoje, com ${esc(fmtV(toVnow(S().monthly)))}${fxOn() ? ` (${esc(fmtMoney(S().monthly))})` : ''} por mês, faltam cerca de ${n} ${n === 1 ? 'aporte' : 'aportes'}${n >= 24 ? ` (${(n / 12).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} anos)` : ''}.`; }
   return `<div style="margin-top:14px"><div class="sec-head"><span>Meta de ${esc(amtTxt(g))}</span><b class="num">${Math.floor(pct * 100)}%</b></div><div class="meter" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.floor(pct * 100)}"><i style="width:${(pct * 100).toFixed(2)}%"></i></div><p class="hint">${txt}</p></div>`;
+}
+/* Meta batida (1.8.40, pedido do Nicolas): quando o registro tocado leva a pilha até a meta (aporte de compra, novo ou
+   editado, ou UTXO De terceiros), a folha dele vira a comemoração, no meio da tela e com confete, com a opção de dobrar a meta:
+   a piada com a frase da Dilma Rousseff no lançamento do Pronatec Jovem Aprendiz (jul/2015). Abre só nesse toque, para o
+   Voltar fechar a comemoração (a entrada do histórico nasce no toque): nunca ao abrir o app, ao escolher uma meta já
+   alcançada, ao importar, restaurar ou desfazer, nem no exemplo. No Início, "Meta alcançada" oferece "Dobrar a meta", que
+   abre a mesma comemoração. Dobrar com a pilha acima da meta dobrada continua a festa. */
+const metaBateu = antes => { const g = S().goalSats; return !state.demo && antes < g && calc().hold >= g; };
+function metaFesta() { ui.metaVez = 0; ui.form = {}; openSheet('meta', metaHTML, { label: 'Meta batida', onOpen: metaConfete }); }
+function metaHTML() {
+  const g = S().goalSats, de = ui.metaVez > 0;
+  return `<p class="festa-emoji" aria-hidden="true">🎉</p><h2>${de ? 'Dobrou e já bateu de novo!' : 'Meta batida!'}</h2>
+    <p class="sub">Sua pilha chegou a <b>${AMT(calc().hold)}</b>${de ? `, acima também da meta dobrada de ${esc(amtTxt(g))}` : `. A meta era ${esc(amtTxt(g))}`}.</p>
+    <p class="festa-dica">E agora? Como já dizia a Dilma:</p>
+    <blockquote class="tip festa-cit"><p>“…quando atingirmos a meta, vamos dobrar a meta.”</p><cite>Dilma Rousseff, 2015</cite></blockquote>
+    <button class="btn btn-p block" data-act="meta-dobra">Dobrar a meta para ${esc(amtTxt(2 * g))}</button>
+    <button class="btn btn-q block" data-act="open-settings">Escolher outra meta</button>`;
+}
+// confete que cai uma vez, por cima da comemoração e sem receber toques; posições fixas (as telas dos testes se repetem)
+function metaConfete() {
+  const ov = $('#ov'), sh = $('#ov .sheet'); if (!ov || !sh) return;
+  ov.classList.add('festa'); sh.classList.add('festa');
+  const velho = ov.querySelector('.confete'); if (velho) velho.remove();
+  const cor = ['var(--orange)', 'var(--ink)', 'var(--orange)', 'var(--muted)'];
+  ov.insertAdjacentHTML('beforeend', `<div class="confete" aria-hidden="true">${Array.from({ length: 36 }, (_, i) => `<i style="--x:${(i * 37 + 7) % 100}%;--d:${(i * 7 % 13) / 10}s;--t:${(2.2 + (i * 5 % 9) / 10).toFixed(1)}s;--r:${i * 47 % 360}deg;--c:${cor[i % 4]}"></i>`).join('')}</div>`);
+}
+function metaDobra() {
+  const s = S(), g = s.goalSats * 2; s.goalSats = g; save(); render(); toast(`Meta dobrada: ${amtTxt(g)}`);
+  if (calc().hold < g || !ui.sheet || ui.sheet.kind !== 'meta') { closeSheet(); return; }
+  ui.metaVez++; const b = $('#sheet-body'); if (b) b.innerHTML = metaHTML(); metaConfete();   // a pilha já passa da meta dobrada: a festa continua
+  const sh = $('#ov .sheet'); if (sh) { sh.scrollTop = 0; sh.focus({ preventScroll: true }); }
 }
 /* Pilha dividida entre corretora e autocustódia. Na aba Carteira (vender = true), cada lado com saldo oferece registrar a venda
    feita dali: na corretora ou direto da carteira (P2P). */
@@ -2734,6 +2780,7 @@ function saveAporte() {
     if (prev) toast('Venda atualizada'); else toastRegistro('Venda registrada'); fxSync(); return;
   }
   const ap = { ...base, type: 'compra', dest: set.utxo ? f.dest : (prev ? prev.dest || 'ex' : 'ex'), utxoId: prev ? prev.utxoId : undefined };
+  const antes = calc().hold;   // meta batida (1.8.40): a pilha antes deste registro
   if (prev && prev.entrada && ap.dest !== 'self') return formErr('Os sats desta entrada já estão na carteira: o destino continua Direto na carteira.');   // 1.8.19
   const eL = ledgerErrNovo(ledger(state.aportes.filter(x => x.id !== ap.id).concat([ap]))); if (eL) return formErr(ledgerErrText(eL));
   if (set.utxo) {
@@ -2756,7 +2803,8 @@ function saveAporte() {
   const cur0 = prev ? byId(state.aportes, prev.id) : null;
   if (cur0) Object.assign(cur0, ap); else state.aportes.push(ap);
   if (ap.ex && !isDefEx(ap.ex)) set.exchange = ap.ex;
-  save(); closeSheet(); render(); if (prev) toast('Aporte atualizado'); else toastRegistro('Aporte registrado'); fxSync();
+  save(); if (metaBateu(antes)) { render(); metaFesta(); } else { closeSheet(); render(); }   // a folha do aporte vira a comemoração
+  if (prev) toast('Aporte atualizado'); else toastRegistro('Aporte registrado'); fxSync();
 }
 function delAporte(id) {
   const a = byId(state.aportes, id); if (!a) return;
@@ -3764,6 +3812,7 @@ const ACT = {
   'bk-adiar': () => { S().bkAdiar = Date.now() + 7 * DIA; save(); render(); toast('Combinado: lembro de novo em 7 dias.'); },
   'bk-lembrar': () => { S().bkLembrar = S().bkLembrar === false; S().bkAdiar = 0; save(); render(); refreshSheet(); toast(S().bkLembrar ? 'Lembrete de backup ligado' : 'Lembrete de backup desligado'); },
   'open-settings': () => { ui.setSec = null; sheetSettings(); },
+  'meta-festa': () => metaFesta(), 'meta-dobra': () => metaDobra(),   // meta batida (1.8.40)
   'set-sec': el => setSecToggle(el.dataset.sec),
   'set': el => setValue(el.dataset.k, el.dataset.v),
   'desfazer': () => {
@@ -4176,7 +4225,7 @@ function saveNewUtxo() {
   const cTxt = f.origin === 'externo' ? (fv('cost') || '').trim() : '', cost = cTxt ? parseNum(cTxt) : 0;   // valor pago pelo que veio de terceiros (1.8.19)
   if (cTxt && !(cost >= 0)) return formErr('Confira o valor pago: use só números, como 1.500,00. Ou deixe o campo vazio.');
   if (cost > 0 && !f.warned) { const est = histPrice(date.slice(0, 7)), pr = cost / (sats / 1e8); if (est && (pr > est * 2.5 || pr < est / 2.5)) { f.warned = true; const b = $('[data-act="save-new-utxo"]'); if (b) b.textContent = 'Adicionar mesmo assim'; return formErr(`O valor pago dá ${fmtMoney(pr, cur(), 0)} por bitcoin, bem diferente da média do mês (${fmtMoney(est, cur(), 0)}). Confira se não faltou ou sobrou um zero.`); } }
-  const def = f.origin === 'externo' ? DEF_TERCEIROS : 'Saque antigo';
+  const def = f.origin === 'externo' ? DEF_TERCEIROS : 'Saque antigo', antes = calc().hold;   // antes: a pilha, para a meta batida (1.8.40)
   const ok = attempt(() => {
     const r = resolvePicker('n_', def); if (r.err) throw new Error(r.err); const a = addrById(r.aid);
     const u = { id: uid(), sats, address: a.id, wallet: a.wallet, type: a.type, label: (fv('label').trim() || def).slice(0, 80), date, txid, vout, origin: f.origin === 'externo' ? 'externo' : 'saque', kyc: f.kyc, frozen: false, spent: false };
@@ -4185,7 +4234,8 @@ function saveNewUtxo() {
     if (cost > 0) entradaPaga(u, cost, 'Valor pago informado ao adicionar o UTXO');
   });
   if (!ok) return false;
-  save(); closeSheet(); render(); toast(cost > 0 ? 'UTXO adicionado e valor pago somado ao total aportado' : 'UTXO adicionado'); if (cost > 0) fxSync();
+  save(); if (metaBateu(antes)) { render(); metaFesta(); } else { closeSheet(); render(); }   // De terceiros que bate a meta: a comemoração
+  toast(cost > 0 ? 'UTXO adicionado e valor pago somado ao total aportado' : 'UTXO adicionado'); if (cost > 0) fxSync();
 }
 /* Valor pago pelo que veio de terceiros (1.8.19, pedido do Nicolas; antes chamado entrada externa): vira aporte direto na
    carteira, ligado ao UTXO (origem aporte), e o valor entra no total aportado, no preço médio e no IR. O aporte leva
