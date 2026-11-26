@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="App do Projeto Hold BTC 100: registre seus aportes mensais em bitcoin, acompanhe preço médio e resultado, gerencie UTXOs e aprenda autocustódia.">
 <title>Hold BTC 100</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nGJB5yv1S0TXSDemo2f2BTqjhL4cAi/VD6jMy2pZX38='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ddUYOGeOtKlhG6r7ldOPHJomnx/biiXPiiNgAfm4qHU='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -326,6 +326,20 @@ select.inp{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 5
 .tool b{font-family:var(--fc);font-size:20px;font-weight:700}
 .tool span{font-size:14px;color:var(--muted);grid-column:1}
 .tool .chev{grid-row:1/3;grid-column:2;font-size:20px}
+/* Fale comigo: cartão como os da seção (18 px, superfície e linha); botões lado a lado enquanto o texto cabe numa linha
+   (min-width do conteúdo + flex-wrap); senão, um embaixo do outro, cada um na largura toda */
+.fale-sec{padding-top:16px}
+.fale{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 14px 14px}
+.fale .fale-t{font-family:var(--fc);font-size:21px;font-weight:700;line-height:1.15;margin:0 0 8px}
+.fale p{margin:0 0 8px;font-size:14.5px;line-height:1.5;color:var(--muted)}
+.fale p.fale-s{font-size:13.5px;margin-bottom:14px}
+.fale-bts{display:flex;flex-wrap:wrap;gap:10px}
+.fale-b{flex:1 1 0;min-width:max-content;justify-content:flex-start;gap:8px;padding:8px 12px;border-radius:14px}
+.fale-b.btn-p{border:1.5px solid transparent}   /* mesma borda do WhatsApp (btn-o): larguras iguais lado a lado */
+.fale-b svg{width:22px;height:22px;flex:none}
+.fale-l{display:flex;flex-direction:column;align-items:flex-start;text-align:left;white-space:nowrap;line-height:1.2}
+.fale-l b{font-size:15.5px;font-weight:700}
+.fale-l small{font-size:13px;font-weight:600}
 
 /* KriptoBR: cartões no padrão visual da marca (verde-água, azul, marinho e grafite; logo oficial) */
 :root{--kbr-teal:#00C69F;--kbr-blue:#05668D;--kbr-navy:#143642;--kbr-ink:#313131;--kbr-muted:#5b6b71;--kbr-bg:#fff;--kbr-line:#dbe6e9;--kbr-tile:#e8f8f3;--kbr-fill:#fff;--kbr-deep:#143642;--kbr-slot:#143642;--kbr-cta:#143642;--kbr-cta-ink:#fff}
@@ -1116,6 +1130,19 @@ const COMMUNITY = [
   ['Contato', 'Telegram @nicolasmaia42', 'https://t.me/nicolasmaia42']
 ];
 
+// Cartão "Fale comigo" (0.9.4), no Aprender entre o progresso e a Trilha do holder. O contato é o que o Nicolas escolheu
+// publicar (DIRETRIZES §8b). Ícones genéricos, nunca o logo do Telegram ou do WhatsApp (DIRETRIZES §14).
+const FALE = {
+  t: 'Ficou com alguma dúvida? Fale\u00a0comigo',   // \u00a0: "Fale comigo" não se separa na tela estreita
+  d: 'Tem alguma dúvida sobre criptomoedas, carteiras, segurança, DeFi, o app ou o projeto Hold BTC 100? Pode me chamar sem compromisso para trocar uma ideia.',
+  c: 'Se quiser um acompanhamento passo a passo, também faço consultorias particulares pagas, por videochamada: configuração de carteiras, autocustódia, organização dos UTXOs.',
+  s: 'Nunca vou pedir suas 12 ou 24 palavras nem sua chave privada.',
+  bts: [
+    { k: 'tg', nome: 'Telegram', v: '@nicolasmaia42', rot: 'Telegram (@nicolasmaia42)', url: 'https://t.me/nicolasmaia42' },
+    { k: 'wa', nome: 'WhatsApp', v: '(48) 99830-8857', rot: 'WhatsApp (48) 99830-8857', url: 'https://wa.me/5548998308857' }
+  ]
+};
+
 // Cartões do ecossistema (marca em MARCAS, no app.js): logo da própria marca e link do cartão, sem selo de parceria.
 const KS_CARDS = {
   steel: { marca: 'ksteel', url: KSTEEL_URL, t: 'KriptoSteel: sua seed à prova de fogo', d: 'Placa de aço para guardar as 12 ou 24 palavras longe do papel, que queima e molha.', cta: 'Ver KriptoSteel' },
@@ -1134,7 +1161,7 @@ const KS_CONVITE = { marca: 'academy', url: ACADEMY_URL, t: 'Quer ir além?', d:
    Claude, sem PIN, também espelha num documento privado.
    ========================================================= */
 
-const APP_VERSION = '0.9.3';
+const APP_VERSION = '0.9.4';
 /* Numeração pública: 0.9.x no beta fechado (cada entrega sobe o último número) e 1.0.0 no lançamento público. A 1.0 a 1.8.42
    foi a fase de desenvolvimento (série 1); APP_SERIE vai no backup para as duas numerações não se confundirem. */
 const APP_SERIE = 2;
@@ -1673,7 +1700,10 @@ const I = {
   ext: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
   ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
   info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.6v.1"/></svg>',
-  chev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>'
+  chev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',
+  // genéricos (aviãozinho de papel e balão de conversa) para os botões do "Fale comigo"; nunca o logo de um app
+  send: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.5 2.5 10.5 13.5"/><path d="M21.5 2.5 14.5 21.5l-4-8-8-4z"/></svg>',
+  chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5c4.97 0 9 3.58 9 8s-4.03 8-9 8c-1.3 0-2.54-.25-3.66-.7L3.5 20.5l1.4-4.2A7.5 7.5 0 0 1 3 11.5c0-4.42 4.03-8 9-8z"/><path d="M8 11.6h.01M12 11.6h.01M16 11.6h.01" stroke-width="2.6"/></svg>'
 };
 const extLink = (url, inner, cls = '') => `<a class="${cls}" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${inner}</a>`;
 
@@ -2280,6 +2310,7 @@ function viewAprender() {
   const trilha = lista.length ? lista.map(l => lessonRow(l)).join('') : `<div class="trilha-fim"><b>Trilha concluída</b><p class="small muted">Você concluiu as ${LESSONS.length} lições. Elas ficam em Lições concluídas, para rever quando quiser.</p><button class="btn btn-q btn-s" data-act="page" data-page="licoes">Ver as lições concluídas</button></div>`;
   const more = (arr, key, n) => { const open = ui[key]; const list = open ? arr : arr.slice(0, n); return `<div class="links">${list.map(([t, u]) => extLink(u, `<b>${esc(t)}</b><span class="ext">${I.ext}</span>`)).join('')}</div>${arr.length > n ? `<p><button class="link-btn" data-act="toggle-ui" data-k="${key}">${open ? 'Mostrar menos' : `Ver todos (${arr.length})`}</button></p>` : ''}`; };
   return `${mempoolHTML()}<section class="sec"><div class="progress"><svg class="ring" viewBox="0 0 64 64" role="img" aria-label="${done} de ${LESSONS.length} lições concluídas"><circle class="bgc" cx="32" cy="32" r="27"/>${done ? `<circle class="fgc" cx="32" cy="32" r="27" stroke-dasharray="${(C * pct).toFixed(1)} ${C.toFixed(1)}"/>` : ''}<text x="32" y="38" text-anchor="middle">${done}</text></svg><div><h1 class="sec-t" style="font-size:28px;margin:0">Aprender</h1><p class="muted small" style="margin:0">${done} de ${LESSONS.length} lições da trilha do holder</p></div></div></section>
+  ${faleCard()}
   <section class="sec"><div class="sec-head"><h2 class="sec-t">Trilha do holder</h2>${feitas.length ? `<button class="link-btn" data-act="page" data-page="licoes">Concluídas (${feitas.length})</button>` : ''}</div>${trilha}</section>
   <section class="sec"><h2 class="sec-t">Ferramentas</h2>
     <button class="tool" data-act="page" data-page="sim"><b>Se eu tivesse começado antes</b><span>Aporte mensal desde 2015, com preços históricos</span><span class="chev" aria-hidden="true">›</span></button>
@@ -2290,6 +2321,16 @@ function viewAprender() {
   <section class="sec"><h2 class="sec-t">Holdteca</h2><p class="small muted">A biblioteca do Hold BTC 100.</p>${more(HOLDTECA, 'tecaAll', 5)}</section>
   <section class="sec"><h2 class="sec-t">Comunidade Hold BTC 100</h2><div class="links">${COMMUNITY.map(([t, d, u]) => extLink(u, `<span><b>${esc(t)}</b><small>${esc(d)}</small></span><span class="ext">${I.ext}</span>`)).join('')}</div></section>
   <section class="sec"><h2 class="sec-t kbr-t">Loja KriptoBR</h2>${ksCard('steel')}${ksCard('hw')}${ksCard('f2')}</section>`;
+}
+/* "Fale comigo" (0.9.4): convite para tirar dúvidas com o Nicolas, com a consultoria paga dita às claras. Telegram em
+   destaque (laranja), WhatsApp secundário (contorno). Os botões ficam lado a lado enquanto cabem sem quebrar o texto
+   e empilham sozinhos em tela estreita (style.css, .fale-bts). Texto e links no content.js (FALE). */
+function faleCard() {
+  const v = FALE, ic = { tg: I.send, wa: I.chat };
+  const bt = (b, i) => `<a class="btn ${i ? 'btn-o' : 'btn-p'} fale-b fale-${b.k}" href="${esc(b.url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(b.rot)}">${ic[b.k] || ''}<span class="fale-l"><b>${esc(b.nome)}</b><small>${esc(b.v)}</small></span></a>`;
+  return `<section class="sec fale-sec" aria-labelledby="fale-t"><div class="fale">
+    <h2 class="fale-t" id="fale-t">${esc(v.t)}</h2><p>${esc(v.d)}</p><p>${esc(v.c)}</p><p class="fale-s">${esc(v.s)}</p>
+    <div class="fale-bts">${v.bts.map(bt).join('')}</div></div></section>`;
 }
 /* Cartões do ecossistema KriptoBR no padrão visual da marca: verde-água #00C69F, azul #05668D, marinho #143642, grafite #313131.
    Os desenhos são genéricos (placa de aço, hardware wallet, chave de segurança, jornal), no estilo de ícones de
