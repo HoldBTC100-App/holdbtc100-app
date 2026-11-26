@@ -6,8 +6,9 @@
    Só a navegação para o próprio app (/ ou /index.html) vira a cópia do index.html. Até a 1.8.11, abrir outra página do
    site (a política de privacidade) gravava essa página no lugar do app, e o app aberto sem internet mostrava a política.
    A política fica guardada também, para abrir sem internet (1.8.12).
+   Toque na notificação "Hora de sacar" (0.9.1): traz o app para a frente, ou abre, se estiver fechado.
    Troque CACHE a cada versão publicada para os aparelhos baixarem a nova. */
-const CACHE = 'holdbtc100-v0.9.0';
+const CACHE = 'holdbtc100-v0.9.3';
 const FLAGS = 'holdbtc100-flags';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 const EXTRA = ['./privacidade.html'];   // se faltar no site, a instalação segue sem ela
@@ -17,6 +18,12 @@ const isApp = u => /\/(index\.html)?$/.test(u.pathname);
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL).then(() => c.addAll(EXTRA).catch(() => { }))).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('holdbtc100-') && k !== CACHE && k !== FLAGS).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+});
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(cs => {
+    const c = cs.find(x => 'focus' in x); return c ? c.focus() : self.clients.openWindow('./');
+  }));
 });
 self.addEventListener('fetch', e => {
   const req = e.request; if (req.method !== 'GET') return;
