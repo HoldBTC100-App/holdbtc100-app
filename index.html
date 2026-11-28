@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="App do Projeto Hold BTC 100: registre seus aportes mensais em bitcoin, acompanhe preço médio e resultado, gerencie UTXOs e aprenda autocustódia.">
 <title>Hold BTC 100</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ddUYOGeOtKlhG6r7ldOPHJomnx/biiXPiiNgAfm4qHU='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-en6b1T2OO8LzsEYrOPxCU1sQEvo4cu+6xoXKAqzuESs='; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -28,7 +28,7 @@
   --orange:#F7931A; --orange-press:#E2850F; --on-orange:#000; --orange-txt:#B95C00;
   --bg:#F4F4F4; --hero:#F7931A; --surface:#FFFFFF; --surface-2:#ECECEC;
   --ink:#111111; --muted:#5C5C5C; --line:#E2E2E2; --line-2:#ECECEC;
-  --custodia:#4F46E5;
+  --custodia:#4F46E5; --custodia-2:#8B90F0;
   --pos:#17773A; --pos-bg:rgba(23,119,58,.11); --neg:#B42318; --neg-bg:rgba(180,35,24,.10);
   --pos-line:rgba(23,119,58,.30); --neg-line:rgba(180,35,24,.28); --pos-ink:#146C33; --press:rgba(0,0,0,.06);
   --warn:#8F4D00; --warn-bg:rgba(247,147,26,.18); --focus:#000; --overlay:rgba(0,0,0,.45); --cell-miss:#E6E6E6;
@@ -41,7 +41,7 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#000000; --hero:#F7931A; --surface:#141414; --surface-2:#1F1F1F; --orange-txt:#F7931A;
   --ink:#F2F2F2; --muted:#A6A6A6; --line:#2A2A2A; --line-2:#1F1F1F;
-  --custodia:#818CF8;
+  --custodia:#818CF8; --custodia-2:#5B5FD6;
   --pos:#57C786; --pos-bg:rgba(87,199,134,.14); --neg:#FF8373; --neg-bg:rgba(255,131,115,.13);
   --pos-line:rgba(87,199,134,.34); --neg-line:rgba(255,131,115,.32); --pos-ink:#57C786; --press:rgba(255,255,255,.08);
   --warn:#F6B45A; --warn-bg:rgba(247,147,26,.16); --focus:#F7931A; --overlay:rgba(0,0,0,.65); --cell-miss:#2A2A2A;
@@ -51,7 +51,7 @@
 :root[data-theme="dark"]{
   --bg:#000000; --hero:#F7931A; --surface:#141414; --surface-2:#1F1F1F; --orange-txt:#F7931A;
   --ink:#F2F2F2; --muted:#A6A6A6; --line:#2A2A2A; --line-2:#1F1F1F;
-  --custodia:#818CF8;
+  --custodia:#818CF8; --custodia-2:#5B5FD6;
   --pos:#57C786; --pos-bg:rgba(87,199,134,.14); --neg:#FF8373; --neg-bg:rgba(255,131,115,.13);
   --pos-line:rgba(87,199,134,.34); --neg-line:rgba(255,131,115,.32); --pos-ink:#57C786; --press:rgba(255,255,255,.08);
   --warn:#F6B45A; --warn-bg:rgba(247,147,26,.16); --focus:#F7931A; --overlay:rgba(0,0,0,.65); --cell-miss:#2A2A2A;
@@ -506,6 +506,22 @@ button.io:active{background:var(--surface-2)}
 .fee-in{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
 .fee-in .seg{margin:0;min-width:110px}
 .fee-in .seg button{padding:0 10px}
+/* CNPJ da corretora (0.9.5): a barra de seleção desce logo abaixo do campo, no fluxo da folha (empurra os campos de baixo
+   em vez de cobri-los), e o campo do CNPJ leva o Buscar ao lado, só no modo Online */
+.ex-sug{margin:6px 0 0;border:1.5px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden}
+.ex-op{display:block;width:100%;text-align:left;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:inherit;padding:9px 13px;min-height:50px}
+.ex-op:first-child{border-top:0}
+.ex-op .n{display:block;font-weight:700;font-size:15px;line-height:1.3;overflow-wrap:anywhere}
+.ex-op .c{display:block;font-size:13px;line-height:1.35;color:var(--muted);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.ex-op:active,.ex-op[aria-selected="true"]{background:var(--press)}
+.ex-op:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
+.cnpj-in{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+.cnpj-in .btn{min-height:50px}
+#f-cnpj{font-variant-numeric:tabular-nums}
+#cnpj-info{overflow-wrap:anywhere}
+.cnpj-aviso{margin:0 0 14px;background:var(--warn-bg)}
+.cnpj-aviso p{margin:0 0 10px}
+.cnpj-aviso .btn+.btn{margin-top:8px}
 /* ---------- aporte e venda na moeda dos valores (1.8.31): valor em R$ e dólar, ligados ao valor em US$ ---------- */
 .fx-par{gap:10px;margin:-4px 0 0}
 .fx-par .field{margin:0;min-width:0}
@@ -763,7 +779,7 @@ h1,h2,h3,p,li,b,strong,small,label,.k,.v,.t,.d,.sub,.lead,.note,.hint,.tool b,.t
 .mapa-rola{overflow:auto;border-radius:17px;overscroll-behavior:contain;touch-action:pan-x pan-y;scrollbar-width:thin;-webkit-tap-highlight-color:transparent}
 .mapa-cont{position:relative} .mapa-tela{position:relative;width:100%} #mapa-svg{display:block}
 .mapa-rot{position:sticky;left:0;width:0;height:0;z-index:2;pointer-events:none}
-.mapa-rot span{position:absolute;left:8px;max-width:128px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 11.5px/1.5 var(--f);color:var(--muted);background:var(--surface);padding:0 6px;border-radius:6px}
+.mapa-rot span{position:absolute;left:8px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 11.5px/1.5 var(--f);color:var(--muted);background:var(--surface);padding:0 6px;border-radius:6px}
 .mapa-eixo{position:sticky;bottom:0;z-index:1;height:34px;overflow:hidden;background:var(--surface);pointer-events:none}
 .mapa-eixo .mapa-ax{position:absolute;left:0;top:0;display:block}
 .mapa-eixo span{position:absolute;top:12px;transform:translateX(-50%);white-space:nowrap;font:500 11px/1.2 var(--f);color:var(--muted)}
@@ -771,9 +787,11 @@ h1,h2,h3,p,li,b,strong,small,label,.k,.v,.t,.d,.sub,.lead,.note,.hint,.tool b,.t
 .mapa-eixo span.pausa{top:0;font:700 13px/1 var(--f);color:var(--muted)}
 .mapa .el{transition:opacity .12s ease}
 .mapa .foco .el{opacity:.12} .mapa .foco .el.l1{opacity:.5} .mapa .foco .el.l2{opacity:1}
-.mapa .pb-x{fill:var(--custodia)} .mapa .pb-u{fill:var(--orange)} .mapa .ps{fill:rgba(0,0,0,.2)}
+.mapa .pb-x{fill:var(--custodia)} .mapa .pb-y{fill:var(--custodia-2)} .mapa .pb-u{fill:var(--orange)} .mapa .ps{fill:rgba(0,0,0,.2)}
 .mapa .s-x{stop-color:var(--custodia)} .mapa .s-u{stop-color:var(--orange)} .mapa .s-v{stop-color:var(--pos)} .mapa .s-e{stop-color:var(--muted)}
 .mapa .rio,.mapa path.ap,.mapa .bo.ap .c{fill:url(#mp-hx)}
+/* 0.9.7: uma corretora por rio; um sim, outro não, num índigo mais claro (no escuro, mais fundo), para separar as vizinhas */
+.mapa .rio.r2,.mapa path.ap.r2,.mapa .bo.ap.r2 .c{fill:url(#mp-hy)}
 .mapa path.ut,.mapa .bo.ut .c,.mapa .bo.no .c{fill:var(--orange)} .mapa path.ut.k,.mapa .bo.ut.k .c{fill:url(#mp-hu)}
 .mapa .saq{fill:url(#mp-gxu)} .mapa .vx{fill:url(#mp-gxv)} .mapa .se{fill:url(#mp-gue)} .mapa .sv{fill:url(#mp-guv)} .mapa .dx{fill:url(#mp-gux)}
 .mapa .pv{fill:var(--pos)} .mapa .pe{fill:var(--muted)} .mapa .pe.tr{fill:none;stroke:var(--muted);stroke-width:1.5;stroke-dasharray:3 2}
@@ -813,6 +831,16 @@ h1,h2,h3,p,li,b,strong,small,label,.k,.v,.t,.d,.sub,.lead,.note,.hint,.tool b,.t
 @keyframes metaSalva{0%{background:var(--pos-bg);box-shadow:0 0 0 6px var(--pos-bg)}100%{background:transparent;box-shadow:0 0 0 6px transparent}}
 /* hora de sacar junto com a meta batida (0.9.1) */
 .sheet.festa .sacar-junto{text-align:left;margin-top:16px}
+/* Verificar poeira (0.9.7): na memória, na tela e a diferença, uma por linha (nome à esquerda, valor à direita) */
+.po-h{font:700 16px/1.3 var(--f);margin:18px 0 8px}
+.po-it{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 8px}
+.po-r{margin:0 0 6px;font-weight:600;font-size:14.5px;overflow-wrap:anywhere}
+.po-v{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:3px 12px;margin:0;align-items:baseline}
+.po-v div{display:contents}
+.po-v dt{font-size:13px;color:var(--muted)} .po-v dd{margin:0;font-size:14px;text-align:right;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.po-d{margin:6px 0 0;font-size:12.5px;color:var(--muted)}
+.po-neg{color:var(--warn)}
+.po-pe{text-align:center;margin:4px 0 12px}
 
 .ic{display:block;width:24px;height:24px}
 </style>
@@ -1153,6 +1181,23 @@ const KS_CARDS = {
 // Convite discreto depois do Teste rápido de cada lição (0.9.2)
 const KS_CONVITE = { marca: 'academy', url: ACADEMY_URL, t: 'Quer ir além?', d: 'Cursos sobre carteiras, segurança e criptomoedas.' };
 
+/* Corretoras conhecidas (0.9.5): a lista que a barra de seleção do campo "Onde comprou" oferece junto com as corretoras
+   que a pessoa já usou. Só dado público, conferido em 27/11/2026 (termos de uso e páginas das próprias corretoras, CVM e
+   cadastros com os dados abertos da Receita); todos os CNPJs passam no dígito verificador. Razão social como no cadastro
+   da Receita, em maiúsculas e sem acento. Nada daqui entra num registro sozinho: só com o toque numa opção.
+   Binance: a própria corretora disse não ter CNPJ no Brasil, e o pedido de licença ao Banco Central (10/2026) saiu por
+   outra empresa do grupo; por isso vai sem CNPJ, com a dica de conferir no informe. Coinext: encerrou o varejo em 2026,
+   e fica por causa dos aportes antigos. */
+const CORRETORAS_BR = [
+  { nome: 'Mercado Bitcoin', alias: ['MB'], cnpj: '18213434000135', razao: 'MERCADO BITCOIN SERVICOS DIGITAIS LTDA' },
+  { nome: 'Bipa', cnpj: '37008710000178', razao: 'BIPA TECNOLOGIA E SERVICOS LTDA' },
+  { nome: 'Foxbit', cnpj: '21246584000150', razao: 'FOXBIT SERVICOS DIGITAIS LTDA' },
+  { nome: 'OKX', alias: ['OKEx'], cnpj: '50459025000126', razao: 'OKX SERVICOS DIGITAIS LTDA' },
+  { nome: 'Ripio', cnpj: '23351302000100', razao: 'RIPIO BRASIL SOCIEDADE PRESTADORA DE SERVICOS DE ATIVOS VIRTUAIS LTDA' },
+  { nome: 'Coinext', cnpj: '29242868000180', razao: 'COINEXT SERVICOS DIGITAIS S.A.', nota: 'encerrada em 2026' },
+  { nome: 'Binance', cnpj: '', razao: '', nota: 'CNPJ: confira no informe da corretora' }
+];
+
 /* =========================================================
    Hold BTC 100 · gestão de aportes em bitcoin
    HTML/CSS/JS puro, sem dependências. Local-first:
@@ -1161,7 +1206,7 @@ const KS_CONVITE = { marca: 'academy', url: ACADEMY_URL, t: 'Quer ir além?', d:
    Claude, sem PIN, também espelha num documento privado.
    ========================================================= */
 
-const APP_VERSION = '0.9.4';
+const APP_VERSION = '0.9.7';
 /* Numeração pública: 0.9.x no beta fechado (cada entrega sobe o último número) e 1.0.0 no lançamento público. A 1.0 a 1.8.42
    foi a fase de desenvolvimento (série 1); APP_SERIE vai no backup para as duas numerações não se confundirem. */
 const APP_SERIE = 2;
@@ -1202,35 +1247,53 @@ const _cf = {};
 function fmtMoney(v, c = cur(), dec = 2) { const k = c + dec; if (!_cf[k]) _cf[k] = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: c, minimumFractionDigits: dec, maximumFractionDigits: dec }); return _cf[k].format(v); }
 function fmtPct(p, plus = true) { const a = Math.abs(p * 100); const s = a.toLocaleString('pt-BR', { maximumFractionDigits: a < 10 ? 1 : 0 }); return (p > 0 && plus ? '+' : p < 0 ? '−' : '') + s + '%'; }
 function fmtInput(v, dec = 2) { return Number(v).toLocaleString('pt-BR', { minimumFractionDigits: dec, maximumFractionDigits: dec }); }
+/* Lê número digitado, colado ou de planilha. pt-BR: 1.234,56. Desde a 0.9.6 lê também o formato com ponto decimal
+   (351,721.46 e 351721.4589): o último separador é o dos centavos quando vem depois do outro, e um ponto só separa
+   milhares quando o número fica certo assim (1.234 e 12.345.678; 1234.567 e 0.123 são decimais). */
 function parseNum(str) {
   if (typeof str === 'number') return str;
   let s = String(str ?? '').trim().replace(/[^\d,.\-]/g, '');
   if (!s) return NaN;
-  if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
-  else { const p = s.split('.'); if (p.length > 2 || (p.length === 2 && p[1].length === 3)) s = p.join(''); }
+  const c = s.lastIndexOf(','), p = s.lastIndexOf('.');
+  if (c >= 0 && (p > c || (p < 0 && s.indexOf(',') !== c))) s = s.replace(/,/g, '');   // 351,721.46 e 1,234,567
+  else if (c >= 0) s = s.replace(/\./g, '').replace(',', '.');
+  else if (p >= 0 && (s.indexOf('.') !== p || /^-?[1-9]\d{0,2}\.\d{3}$/.test(s))) s = s.replace(/\./g, '');
   return parseFloat(s);
 }
 const groupDigits = d => d.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+/* Cotação do registro com centavos (0.9.6): guardada com todas as casas que a pessoa digitou; nas telas, 2 casas.
+   cotTxt: o número com as casas guardadas, sem o ruído das contas (15 algarismos significativos); cotIn: o mesmo no
+   formato do campo (351.721,4589), para a edição não perder nenhuma casa. */
+const cotTxt = v => { const n = Number(Number(v).toPrecision(15)), s = String(n); return /e/i.test(s) ? n.toFixed(8).replace(/\.?0+$/, '') : s; };
+const cotIn = v => { if (!(Number(v) > 0)) return ''; const [i, d] = cotTxt(v).split('.'); return groupDigits(i) + (d ? ',' + d : ''); };
+const cotCSV = v => { if (!(Number(v) > 0)) return '0,00'; const [i, d = ''] = cotTxt(v).split('.'); return i + ',' + d.padEnd(2, '0'); };   // planilha: no mínimo 2 casas, e todas as guardadas
 const fmtNum = v => Number(v).toLocaleString('pt-BR', { maximumFractionDigits: 2 });
-/* Formata campos numéricos enquanto o usuário digita: data-num="int" (sats) ou "dec" (valores com vírgula).
+/* Formata campos numéricos enquanto o usuário digita: data-num="int" (sats), "dec" (valores com vírgula, até data-dec
+   casas) ou "cot" (cotação do registro, casas livres, 0.9.6); "money" é o dinheiro no estilo dos apps de banco.
    Mantém o cursor no lugar; apagar um separador apaga o dígito anterior; ponto digitado em campo decimal vira vírgula. */
 function fmtLive(el, e) {
   const kind = el.dataset.num; if (!kind) return;
   let v = el.value, pos = el.selectionStart == null ? v.length : el.selectionStart;
   const prev = el.dataset.prev == null ? v : el.dataset.prev, it = e ? e.inputType || '' : '';
-  if (it === 'deleteContentBackward' && v.length < prev.length && v.replace(/\D/g, '') === prev.replace(/\D/g, '')) {
+  // a vírgula dos decimais apagada sai sozinha (0.9.6; antes, levava o dígito de antes, como o ponto de milhar)
+  if (it === 'deleteContentBackward' && v.length < prev.length && v.replace(/\D/g, '') === prev.replace(/\D/g, '') && !((kind === 'dec' || kind === 'cot') && prev[pos] === ',')) {
     let k = pos - 1; while (k >= 0 && !/\d/.test(v[k])) k--;
     if (k >= 0) { v = v.slice(0, k) + v.slice(k + 1); pos = k; }
   }
   if (kind === 'money') return fmtMoneyLive(el, v, pos, it, e && e.data);
   if (kind === 'dec' && it === 'insertText' && e.data === '.' && pos > 0 && v[pos - 1] === '.' && !v.includes(',')) v = v.slice(0, pos - 1) + ',' + v.slice(pos);
-  const neg = el.dataset.neg && /^\s*-/.test(v), sigC = ch => /\d/.test(ch) || (kind === 'dec' && ch === ',') || (neg && ch === '-');
+  // cotação (0.9.6), casas livres: o ponto digitado depois de 4 dígitos ou mais é a vírgula dos centavos (351721.46); antes,
+  // é o de milhar (412.900), que o campo põe sozinho
+  if (kind === 'cot' && it === 'insertText' && e.data === '.' && pos > 0 && v[pos - 1] === '.' && !v.includes(',') && v.slice(0, pos - 1).replace(/\D/g, '').length >= 4) v = v.slice(0, pos - 1) + ',' + v.slice(pos);
+  const neg = el.dataset.neg && /^\s*-/.test(v), sigC = ch => /\d/.test(ch) || ((kind === 'dec' || kind === 'cot') && ch === ',') || (neg && ch === '-');
   let sig = 0; for (let i = 0; i < Math.min(pos, v.length); i++) if (sigC(v[i])) sig++;
   let out;
   if (kind === 'int') { const d = v.replace(/\D/g, '').replace(/^0+(?=\d)/, ''); out = d ? groupDigits(d) : ''; }
   else {
-    const maxDec = +(el.dataset.dec || 2), s = v.replace(/[^\d.,]/g, ''), ci = s.indexOf(','); let ip, dp = null;
-    if (ci >= 0) { ip = s.slice(0, ci).replace(/[.,]/g, ''); dp = s.slice(ci + 1).replace(/[.,]/g, '').slice(0, maxDec); }
+    const maxDec = kind === 'cot' ? Infinity : +(el.dataset.dec || 2), s = v.replace(/[^\d.,]/g, ''), ci = s.indexOf(','); let ip, dp = null;
+    // cotação colada (351721.4589, 351,721.46, R$ 351.721,46): lida pelo parseNum, com todas as casas; o cursor vai para o fim
+    if (kind === 'cot' && (it === 'insertFromPaste' || it === 'insertFromDrop' || it === 'insertReplacementText' || (it === 'insertText' && e.data && e.data.length > 1)) && /[.,]/.test(s)) { const t = isFinite(parseNum(s)) ? cotTxt(Math.abs(parseNum(s))) : '', k = t.indexOf('.'); ip = k >= 0 ? t.slice(0, k) : t; dp = k >= 0 ? t.slice(k + 1) : null; sig = Infinity; }
+    else if (ci >= 0) { ip = s.slice(0, ci).replace(/[.,]/g, ''); dp = s.slice(ci + 1).replace(/[.,]/g, '').slice(0, maxDec); }
     else if (it === 'insertFromPaste' && /^\d+\.\d{1,2}$/.test(s)) { const k = s.indexOf('.'); ip = s.slice(0, k); dp = s.slice(k + 1); }
     else ip = s.replace(/\./g, '');
     ip = ip.replace(/^0+(?=\d)/, ''); if (!ip && dp !== null) ip = '0';
@@ -1271,6 +1334,7 @@ function defaultState() {
     v: 2, createdAt: Date.now(), updatedAt: 0, demo: false,
     settings: { offline: false, currency: 'BRL', monthly: 100, day: 10, goalSats: 1000000, unit: 'sats', theme: 'auto', hide: false, utxo: false, feeRate: 5, wdFee: 0, wdPct: 1, wdNotif: false, exchange: '', onboarded: false, pin: null, bio: null, lockMin: 5, gridAll: false, viewCur: null, bkAt: 0, bkSig: '', bkAdiar: 0, bkLembrar: true, grafModo: 'valor' /* gráfico da pilha: valor | pilha (1.8.26) */, trilhaTudo: false /* lições concluídas também na trilha (1.8.34) */, apGraf: false /* gráfico da pilha aberto na aba Aportes (1.8.41) */, irExOutro: {} /* ano → sats de outras pessoas na corretora em 31/12 (1.8.35) */ },
     aportes: [], saques: [], utxos: [], wallets: [], addresses: [], spends: [],
+    corretoras: [],   // memória das corretoras (0.9.5): [{ nome, cnpj, razao }], a última informada de cada nome
     learn: { done: {}, quiz: {}, nivel: {}, qv: {} },   // nivel: maior nível de teste acertado; qv: versão do teste respondido (1.8.34)
     price: { ...REF_PRICE }, fees: null, fxm: null   // fxm: dólar de hoje informado no modo offline (1.8.7)
   };
@@ -1294,13 +1358,14 @@ const SF = {
   ids: new Set(['id', 'wallet', 'address', 'utxoId', 'txId', 'spendId', 'spendId0', 'aporteId', 'saqueId', 'saleId', 'utxo', 'out', 'key']),
   nums: new Set(['fiat', 'price', 'sats', 'fee', 'feeSats', 'dolar', 'vsize', 'outSats', 'sent']),
   bools: new Set(['kyc', 'frozen', 'spent', 'rem', 'vsizeReal', 'sale', 'entrada', 'fora']),
-  texts: new Set(['note', 'ex', 'name', 'label', 'addr']),
+  texts: new Set(['note', 'ex', 'name', 'label', 'addr', 'razao']),
   opts: new Set(['type', 'kind', 'role', 'origin', 'dest', 'src', 'moeda', 'dono']),
   dates: new Set(['date', 'spentAt'])
 };
 /* Campos que o app não conhece (1.8.21, auditoria S8): a validação cuida só dos campos conhecidos e deixa os outros como
    vieram, porque migrações nunca apagam dados (DIRETRIZES §13). Na restauração de um backup, o app mostra quais são. */
-const SF_REG = new Set([...SF.ids, ...SF.nums, ...SF.bools, ...SF.texts, ...SF.opts, ...SF.dates, 'createdAt', 'txid', 'vout', 'path', 'inputs', 'outputs']);
+const SF_REG = new Set([...SF.ids, ...SF.nums, ...SF.bools, ...SF.texts, ...SF.opts, ...SF.dates, 'createdAt', 'txid', 'vout', 'path', 'inputs', 'outputs', 'cnpj']);
+const COR_REG = new Set(['nome', 'cnpj', 'razao']);   // campos da memória das corretoras (0.9.5)
 function camposDesconhecidos(o) {
   const fora = new Set(), d = defaultState(), ver = (obj, ok, onde) => { if (obj && typeof obj === 'object' && !Array.isArray(obj)) for (const k of Object.keys(obj)) if (!ok.has(k)) fora.add(onde + k); };
   ver(o, new Set(Object.keys(d)), '');
@@ -1309,6 +1374,7 @@ function camposDesconhecidos(o) {
   ver(o.learn, new Set(['done', 'quiz', 'nivel', 'qv']), 'learn.');
   for (const k of ['aportes', 'saques', 'utxos', 'wallets', 'addresses', 'spends'])
     for (const x of o[k] || []) { ver(x, SF_REG, k + '.'); if (x && Array.isArray(x.outputs)) for (const y of x.outputs) ver(y, SF_REG, k + '.outputs.'); }
+  for (const x of Array.isArray(o.corretoras) ? o.corretoras : []) ver(x, COR_REG, 'corretoras.');
   return [...fora];
 }
 let migrateFixes = 0;
@@ -1332,6 +1398,7 @@ function sanitizeState(o) {
       else if (k === 'txid') { if (!(typeof v === 'string' && (v === '' || /^[0-9a-fA-F]{64}$/.test(v)))) { x[k] = ''; n++; } }
       else if (k === 'vout') { if (!((isNum(v) && Number.isInteger(v) && v >= 0) || (typeof v === 'string' && /^\d{0,10}$/.test(v)))) { x[k] = ''; n++; } }
       else if (k === 'path') { if (!(typeof v === 'string' && /^\d{1,3}\/\d{1,10}$/.test(v))) { delete x[k]; n++; } }
+      else if (k === 'cnpj') { const c = cnpjLimpo(v); if (!CNPJ_RE.test(c)) { delete x[k]; n++; } else if (c !== v) { x[k] = c; n++; } }   // 0.9.5: 14 posições, sem a máscara
       else if (k === 'inputs') { const ok = (Array.isArray(v) ? v : []).filter(y => typeof y === 'string' || isNum(y)); n += (Array.isArray(v) ? v.length : 1) - ok.length; x[k] = ok.map(newId); }
       else if (k === 'outputs') { if (!Array.isArray(v)) { delete x[k]; n++; } else { x[k] = objs(v); x[k].forEach(rec); } }
     }
@@ -1342,6 +1409,19 @@ function sanitizeState(o) {
     // de quem é (1.8.35): só 'eu' ou 'outro'
     for (const x of o[k]) if (x.dono != null && x.dono !== 'eu' && x.dono !== 'outro') { delete x.dono; n++; }
   }
+  // memória das corretoras (0.9.5): nome de até 60 caracteres (nunca "Aporte" ou "Venda"), CNPJ de 14 posições e razão
+  // social de até 150; uma por nome, a última. Os outros campos ficam como vieram (nunca apagar campo de backup).
+  if (o.corretoras != null && !Array.isArray(o.corretoras)) n++;
+  const porNome = new Map();
+  for (const c of objs(o.corretoras)) {
+    const nome = typeof c.nome === 'string' ? c.nome.trim().slice(0, 60) : '', cnpj = cnpjLimpo(c.cnpj);
+    if (!nome || isDefEx(nome) || !CNPJ_RE.test(cnpj)) { n++; continue; }
+    if (nome !== c.nome) { c.nome = nome; n++; }
+    if (cnpj !== c.cnpj) { c.cnpj = cnpj; n++; }
+    if (c.razao != null && typeof c.razao !== 'string') { delete c.razao; n++; } else if (typeof c.razao === 'string' && c.razao.length > 150) { c.razao = c.razao.slice(0, 150); n++; }
+    const k = exNorm(nome); if (porNome.has(k)) { porNome.delete(k); n++; } porNome.set(k, c);
+  }
+  o.corretoras = [...porNome.values()]; if (o.corretoras.length > COR_MAX) { o.corretoras = o.corretoras.slice(-COR_MAX); n++; }
   const s = o.settings, d = defaultState().settings;
   for (const k of ['monthly', 'day', 'goalSats', 'feeRate', 'wdFee', 'wdPct', 'lockMin', 'bkAt', 'bkAdiar']) if (s[k] != null) { const f = toNum(s[k]); if (!isNum(f)) { s[k] = d[k]; n++; } else if (f !== s[k]) { s[k] = f; n++; } }
   for (const k of ['offline', 'hide', 'utxo', 'onboarded', 'gridAll', 'bkLembrar', 'trilhaTudo', 'apGraf', 'wdNotif']) if (s[k] != null && typeof s[k] !== 'boolean') { s[k] = !!s[k]; n++; }
@@ -1605,6 +1685,235 @@ function ledgerEvents() {
 const DEF_EX = t => t === 'venda' ? 'Venda' : 'Aporte';
 const isDefEx = x => x === 'Aporte' || x === 'Venda';
 const exNames = () => [...new Set(state.aportes.map(x => x.ex).filter(x => x && !isDefEx(x)))];
+const exP2P = a => isSale(a) && a.src === 'self';   // venda da carteira (P2P): o nome é o do comprador, não o de uma corretora
+const exNorm = s => String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+
+/* ---------------- CNPJ da corretora e memória das corretoras (0.9.5) ----------------
+   O CNPJ é opcional: compra P2P e corretora no exterior ficam sem ele, e nada trava o salvamento por causa dos dígitos
+   verificadores (o formulário só avisa). Desde 31/07/2026 a Receita emite também o CNPJ alfanumérico (IN RFB 2.229/2024):
+   letras maiúsculas e números nas 12 primeiras posições e os dois dígitos verificadores numéricos, pelo módulo 11 com o
+   valor de cada caractere = código ASCII − 48 (o mesmo cálculo de sempre para os CNPJs só de números). O registro guarda as
+   14 posições sem a máscara (cnpj) e a razão social (razao); a tela mostra 00.000.000/0000-00.
+   Memória (state.corretoras): a última corretora informada de cada nome, com CNPJ certo e razão social; vai no backup. */
+const CNPJ_RE = /^[0-9A-Z]{12}[0-9]{2}$/, COR_MAX = 300;
+function cnpjLimpo(v) { return typeof v === 'string' || typeof v === 'number' ? String(v).toUpperCase().replace(/[^0-9A-Z]/g, '') : ''; }
+function cnpjFmt(v) { const c = cnpjLimpo(v); return c.length === 14 ? `${c.slice(0, 2)}.${c.slice(2, 5)}.${c.slice(5, 8)}/${c.slice(8, 12)}-${c.slice(12)}` : c; }
+function cnpjMascara(v) {   // enquanto digita: letras só nas 12 primeiras posições, números nas duas últimas
+  let c = cnpjLimpo(v); c = (c.slice(0, 12) + c.slice(12).replace(/\D/g, '')).slice(0, 14);
+  let o = ''; for (let i = 0; i < c.length; i++) o += (i === 2 || i === 5 ? '.' : i === 8 ? '/' : i === 12 ? '-' : '') + c[i];
+  return o;
+}
+function cnpjValido(v) {
+  const c = cnpjLimpo(v); if (!CNPJ_RE.test(c) || /^(\d)\1{13}$/.test(c)) return false;
+  const dv = n => { const p = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2].slice(13 - n); let s = 0; for (let i = 0; i < n; i++) s += (c.charCodeAt(i) - 48) * p[i]; const r = s % 11; return r < 2 ? 0 : 11 - r; };
+  return dv(12) === c.charCodeAt(12) - 48 && dv(13) === c.charCodeAt(13) - 48;
+}
+// texto colado (ou vindo do teclado de uma vez): o primeiro CNPJ certo que aparecer nele; sem nenhum, o primeiro no formato
+function cnpjDoTexto(t) {
+  const s = String(t || '').toUpperCase(), re = /[0-9A-Z]{2}\.?[0-9A-Z]{3}\.?[0-9A-Z]{3}\/?[0-9A-Z]{4}-?[0-9]{2}/g; let m, prim = '';
+  while ((m = re.exec(s))) { const c = cnpjLimpo(m[0]); if (cnpjValido(c)) return c; if (!prim) prim = c; re.lastIndex = m.index + 1; }
+  return prim || cnpjLimpo(s).slice(0, 14);
+}
+const corMem = nome => { const k = exNorm(nome); return k ? state.corretoras.find(c => exNorm(c.nome) === k) || null : null; };
+// razão social conhecida de um CNPJ: a da memória, a dos registros ou a da lista do app (CORRETORAS_BR, no content.js)
+function cnpjRazao(cnpj) {
+  if (!cnpj) return '';
+  const m = state.corretoras.find(c => c.cnpj === cnpj && c.razao); if (m) return m.razao;
+  for (let i = state.aportes.length - 1; i >= 0; i--) { const a = state.aportes[i]; if (a.cnpj === cnpj && a.razao) return a.razao; }
+  const l = CORRETORAS_BR.find(c => c.cnpj === cnpj); return l ? l.razao : '';
+}
+// CNPJ lembrado de um nome, para o aporte novo: o da memória; sem ela, o do último registro com esse nome e um CNPJ
+function cnpjDoNome(nome) {
+  if (!nome || isDefEx(nome)) return null;
+  const m = corMem(nome); if (m) return { cnpj: m.cnpj, razao: m.razao || cnpjRazao(m.cnpj) };
+  const k = exNorm(nome); for (let i = state.aportes.length - 1; i >= 0; i--) { const a = state.aportes[i]; if (a.cnpj && !exP2P(a) && exNorm(a.ex) === k) return { cnpj: a.cnpj, razao: a.razao || cnpjRazao(a.cnpj) }; }
+  return null;
+}
+// grava na memória (só CNPJ com os dígitos verificadores certos); a mais recente vai para o fim e mantém os outros campos
+function corGrava(nome, cnpj, razao) {
+  if (!nome || isDefEx(nome) || !cnpjValido(cnpj)) return;
+  const velho = corMem(nome), novo = { ...(velho || {}), nome: String(nome).trim().slice(0, 60), cnpj };
+  const r = String(razao || (velho && velho.cnpj === cnpj && velho.razao) || '').slice(0, 150); if (r) novo.razao = r; else delete novo.razao;
+  state.corretoras = state.corretoras.filter(c => c !== velho).concat([novo]).slice(-COR_MAX);
+}
+/* Barra de seleção do campo "Onde comprou" (0.9.5): só ao digitar, com as corretoras que a pessoa já usou (memória e
+   registros, as mais recentes primeiro) e as da lista do app; até 6, as que começam pelo texto primeiro (com 1 letra, só
+   essas). O toque preenche o nome, o CNPJ e a razão social; nada é escolhido sozinho. Venda da carteira (P2P) fica sem. */
+function exOpcoes() {
+  const m = new Map(), add = (nome, cnpj, razao, nota, alias) => {
+    nome = String(nome || '').trim(); const k = exNorm(nome); if (!k || isDefEx(nome)) return;
+    const o = m.get(k);
+    if (!o) { m.set(k, { nome, cnpj: cnpj || '', razao: cnpj ? razao || '' : '', nota: nota || '', alias: alias || [] }); return; }
+    if (alias) o.alias = o.alias.concat(alias);
+    if (!o.cnpj && cnpj) { o.cnpj = cnpj; o.razao = razao || ''; o.nota = nota || ''; } else if (!o.cnpj && nota && !o.nota) o.nota = nota;
+  };
+  for (let i = state.corretoras.length - 1; i >= 0; i--) { const c = state.corretoras[i]; add(c.nome, c.cnpj, c.razao); }
+  for (let i = state.aportes.length - 1; i >= 0; i--) { const a = state.aportes[i]; if (!exP2P(a)) add(a.ex, a.cnpj, a.razao); }
+  for (const c of CORRETORAS_BR) add(c.nome, c.cnpj, c.razao, c.nota, c.alias);
+  return [...m.values()];
+}
+function exSugestoes(q) {
+  const t = exNorm(q); if (!t) return [];
+  const dig = cnpjLimpo(q), r = [];
+  for (const o of exOpcoes()) {
+    const nomes = [o.nome, ...o.alias].map(exNorm), comeca = nomes.some(n => n.startsWith(t) || n.split(' ').some(w => w.startsWith(t)));
+    const tem = comeca || (t.length >= 2 && (nomes.some(n => n.includes(t)) || (o.razao && exNorm(o.razao).includes(t)))) || (dig.length >= 4 && /^\d/.test(dig) && o.cnpj.startsWith(dig));
+    if (tem) r.push({ o, p: comeca ? 0 : 1 });
+  }
+  return r.sort((a, b) => a.p - b.p).slice(0, 6).map(x => x.o);
+}
+const exSugCampo = f => !(f.type === 'venda' && f.src === 'self');   // a venda da carteira (P2P) fica sem a barra e sem o CNPJ
+function exSugere(el) {
+  const f = ui.form, box = $('#ex-sug'); if (!f || f.kind !== 'aporte' || !box) return;
+  const ops = exSugCampo(f) && (el.value || '').trim() ? exSugestoes(el.value) : [];
+  f.exOps = ops; f.exSel = -1;
+  box.innerHTML = ops.map((o, i) => `<button type="button" class="ex-op" role="option" id="ex-op-${i}" aria-selected="false" data-act="ex-pick" data-i="${i}"><span class="n">${esc(o.nome)}</span><span class="c">${o.cnpj ? esc(cnpjFmt(o.cnpj)) : ''}${o.nota ? `${o.cnpj ? ' · ' : ''}${esc(o.nota)}` : ''}${!o.cnpj && !o.nota ? 'sem CNPJ salvo' : ''}</span></button>`).join('');
+  box.hidden = !ops.length; el.setAttribute('aria-expanded', ops.length ? 'true' : 'false'); el.removeAttribute('aria-activedescendant');
+}
+function exFecha() {
+  const box = $('#ex-sug'), el = $('#f-ex'); if (box) { box.hidden = true; box.innerHTML = ''; }
+  if (el) { el.setAttribute('aria-expanded', 'false'); el.removeAttribute('aria-activedescendant'); }
+  if (ui.form) { ui.form.exOps = []; ui.form.exSel = -1; }
+}
+function exMarca(i) {   // setas do teclado na barra de seleção
+  const f = ui.form, n = (f.exOps || []).length; if (!n) return;
+  f.exSel = (i + n) % n; $$('#ex-sug .ex-op').forEach((b, k) => b.setAttribute('aria-selected', k === f.exSel ? 'true' : 'false'));
+  const el = $('#f-ex'); if (el) el.setAttribute('aria-activedescendant', `ex-op-${f.exSel}`);
+}
+function exEscolhe(i) {
+  const f = ui.form, o = f && f.exOps && f.exOps[i]; if (!o) return;
+  const el = $('#f-ex'), cEl = $('#f-cnpj');
+  if (el) el.value = o.nome;
+  f.cnpjLig = { nome: o.nome, cnpj: o.cnpj }; f.cnpjMao = false; f.cnpjApagado = ''; f.czMsg = null; f.exNota = o.cnpj ? '' : o.nota;
+  f.cz = o.cnpj ? { cnpj: o.cnpj, razao: o.razao || cnpjRazao(o.cnpj) } : null;
+  if (cEl) cEl.value = o.cnpj ? cnpjFmt(o.cnpj) : '';
+  exFecha(); cnpjDecideLimpa(); cnpjInfo(); if (el) el.blur();
+}
+/* O CNPJ que veio preenchido (do aporte anterior, da barra ou do próprio registro) acompanha o nome a que pertence: trocar o
+   nome tira esse CNPJ do campo, e voltar ao nome o devolve. O CNPJ digitado à mão nunca muda sozinho. */
+function cnpjSegueNome(nome) {
+  const f = ui.form, cEl = $('#f-cnpj'), lig = f && f.cnpjLig; if (!cEl || !lig || !lig.cnpj || f.cnpjMao) return;
+  if (exNorm(nome) === exNorm(lig.nome)) { if (!cnpjLimpo(cEl.value)) { cEl.value = cnpjFmt(lig.cnpj); f.cnpjApagado = ''; } }
+  else if (cnpjLimpo(cEl.value) === lig.cnpj) { cEl.value = ''; f.cnpjApagado = lig.nome; }
+}
+const CNPJ_DICA = 'Vai para o Relatório do IR. Fica em branco em compra P2P ou em corretora no exterior.';
+function cnpjInfo() {
+  const f = ui.form, el = $('#f-cnpj'), h = $('#cnpj-info'); if (!f || f.kind !== 'aporte' || !el || !h) return;
+  const c = cnpjLimpo(el.value), msg = f.czMsg && f.czMsg.cnpj === c ? f.czMsg.html : '';
+  let t;
+  if (!c) t = f.exNota ? `${esc(f.exNota)}.` : f.cnpjApagado ? `O CNPJ de “${esc(f.cnpjApagado)}” saiu do campo, porque o nome mudou.` : CNPJ_DICA + (NET() ? ' O Buscar envia só o número à BrasilAPI.' : '');
+  else if (c.length < 14) t = `CNPJ incompleto: ${c.length} de 14.`;
+  else if (!cnpjValido(c)) t = '<span class="warn">Os dígitos verificadores não conferem. Confira o número (dá para salvar assim mesmo).</span>';
+  else {
+    const z = f.cz && f.cz.cnpj === c ? f.cz : { razao: cnpjRazao(c) };
+    t = `<span class="pos">✓ CNPJ válido</span>${z.razao ? ` · ${esc(z.razao)}` : ''}${z.fantasia && exNorm(z.fantasia) !== exNorm(z.razao) ? ` (${esc(z.fantasia)})` : ''}${z.fonte === 'brasilapi' ? ' · Receita Federal, pela BrasilAPI' : ''}${z.situacao && z.situacao !== 'ATIVA' ? ` · <span class="warn">situação na Receita: ${esc(z.situacao)}</span>` : ''}`;
+  }
+  h.innerHTML = t + (msg ? `<br>${msg}` : '');
+}
+function cnpjDigita(el, e) {   // máscara enquanto digita, com o cursor no lugar; colado, acha o CNPJ no meio do texto
+  const v = el.value, colado = (e && /^insertFromPaste|insertReplacementText$/.test(e.inputType || '')) || /[^0-9A-Za-z./\- ]/.test(v) || cnpjLimpo(v).length > 14;
+  if (colado) { el.value = cnpjMascara(cnpjDoTexto(v)); return; }
+  const pos = el.selectionStart == null ? v.length : el.selectionStart, antes = cnpjLimpo(v.slice(0, pos)).length, m = cnpjMascara(v);
+  if (m === v) return;
+  el.value = m; let i = 0, n = 0; while (i < m.length && n < antes) { if (/[0-9A-Z]/.test(m[i])) n++; i++; }
+  try { el.setSelectionRange(i, i); } catch (x) { }
+}
+/* Buscar (0.9.5): só no modo Online e fora da prévia, e só com o toque; envia à BrasilAPI só o número do CNPJ, sem
+   referência da página. A resposta é conferida (o CNPJ tem de ser o pedido; textos curtos, sem caracteres de controle) e
+   a razão social vai para o registro e para a memória quando o aporte é salvo. Na prévia, a busca fica na lista do app. */
+const CNPJ_API = 'https://brasilapi.com.br/api/cnpj/v1/';
+function cnpjResposta(j, c) {
+  if (!j || typeof j !== 'object' || Array.isArray(j)) return { ok: false };
+  if (j.cnpj != null && cnpjLimpo(String(j.cnpj)).padStart(14, '0') !== c) return { ok: false };
+  const txt = (v, n) => typeof v === 'string' ? v.replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n) : '';
+  const razao = txt(j.razao_social, 150); if (!razao) return { ok: false };
+  return { ok: true, razao, fantasia: txt(j.nome_fantasia, 80), situacao: txt(j.descricao_situacao_cadastral, 30).toUpperCase() };
+}
+async function cnpjConsulta(c) {
+  if (IN_CLAUDE || !NET()) return { ok: false };
+  const ctl = typeof AbortController === 'function' ? new AbortController() : null, t = ctl ? setTimeout(() => ctl.abort(), 12000) : 0;
+  try {
+    const r = await fetch(CNPJ_API + encodeURIComponent(c), { signal: ctl ? ctl.signal : undefined, headers: { Accept: 'application/json' }, cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer' });
+    if (r.status === 404) return { ok: false, nf: true };
+    if (!r.ok) return { ok: false };
+    return cnpjResposta(await r.json(), c);
+  } catch (x) { return { ok: false }; } finally { clearTimeout(t); }
+}
+async function cnpjBusca() {
+  const f = ui.form, el = $('#f-cnpj'); if (!f || f.kind !== 'aporte' || !el || f.cnpjBuscando) return;
+  const c = cnpjLimpo(el.value), aviso = html => { f.czMsg = { cnpj: c, html }; cnpjInfo(); };
+  if (c.length !== 14) return aviso('Digite os 14 caracteres do CNPJ para buscar.');
+  if (!cnpjValido(c)) return aviso('<span class="warn">Confira o número antes de buscar: os dígitos verificadores não conferem.</span>');
+  if (!NET()) return;
+  if (IN_CLAUDE) { const r = cnpjRazao(c); if (r) f.cz = { cnpj: c, razao: r }; return aviso(r ? 'Na prévia, sem internet: a razão social vem da lista do app.' : 'Na prévia, a busca na BrasilAPI fica desligada (sem internet). No app instalado, ela traz a razão social.'); }
+  const bt = (on) => { const b = $('#sheet-body [data-act="ap-cnpj-busca"]'); if (b) { b.disabled = on; b.textContent = on ? 'Buscando…' : 'Buscar'; } };
+  f.cnpjBuscando = true; bt(true); aviso('Buscando na BrasilAPI…');
+  const r = await cnpjConsulta(c);
+  f.cnpjBuscando = false; if (ui.form !== f) return; bt(false);
+  if (cnpjLimpo(($('#f-cnpj') || {}).value) !== c) return;   // o CNPJ mudou durante a busca
+  if (r.ok) { f.cz = { cnpj: c, razao: r.razao, fantasia: r.fantasia, situacao: r.situacao, fonte: 'brasilapi' }; f.czMsg = null; cnpjInfo(); }
+  else aviso(r.nf ? '<span class="warn">CNPJ não encontrado na Receita (BrasilAPI). Confira o número.</span>' : 'Sem resposta da BrasilAPI agora. O CNPJ fica no registro do mesmo jeito; tente de novo depois.');
+}
+/* Registros da mesma corretora com CNPJ diferente (0.9.5): ao salvar com um CNPJ, os outros registros do mesmo nome que
+   estejam sem CNPJ ou com outro fazem o formulário perguntar antes de salvar. Nada muda neles sem a pessoa pedir. */
+function cnpjDivergencia(ap) {
+  if (!ap.cnpj || isDefEx(ap.ex) || exP2P(ap)) return null;
+  const k = exNorm(ap.ex), outros = state.aportes.filter(x => x.id !== ap.id && !exP2P(x) && exNorm(x.ex) === k);
+  const sem = outros.filter(x => !x.cnpj).length, dif = outros.filter(x => x.cnpj && x.cnpj !== ap.cnpj);
+  return sem || dif.length ? { nome: ap.ex, sem, dif: dif.length, cnpjs: [...new Set(dif.map(x => x.cnpj))], compras: outros.every(x => !isSale(x)) } : null;
+}
+function cnpjAvisoTexto(d) {
+  const reg = (n, um, varios) => `${n} ${n === 1 ? um : varios}`, nome = `“${esc(d.nome)}”`, outro = d.cnpjs.slice(0, 2).map(c => esc(cnpjFmt(c))).join(', ') + (d.cnpjs.length > 2 ? '…' : '');
+  const pal = d.compras ? ['aporte anterior', 'aportes anteriores'] : ['registro anterior', 'registros anteriores'];
+  if (d.sem && d.dif) return `Dos ${pal[1]} de ${nome}, ${reg(d.sem, 'está', 'estão')} sem CNPJ e ${reg(d.dif, 'está', 'estão')} com outro (${outro}).`;
+  if (d.sem) return `${reg(d.sem, pal[0], pal[1])} de ${nome} ${d.sem === 1 ? 'está' : 'estão'} sem CNPJ.`;
+  return `${reg(d.dif, pal[0], pal[1])} de ${nome} ${d.dif === 1 ? 'está' : 'estão'} com outro CNPJ (${outro}).`;
+}
+function cnpjPergunta(ap) {
+  const f = ui.form; if (f.cnpjDecisao) return false;
+  const d = cnpjDivergencia(ap), box = $('#ap-cnpj-aviso'); if (!d || !box) return false;
+  box.innerHTML = `<div class="note cnpj-aviso" role="alert"><p><b>Registros antigos diferentes.</b> ${cnpjAvisoTexto(d)} Assim, o Relatório do IR pode sair com informações incompatíveis com a realidade.</p><button class="btn btn-p block" data-act="ap-cnpj-todos">Atualizar todos os antigos para o CNPJ informado</button><button class="btn btn-q block" data-act="ap-cnpj-manter">Manter como está</button></div>`;
+  box.hidden = false; box.scrollIntoView({ block: 'nearest' }); return true;
+}
+function cnpjDecideLimpa() { const f = ui.form; if (!f || !f.cnpjDecisao && !$('#ap-cnpj-aviso:not([hidden])')) return; f.cnpjDecisao = null; const box = $('#ap-cnpj-aviso'); if (box) { box.hidden = true; box.innerHTML = ''; } }
+// aplica o CNPJ (e a razão social) aos registros do mesmo nome; devolve quantos mudaram
+function cnpjAplicaTodos(nome, cnpj, razao, exceto) {
+  const k = exNorm(nome); let n = 0;
+  for (const x of state.aportes) {
+    if (x.id === exceto || exP2P(x) || exNorm(x.ex) !== k) continue;
+    if (x.cnpj !== cnpj) { x.cnpj = cnpj; if (razao) x.razao = razao; else delete x.razao; n++; }
+    else if (razao && x.razao !== razao) { x.razao = razao; n++; }
+  }
+  return n;
+}
+// depois de gravar o registro: se a pessoa escolheu, os registros antigos (com Desfazer); e a memória, com o CNPJ do
+// registro mais recente da corretora (corrigir um registro antigo com outro CNPJ não troca o que vem no aporte novo)
+function cnpjDepois(ap) {
+  const f = ui.form; if (!ap.cnpj || exP2P(ap) || isDefEx(ap.ex)) return null;
+  let r = null;
+  if (f && f.cnpjDecisao === 'todos') {
+    const snap = fotoDados(), n = cnpjAplicaTodos(ap.ex, ap.cnpj, ap.razao, ap.id);
+    if (n) r = { n, snap, msg: `${n} ${n === 1 ? 'registro antigo' : 'registros antigos'} de “${ap.ex}” com o CNPJ ${cnpjFmt(ap.cnpj)}` };
+  }
+  const k = exNorm(ap.ex), depois = state.aportes.some(x => x.id !== ap.id && x.cnpj && x.cnpj !== ap.cnpj && !exP2P(x) && exNorm(x.ex) === k && x.date > ap.date);
+  if (!depois) corGrava(ap.ex, ap.cnpj, ap.razao);
+  return r;
+}
+/* CNPJs de uma corretora no relatório do IR: os gravados nos registros dela até a data (com quantos registros cada um e a
+   razão social do mais recente), e quantos estão sem CNPJ. Sem nenhum registro até a data (só envios Para a corretora),
+   vale o da memória. */
+function exCnpjInfo(nome, ate) {
+  const k = exNorm(nome), recs = state.aportes.filter(a => a.date <= ate && !exP2P(a) && exNorm(a.ex) === k);
+  if (!recs.length) { const m = corMem(nome); return { com: m ? [{ cnpj: m.cnpj, razao: m.razao || '', n: 0 }] : [], sem: 0 }; }
+  const by = new Map(); let sem = 0;
+  for (const a of recs) {
+    if (!a.cnpj) { sem++; continue; }
+    const o = by.get(a.cnpj) || { cnpj: a.cnpj, razao: '', n: 0, d: '' }; o.n++;
+    if (a.razao && a.date >= o.d) { o.razao = a.razao; o.d = a.date; }
+    by.set(a.cnpj, o);
+  }
+  return { com: [...by.values()].sort((x, y) => y.n - x.n).map(({ cnpj, razao, n }) => ({ cnpj, razao, n })), sem };
+}
 const Cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
 /* No mesmo dia: primeiro as entradas (compras e de terceiros), depois as vendas, depois envios e taxas. Saída maior que a
    pilha do momento (registros fora de ordem, como um histórico importado antes dos aportes) fica pendente e sai das
@@ -1664,6 +1973,53 @@ function holdAt(date) {
   const hold = b - wf - sp + ext - sEx; const ex = bx - wd - sEx + dep;
   return { hold, ex, self: hold - ex };
 }
+/* ---------------- corretoras separadas (0.9.7, pedido do Nicolas de 27/11/2026) ----------------
+   O saldo de cada corretora: compras e envios para ela entram; vendas nela, saques e a taxa deles saem. A chave é o CNPJ
+   (o do registro; sem ele, o do nome na memória, nos registros ou na lista do app, com os apelidos) ou, sem CNPJ, o nome
+   normalizado; sem nome ("Aporte", "Venda" ou vazio), a "Corretora (não informada)". Uma saída com um nome que nunca teve
+   entrada (o saque importado leva o nome da última corretora, ou "Corretora") sai da corretora com mais saldo na data, e o
+   mapa avisa. Somadas, as corretoras dão o saldo de sempre (calc().ex e holdAt().ex). */
+const EX_NI = 'n:', EX_NI_NOME = 'Corretora (não informada)';
+function exChaves() {
+  const cn = new Map(), liga = (nome, cnpj) => { const k = exNorm(nome); if (k && CNPJ_RE.test(cnpj || '') && !cn.has(k)) cn.set(k, cnpj); };
+  for (let i = state.corretoras.length - 1; i >= 0; i--) liga(state.corretoras[i].nome, state.corretoras[i].cnpj);
+  for (let i = state.aportes.length - 1; i >= 0; i--) { const a = state.aportes[i]; if (!exP2P(a)) liga(a.ex, a.cnpj); }
+  for (const c of CORRETORAS_BR) for (const n of [c.nome, ...(c.alias || [])]) liga(n, c.cnpj);
+  return (nome, cnpj) => {
+    if (CNPJ_RE.test(cnpj || '')) return 'c:' + cnpj;
+    const t = String(nome == null ? '' : nome).trim(); if (!t || isDefEx(t)) return EX_NI;
+    const n = exNorm(t), c = cn.get(n); return c ? 'c:' + c : 'n:' + n;
+  };
+}
+/* Os movimentos de cada corretora em ordem (a do mapa: data, depois compra › venda › saque › envio para ela), com o saldo
+   depois de cada um. de: registro (aporte, saque ou saída da transação) → corretora; chute: as saídas sem entrada da
+   corretora delas, levadas para a de mais saldo. Sem a gestão de UTXOs, só compras e vendas (como no calc). */
+function exLivro() {
+  const set = S(), K = exChaves(), mov = [];
+  const add = (d, o, i, nome, cnpj, s, t, x) => mov.push({ d, o, i, k: K(nome, cnpj), nome: String(nome == null ? '' : nome).trim(), s, t, x });
+  for (const a of state.aportes) {
+    if (isSale(a)) { if (!set.utxo || a.src !== 'self') add(a.date, 1, 0, a.ex, a.cnpj, -a.sats, 'venda', a); }
+    else if (!set.utxo || a.dest !== 'self') add(a.date, 0, 0, a.ex, a.cnpj, a.sats, 'compra', a);
+  }
+  if (set.utxo) {
+    for (const w of state.saques) add(w.date, 2, 0, w.ex, '', -(w.sats + (w.fee || 0)), 'saque', w);
+    spendsEmOrdem().forEach((sp, i) => { for (const o of sp.outputs) if (o.kind === 'ex') add(sp.date, 4, i, o.ex, '', o.sats, 'dep', o); });
+  }
+  mov.sort((p, q) => p.d.localeCompare(q.d) || p.o - q.o || p.i - q.i);
+  const entra = new Set(mov.filter(m => m.s > 0).map(m => m.k)), saldo = new Map(), de = new Map(), nomes = new Map(), chute = new Set(), ult = new Map();
+  for (const m of mov) {
+    if (m.s < 0 && !entra.has(m.k)) {
+      let alvo = null, mx = 0; for (const [k, v] of saldo) if (v > mx) { mx = v; alvo = k; }
+      if (alvo) { m.k0 = m.k; m.k = alvo; chute.add(m.x); }
+    }
+    saldo.set(m.k, (saldo.get(m.k) || 0) + m.s); m.saldo = saldo.get(m.k); de.set(m.x, m.k); ult.set(m.k, m);
+    if (!m.k0 && m.nome && !isDefEx(m.nome) && m.k !== EX_NI) nomes.set(m.k, m.nome);
+  }
+  const nome = k => k === EX_NI ? EX_NI_NOME : nomes.get(k) || (k.startsWith('c:') ? ((state.corretoras.find(c => c.cnpj === k.slice(2)) || CORRETORAS_BR.find(c => c.cnpj === k.slice(2)) || {}).nome || 'Corretora') : 'Corretora');
+  return { mov, de, saldo, chute, ult, nome, cnpj: k => k.startsWith('c:') ? k.slice(2) : '', chaves: [...saldo.keys()] };
+}
+/* saldo de uma corretora pelo nome (o saque): o da chave dela; nome que não é de nenhuma, null */
+function exSaldoDe(nome, L = exLivro()) { const k = exChaves()(nome, ''); return L.saldo.has(k) ? L.saldo.get(k) : null; }
 const walletName = id => { const w = byId(state.wallets, id); return w ? w.name : 'Carteira'; };
 const walletType = id => { const w = byId(state.wallets, id); return w ? w.type : 'p2wpkh'; };
 const spendCost = (u, fr) => Math.ceil((VB.in[u.type] || 68) * fr);
@@ -2209,12 +2565,12 @@ function viewAportes() {
     if (y !== year) { year = y; const o = ys[y]; h += `<div class="yhead"><b>${y}</b><span>${o.n} ${o.n === 1 ? 'aporte' : 'aportes'} · ${MV(o.f, 0)}${fxOn() ? ` (${priv(fmtMoney(o.fb, cur(), 0))})` : ''} · ${AMT(o.s)}${o.v ? ` · ${o.v} ${o.v === 1 ? 'venda' : 'vendas'}` : ''}</span></div>`; }
     if (isSale(a)) {
       const r = fxOn() ? emR(a0) : a, rc = fxOn() ? 'BRL' : vcur(), now = a.sats / 1e8 * priceNow(rc);
-      h += `<button class="row-btn sale" data-act="edit-aporte" data-id="${a.id}"><span class="a">${fmtDate(a.date)} · ${valReg(a0)}</span><span class="r"><b>${AMT(-a.sats)}</b></span><span class="b"><span class="tag s">venda</span> ${esc(fmtMoney(r.price, rc, 0))}${a.ex && !isDefEx(a.ex) ? ' · ' + esc(a.ex) : ''}${taxa(r, rc)}${S().utxo && a.src === 'self' ? ' · ◈ ' + (a.wallet ? esc(walletName(a.wallet)) : 'saiu da carteira') : ''}${fxt}</span><span class="hj">hoje valeriam ${priv(fmtMoney(now, rc))}</span><span class="r b res"><span class="cif-v" role="img" aria-label="venda">$</span></span></button>`;
+      h += `<button class="row-btn sale" data-act="edit-aporte" data-id="${a.id}"><span class="a">${fmtDate(a.date)} · ${valReg(a0)}</span><span class="r"><b>${AMT(-a.sats)}</b></span><span class="b"><span class="tag s">venda</span> ${esc(fmtMoney(r.price, rc))}${a.ex && !isDefEx(a.ex) ? ' · ' + esc(a.ex) : ''}${taxa(r, rc)}${S().utxo && a.src === 'self' ? ' · ◈ ' + (a.wallet ? esc(walletName(a.wallet)) : 'saiu da carteira') : ''}${fxt}</span><span class="hj">hoje valeriam ${priv(fmtMoney(now, rc))}</span><span class="r b res"><span class="cif-v" role="img" aria-label="venda">$</span></span></button>`;
       continue;
     }
     // quanto o aporte rende: o valor de hoje dos sats sobre o valor pago, com a taxa (1.8.32; antes, pela cotação sem a taxa)
     const hoje = c.P * a.sats / 1e8, v = a.sats > 0 && a.fiat > 0 ? hoje / a.fiat - 1 : 0;
-    h += `<button class="row-btn${apLado(v) > 0 ? ' up' : apLado(v) < 0 ? ' down' : ''}" data-act="edit-aporte" data-id="${a.id}"><span class="a">${fmtDate(a.date)} · ${valReg(a0)}</span><span class="r"><b>${AMT(a.sats)}</b></span><span class="b">${esc(fmtV(a.price, 0))}${a.ex ? ' · ' + esc(a.ex) : ''}${taxa(a)}${S().utxo && a.dest === 'self' ? (a.entrada ? ' · ◈ compra de terceiros' : ' · ◈ direto na carteira') : ''}${fxt}</span><span class="hj">hoje ${MV(hoje)}</span><span class="r b res">${apRes(v)}</span></button>`;
+    h += `<button class="row-btn${apLado(v) > 0 ? ' up' : apLado(v) < 0 ? ' down' : ''}" data-act="edit-aporte" data-id="${a.id}"><span class="a">${fmtDate(a.date)} · ${valReg(a0)}</span><span class="r"><b>${AMT(a.sats)}</b></span><span class="b">${esc(fmtV(a.price))}${a.ex ? ' · ' + esc(a.ex) : ''}${taxa(a)}${S().utxo && a.dest === 'self' ? (a.entrada ? ' · ◈ compra de terceiros' : ' · ◈ direto na carteira') : ''}${fxt}</span><span class="hj">hoje ${MV(hoje)}</span><span class="r b res">${apRes(v)}</span></button>`;
   }
   return h + `</section>` + (c.sales ? vendasSecao(c) : '') + (S().utxo && (c.feeSats || c.outSats || c.extSats) ? contaSecao(c) : '');
 }
@@ -2570,15 +2926,37 @@ function pageIR() {
   const foraTxt = [sel.fora.length ? `${sel.fora.length} ${sel.fora.length === 1 ? 'UTXO' : 'UTXOs'}` : '', sel.exOutro ? `${amtTxt(sel.exOutro)} da corretora` : ''].filter(Boolean);
   const comFora = foraTxt.length > 0;
   // custódia: só onde os bitcoins ficaram (compras na corretora e vendas feitas nela); nome de venda da carteira (P2P) não é corretora
-  const exsFora = [...new Set(state.spends.filter(x => x.date <= end).flatMap(x => x.outputs.filter(o => o.kind === 'ex' && o.ex && o.fora).map(o => o.ex)))];   // 1.8.39: envios para corretora no exterior
-  const exs = [...new Set([...aps.filter(a => a.date <= end && (isSale(a) ? a.src !== 'self' : a.dest !== 'self')).map(a => a.ex).filter(x => x && !isDefEx(x)),
-    ...state.spends.filter(x => x.date <= end).flatMap(x => x.outputs.filter(o => o.kind === 'ex' && o.ex && !o.fora).map(o => o.ex))])].filter(x => !exsFora.includes(x));   // e no Brasil
-  // onde: as do Brasil com o CNPJ; as do exterior com o país (ficam localizadas no exterior, IN RFB 2.180/2024, art. 9º)
-  const exOnde = [exs.length || !exsFora.length ? `${exs.length ? exs.join(', ') : 'corretora'} [informe o CNPJ]` : '', exsFora.length ? `${exsFora.join(', ')}, no exterior [informe o país]` : ''].filter(Boolean).join(' e ');
+  // 0.9.5: nomes iguais sem diferença de maiúsculas ou acentos contam uma vez (vale a primeira grafia)
+  const exUni = l => { const m = new Map(); for (const x of l) { const k = exNorm(x); if (k && !m.has(k)) m.set(k, x); } return [...m.values()]; };
+  const exsFora = exUni(state.spends.filter(x => x.date <= end).flatMap(x => x.outputs.filter(o => o.kind === 'ex' && o.ex && o.fora).map(o => o.ex)));   // 1.8.39: envios para corretora no exterior
+  const exs = exUni([...aps.filter(a => a.date <= end && (isSale(a) ? a.src !== 'self' : a.dest !== 'self')).map(a => a.ex).filter(x => x && !isDefEx(x)),
+    ...state.spends.filter(x => x.date <= end).flatMap(x => x.outputs.filter(o => o.kind === 'ex' && o.ex && !o.fora).map(o => o.ex))]).filter(x => !exsFora.some(z => exNorm(z) === exNorm(x)));   // e no Brasil
+  // onde: as do Brasil com o CNPJ; as do exterior com o país (ficam localizadas no exterior, IN RFB 2.180/2024, art. 9º).
+  // 0.9.5: cada corretora do Brasil com o CNPJ e a razão social gravados nos registros dela até 31/12 (exCnpjInfo); as sem
+  // CNPJ ficam juntas, com "[informe o CNPJ]". Registros da mesma corretora com e sem CNPJ, ou com CNPJs diferentes, saem
+  // como estão, e o aviso acima da ficha diz quais são (irDiv).
+  const exCom = [], exSem = [], irDiv = [];
+  for (const nome of exs) {
+    const i = exCnpjInfo(nome, end);
+    for (const c of i.com) exCom.push(`${nome} (${c.razao && exNorm(c.razao) !== exNorm(nome) ? `${c.razao}, ` : ''}CNPJ ${cnpjFmt(c.cnpj)})`);
+    if (i.sem || !i.com.length) exSem.push(nome);
+    if ((i.sem && i.com.length) || i.com.length > 1) irDiv.push({ nome, ...i });
+  }
+  const exBr = exCom.concat(exSem.length ? [`${exSem.join(', ')} [informe o CNPJ]`] : []).join(', ');
+  const exOnde = [exs.length || !exsFora.length ? (exs.length ? exBr : 'corretora [informe o CNPJ]') : '', exsFora.length ? `${exsFora.join(', ')}, no exterior [informe o país]` : ''].filter(Boolean).join(' e ');
+  ui.irDiv = [];
+  const irDivHTML = irDiv.map(d => {
+    const lista = d.com.map(c => `${esc(cnpjFmt(c.cnpj))} em ${c.n} ${c.n === 1 ? 'registro' : 'registros'}`).join(', '), semT = `${d.sem} ${d.sem === 1 ? 'registro sem CNPJ' : 'registros sem CNPJ'}`;
+    if (d.com.length === 1) {
+      const i = ui.irDiv.push({ nome: d.nome, cnpj: d.com[0].cnpj, razao: d.com[0].razao }) - 1;
+      return `<div class="note cnpj-aviso"><p><b>${esc(d.nome)}:</b> ${semT} e ${lista}. Do jeito que está, a discriminação sai com os dois.</p><button class="btn btn-q btn-s" data-act="ir-cnpj-todos" data-i="${i}">Usar ${esc(cnpjFmt(d.com[0].cnpj))} em todos</button></div>`;
+    }
+    return `<div class="note cnpj-aviso"><p><b>${esc(d.nome)}:</b> CNPJs diferentes nos registros (${lista}${d.sem ? `; ${semT}` : ''}). Abra um registro dessa corretora, confira o CNPJ e salve: o app oferece atualizar os outros.</p></div>`;
+  }).join('');
   // 1.8.34: na autocustódia, a Receita pede o modelo da carteira; com a gestão de UTXOs, vão também os nomes das carteiras
   // que tinham saldo em 31/12, para a pessoa saber quais modelos informar
   const wsAt = S().utxo ? [...new Set(state.utxos.filter(u => u.date <= end && (!u.spent || (u.spentAt || '') > end)).map(u => u.wallet))].map(walletName) : [];
-  const custody = S().utxo ? `${fmtBTC(Math.max(0, at.ex))} BTC em ${exOnde} e ${fmtBTC(Math.max(0, at.self))} BTC em carteira própria (autocustódia${wsAt.length ? ': ' + wsAt.join(', ') : ''}) [informe o modelo da carteira]` : `${exs.length ? exs.join(', ') : '[corretora]'} [informe o CNPJ] e/ou carteira própria (autocustódia) [informe o modelo da carteira]. Ajuste conforme onde os bitcoins estavam em 31/12/${y}`;
+  const custody = S().utxo ? `${fmtBTC(Math.max(0, at.ex))} BTC em ${exOnde} e ${fmtBTC(Math.max(0, at.self))} BTC em carteira própria (autocustódia${wsAt.length ? ': ' + wsAt.join(', ') : ''}) [informe o modelo da carteira]` : `${exs.length ? exBr : '[corretora] [informe o CNPJ]'} e/ou carteira própria (autocustódia) [informe o modelo da carteira]. Ajuste conforme onde os bitcoins estavam em 31/12/${y}`;
   // 1.8.29: o que saiu sem venda e as taxas pagas em bitcoin também entram na discriminação
   const desc = [Ly.sold ? `${fmtBTC(Ly.sold)} BTC vendidos` : '', Ly.outSats ? `${fmtBTC(Ly.outSats)} BTC enviados sem venda (pelo custo médio)` : '', Ly.feeSats ? `${fmtBTC(Ly.feeSats)} BTC de taxas de saque e de rede` : ''].filter(Boolean);
   const descTxt = desc.length ? `, já descontados ${desc.length > 1 ? desc.slice(0, -1).join(', ') + ' e ' + desc[desc.length - 1] : desc[0]}` : '';
@@ -2604,6 +2982,7 @@ function pageIR() {
     ${fxOn() ? '<p class="note" style="margin:0 0 14px">O relatório do IR fica sempre em reais, como pede a Receita, mesmo com os valores do app em dólar.</p>' : ''}
     <div class="field"><label for="ir-y">Ano-base</label><select class="inp" id="ir-y" data-inp="ir-year">${yrs.map(k => `<option ${k === y ? 'selected' : ''}>${k}</option>`).join('')}</select></div>
     <div class="ir-seu"><span class="t">${comFora ? `<b>Só o que é seu.</b> Fica fora, de outras pessoas: ${esc(foraTxt.join(', '))}.` : `<b>Tudo o que está registrado</b> em 31/12/${y} entra no relatório.`}</span><button class="btn btn-q btn-s" data-act="ir-menu">Rever o que é seu</button></div>
+    ${irDivHTML}
     <div class="panel"><b>Ficha Bens e Direitos</b><p class="small muted" style="margin:2px 0 8px">Grupo 08 · Criptoativos · Código 01 · Bitcoin (BTC). Os dois campos de situação levam o custo de aquisição, nunca a cotação de 31/12.</p>
     <ul class="receipt"><li><span class="k">Situação em 31/12/${y - 1}</span><span class="dots"></span><span class="v">${M(custoP)}</span></li>
     <li><span class="k">Situação em 31/12/${y}</span><span class="dots"></span><span class="v">${M(custoY)}</span></li>
@@ -2684,7 +3063,8 @@ function toast(msg, o = {}) {
 const DADOS = ['aportes', 'saques', 'utxos', 'wallets', 'addresses', 'spends'];
 const desfazer = { antes: null, depois: null };
 function fotoDados() { const o = {}; for (const k of DADOS) o[k] = state[k]; return JSON.stringify(o); }
-function toastDesfazer(msg, antes) { desfazer.antes = antes; desfazer.depois = fotoDados(); toast(msg, { act: 'desfazer', label: 'Desfazer' }); }
+function toastDesfazer(msg, antes, feito = 'Exclusão desfeita') { desfazer.antes = antes; desfazer.depois = fotoDados(); desfazer.feito = feito; toast(msg, { act: 'desfazer', label: 'Desfazer' }); }
+const CNPJ_DESFEITO = 'CNPJ dos registros antigos voltou ao que era';   // Desfazer da atualização dos registros antigos (0.9.5)
 /* Lembrete de backup (1.8.23, ESTADO §11, item 2): os registros só existem no aparelho. O Início avisa quando há registros
    e nenhum backup registrado, com o app em uso há 3 dias ou mais, ou quando o último backup tem 30 dias ou mais e os
    registros mudaram desde ele (bkSig é um resumo dos registros no momento do backup). "Lembrar em 7 dias" adia, e a
@@ -2766,8 +3146,11 @@ function sheetAporte(id, presetDate, presetAddr, presetType, presetSrc) {
   // com o outro valor e o dólar ao lado; q: da moeda do formulário para a dos aportes, pelo dólar do registro ou do dia
   const fx = fxOn() ? apFxIni(a, date) : null, fc = apFcDe(type), bv = fc === cur(), q = fx && !bv ? fxToB(1, fx.d) : 1, b0 = a ? a.fiat : type === 'venda' ? 0 : set.monthly;
   ui.form = { kind: 'aporte', id, type, mode: a ? 'sats' : 'price', touched: !!a, dest: a ? (a.dest || 'ex') : (presetAddr ? 'self' : 'ex'), src, exLimpo: !a && type === 'venda' && src === 'self', kyc: u ? !!u.kyc : true, warned: false, presetAddr: presetAddr || null, fx,
-    d: { date, fiat: b0 > 0 ? fmtInput(b0 / q) : '', falt: fx && b0 > 0 ? fmtInput(bv ? fxToF(b0, fx.d) : b0) : '', dolar: fx ? fmtInput(fx.d, 4) : '', price: fmtInput(a ? a.price / q : (histPrice(date.slice(0, 7), fc) || priceNow(fc)), 0), sats: a ? amtIn(a.sats) : '', ex: a ? (isDefEx(a.ex) ? '' : a.ex) : type === 'venda' && src === 'self' ? '' : exLembrada(), note: a ? a.note : '', afee: a && a.feeSats > 0 ? fmtSats(a.feeSats) : a && a.fee ? fmtInput(a.fee / q) : '' }, feeU: a && a.feeSats > 0 ? 'sats' : 'fiat' };
-  openSheet('aporte', apHTML, { label: type === 'venda' ? 'Venda' : 'Aporte', onOpen: updateApCalc });
+    d: { date, fiat: b0 > 0 ? fmtInput(b0 / q) : '', falt: fx && b0 > 0 ? fmtInput(bv ? fxToF(b0, fx.d) : b0) : '', dolar: fx ? fmtInput(fx.d, 4) : '', price: a ? cotIn(a.price / q) : fmtInput(histPrice(date.slice(0, 7), fc) || priceNow(fc), 0), sats: a ? amtIn(a.sats) : '', ex: a ? (isDefEx(a.ex) ? '' : a.ex) : type === 'venda' && src === 'self' ? '' : exLembrada(), note: a ? a.note : '', afee: a && a.feeSats > 0 ? fmtSats(a.feeSats) : a && a.fee ? fmtInput(a.fee / q) : '', cnpj: '' }, feeU: a && a.feeSats > 0 ? 'sats' : 'fiat' };
+  // CNPJ (0.9.5): o do próprio registro na edição; no aporte novo, o da corretora que veio preenchida (memória ou último registro)
+  const f0 = ui.form, lig = a ? (a.cnpj ? { cnpj: a.cnpj, razao: a.razao || cnpjRazao(a.cnpj) } : null) : cnpjDoNome(f0.d.ex);
+  if (lig && exSugCampo(f0)) { f0.d.cnpj = cnpjFmt(lig.cnpj); f0.cnpjLig = { nome: f0.d.ex, cnpj: lig.cnpj }; f0.cz = { cnpj: lig.cnpj, razao: lig.razao }; }
+  openSheet('aporte', apHTML, { label: type === 'venda' ? 'Venda' : 'Aporte', onOpen: () => { updateApCalc(); cnpjInfo(); } });
   if (fx) fxSync(false, true);   // o dólar do dia, que chega com o formulário aberto (apFxData)
 }
 /* Venda: de onde saíram os sats. Da corretora, sai do saldo dela; da carteira (P2P), sai dos UTXOs, com a transação junto. */
@@ -2781,7 +3164,6 @@ function apFeeDica(sale, u) {
 }
 function apHTML() {
   const f = ui.form, set = S(), a = f.id ? byId(state.aportes, f.id) : null, u = a && a.utxoId ? byId(state.utxos, a.utxoId) : null, d = f.d, sale = f.type === 'venda', pa = f.presetAddr, pm = f.mode === 'price', fc = apFc();
-  const exList = exNames();
   const dest = `<div class="field"><span class="lbl">Para onde foram os sats</span><div class="seg"><button class="${f.dest === 'ex' ? 'on' : ''}" data-act="ap-dest" data-dest="ex"${a && a.entrada ? ' disabled' : ''}>Ficaram na corretora</button><button class="${f.dest === 'self' ? 'on' : ''}" data-act="ap-dest" data-dest="self">Direto na carteira</button></div>${a && a.entrada ? '<p class="hint">Compra de terceiros (valor pago): os sats já estão na carteira. Aqui você corrige o valor pago, a data e onde comprou.</p>' : ''}</div>
     <div id="dest-self" ${f.dest === 'self' ? '' : 'hidden'}>
       ${addrPicker('ap_', u ? u.wallet : pa ? (addrById(pa) || {}).wallet : (state.wallets[0] || {}).id, u ? u.address : (pa || '__new'), { addrLabel: 'Endereço que recebeu', exclude: u ? u.id : '' })}
@@ -2800,19 +3182,21 @@ function apHTML() {
     <div class="field"><label for="f-fiat">Valor ${sale ? 'recebido' : 'pago'} (${curSym(fc)})</label><input class="inp big" id="f-fiat" name="fiat" inputmode="decimal" autocomplete="off" data-num="money" data-neg="1" placeholder="0,00" value="${esc(d.fiat)}" data-inp="${f.fx ? 'ap-v' : 'ap-calc'}"></div>
     ${f.fx ? apFxHTML(d) : ''}
     <div class="field"${a && a.entrada ? ' hidden' : ''}><span class="lbl">Você vai informar</span><div class="seg" role="group" aria-label="Forma de informar"><button class="${pm ? 'on' : ''}" data-act="ap-mode" data-mode="price" aria-pressed="${pm}">A cotação</button><button class="${pm ? '' : 'on'}" data-act="ap-mode" data-mode="sats" aria-pressed="${!pm}">Os ${isBTCu() ? 'BTC' : 'sats'} ${sale ? 'vendidos' : 'recebidos'}</button></div></div>
-    <div class="field" id="fld-price" ${pm ? '' : 'hidden'}><label for="f-price">Cotação do bitcoin na ${sale ? 'venda' : 'compra'} (${curSym(fc)})</label><input class="inp" id="f-price" name="price" inputmode="decimal" autocomplete="off" data-num="int" value="${esc(d.price)}" data-inp="ap-price"><p class="hint" id="price-hint">${a ? '' : priceHint(d.date)}</p></div>
+    <div class="field" id="fld-price" ${pm ? '' : 'hidden'}><label for="f-price">Cotação do bitcoin na ${sale ? 'venda' : 'compra'} (${curSym(fc)})</label><input class="inp" id="f-price" name="price" inputmode="decimal" autocomplete="off" data-num="cot" value="${esc(d.price)}" data-inp="ap-price"><p class="hint" id="price-hint">${a ? '' : priceHint(d.date)}</p></div>
     <div class="field" id="fld-sats" ${pm ? 'hidden' : ''}><label for="f-sats">${isBTCu() ? 'BTC' : 'Sats'} ${sale ? 'vendidos' : 'recebidos'}</label><input class="inp" id="f-sats" name="sats" ${amtAttrs()} autocomplete="off" value="${esc(d.sats)}" data-inp="ap-calc"${a && a.entrada ? ' readonly' : ''}><p class="hint">${a && a.entrada ? 'Os sats desta entrada são os do UTXO na carteira e não mudam aqui.' : 'Confira no comprovante. 1 BTC = 100.000.000 sats.'}</p></div>
     <div class="field"><label for="f-afee">Taxa da operação (opcional)</label><div class="fee-in"><input class="inp" id="f-afee" name="afee" inputmode="${f.feeU === 'sats' ? 'numeric' : 'decimal'}" data-num="${f.feeU === 'pct' ? 'dec' : f.feeU === 'sats' ? 'int' : 'money'}" autocomplete="off" placeholder="${f.feeU === 'fiat' ? '0,00' : '0'}" value="${esc(d.afee || '')}" data-inp="ap-calc"><div class="seg" role="group" aria-label="Unidade da taxa">${[['fiat', curSym(fc)], ['pct', '%'], ['sats', 'sats']].map(([k, t]) => `<button class="${f.feeU === k ? 'on' : ''}" data-act="ap-feeu" data-u="${k}" aria-pressed="${f.feeU === k}">${t}</button>`).join('')}</div></div><p class="hint" id="fee-hint">${apFeeDica(sale, f.feeU)}</p></div>
     <div class="calc-line" id="ap-calc" aria-live="polite"></div>
-    <div class="field"><label for="f-ex">Onde ${sale ? 'vendeu' : 'comprou'}</label><input class="inp" id="f-ex" name="ex" list="ex-list" autocomplete="off" placeholder="${sale ? exPlaceholder(f.src) : 'Corretora, app ou P2P'}" value="${esc(d.ex)}"><datalist id="ex-list">${exList.map(e => `<option value="${esc(e)}">`).join('')}</datalist><p class="hint">Em branco, fica como “${sale ? 'Venda' : 'Aporte'}”.</p></div>
+    <div class="field ex-campo"><label for="f-ex">Onde ${sale ? 'vendeu' : 'comprou'}</label><input class="inp" id="f-ex" name="ex" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ex-sug" data-inp="ap-ex" placeholder="${sale ? exPlaceholder(f.src) : 'Corretora, app ou P2P'}" value="${esc(d.ex)}"><div class="ex-sug" id="ex-sug" role="listbox" aria-label="Corretoras" hidden></div><p class="hint">Em branco, fica como “${sale ? 'Venda' : 'Aporte'}”.</p></div>
+    <div class="field" id="fld-cnpj"${exSugCampo(f) ? '' : ' hidden'}><label for="f-cnpj">CNPJ da corretora (opcional)</label><div class="cnpj-in"><input class="inp" id="f-cnpj" name="cnpj" inputmode="numeric" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="00.000.000/0000-00" data-inp="ap-cnpj" value="${esc(d.cnpj || '')}">${NET() ? '<button type="button" class="btn btn-q btn-s" data-act="ap-cnpj-busca" aria-label="Buscar a razão social do CNPJ">Buscar</button>' : ''}</div><p class="hint" id="cnpj-info" aria-live="polite"></p></div>
     ${set.utxo ? (sale ? selfBox : dest) : ''}
     <div class="field" style="margin-top:14px"><label for="f-note">Observação (opcional)</label><input class="inp" id="f-note" name="note" autocomplete="off" value="${esc(d.note)}"></div>
+    <div id="ap-cnpj-aviso" hidden></div>
     <p class="err form" hidden></p>
     <button class="btn btn-p block" data-act="save-aporte">${a ? 'Salvar alterações' : sale ? 'Salvar venda' : 'Salvar aporte'}</button>
     ${a ? `<button class="btn btn-d block" style="margin-top:10px" data-act="del-aporte" data-id="${a.id}">${sale ? 'Excluir venda' : 'Excluir aporte'}</button>` : ''}`;
 }
 function apCapture() {
-  const f = ui.form; f.d = { date: fv('date'), fiat: fv('fiat'), falt: fv('falt'), dolar: fv('dolar'), price: fv('price'), sats: fv('sats'), ex: fv('ex'), note: fv('note'), afee: fv('afee') };
+  const f = ui.form; f.d = { date: fv('date'), fiat: fv('fiat'), falt: fv('falt'), dolar: fv('dolar'), price: fv('price'), sats: fv('sats'), ex: fv('ex'), note: fv('note'), afee: fv('afee'), cnpj: fv('cnpj') };
   if ($('#s-r')) { f.sx = fv('sx'); f.srate = fv('srate'); f.sfee = fv('sfee'); f.stxid = fv('stxid'); }
 }
 /* ---- venda pela carteira ---- */
@@ -2888,7 +3272,8 @@ function apSwitch(type, over = {}) {
   if (type === 'venda' && S().utxo && f.src === 'self' && f.d.ex && f.d.ex === exLembrada()) { f.d.ex = ''; f.exLimpo = true; }
   else if (type !== 'venda' && f.exLimpo && !(f.d.ex || '').trim()) { f.d.ex = exLembrada(); f.exLimpo = false; }
   Object.assign(f.d, over); const fc0 = apFc(); f.type = type; f.warned = false; apFxTroca(fc0, apFc());   // com o par, a venda é em R$ (1.8.32)
-  const sh = $('.sheet'), top = sh ? sh.scrollTop : 0; $('#sheet-body').innerHTML = apHTML(); if (sh) sh.scrollTop = top; updateApCalc();
+  f.cnpjDecisao = null; f.exOps = []; f.exSel = -1;   // a barra de seleção e o aviso dos registros antigos recomeçam (0.9.5)
+  const sh = $('.sheet'), top = sh ? sh.scrollTop : 0; $('#sheet-body').innerHTML = apHTML(); if (sh) sh.scrollTop = top; updateApCalc(); cnpjInfo();
 }
 function priceHint(date) { return date.slice(0, 7) >= nowYM() ? `Cotação de hoje (${esc(priceAge())}). Troque pela do seu comprovante.` : 'Estimativa média do mês. Use a cotação do seu comprovante.'; }
 /* Números do formulário de aporte e venda, na moeda do formulário (apFc). A compra paga o valor total, com a taxa, e a
@@ -2898,6 +3283,12 @@ function priceHint(date) { return date.slice(0, 7) >= nowYM() ? `Cotação de ho
    o valor antes da taxa. Em sats (1.8.31), a corretora tira a taxa dos sats, e ela vale em dinheiro pela cotação.
    semTaxa: os sats sem a taxa, no modo cotação. */
 const apBase = (fiat, fee, sale) => sale ? fiat + fee : fiat - fee;
+/* a cotação guardada ainda dá os sats do formulário com o valor e a taxa dele, pelas contas do modo cotação (0.9.6) */
+function cotFica(p, fiat, fee, feeS, sats, sale) {
+  if (!(p > 0) || !(sats > 0)) return false;
+  if (feeS > 0) { const s0 = Math.round(fiat / p * 1e8); return (sale ? s0 + feeS : s0 - feeS) === sats; }
+  return Math.round(apBase(fiat, fee, sale) / p * 1e8) === sats;
+}
 function apNums() {
   const f = ui.form, sale = f.type === 'venda', fiatIn = parseNum(fv('fiat')), V = Math.abs(fiatIn), t = parseNum(fv('afee'));
   let fee = 0, feeS = 0, sats = NaN, price = NaN, semTaxa = NaN, err = '';
@@ -2915,6 +3306,9 @@ function apNums() {
     if (V > 0 && sats > 0) {
       if (!feeS) price = apBase(V, fee, sale) / (sats / 1e8);
       else { const liq = sale ? sats - feeS : sats + feeS; if (liq > 0) { price = V / (liq / 1e8); fee = feeS * price / 1e8; } else err = 'A taxa em sats não pode ser igual ou maior que os sats vendidos.'; }
+      // edição (0.9.6): a cotação do registro, com todas as casas, enquanto ainda dá os mesmos sats (sem o par de moedas)
+      const a = f.id && !f.fx && !err ? byId(state.aportes, f.id) : null;
+      if (a && !a.entrada && cotFica(a.price, V, fee, feeS, sats, sale)) { price = a.price; if (feeS) fee = feeS * price / 1e8; }
     }
   }
   if (!err && !sale && !feeS && fee > 0 && fee >= V) err = 'A taxa não pode ser igual ou maior que o valor pago.';
@@ -2924,7 +3318,7 @@ function apNums() {
 function apFeeLine(fiat, fee, sats, sale, c = cur(), feeS = 0, efeito = '') {
   if (!(fee > 0)) return '';
   const pct = (fee / (Math.abs(fiat) + (sale ? fee : 0)) * 100).toLocaleString('pt-BR', { maximumFractionDigits: 2 });
-  return `<br>Taxa ${feeS > 0 ? `${esc(fmtSats(feeS))} sats (${esc(fmtMoney(fee, c))} · ${pct}%)` : `${esc(fmtMoney(fee, c))} (${pct}%)`}${efeito ? ': ' + esc(efeito) : ''}${sats > 0 ? ` · ${sale ? 'valor líquido por BTC' : 'custo por BTC, com a taxa'} ${esc(fmtMoney(Math.abs(fiat) / (sats / 1e8), c, 0))}` : ''}`;
+  return `<br>Taxa ${feeS > 0 ? `${esc(fmtSats(feeS))} sats (${esc(fmtMoney(fee, c))} · ${pct}%)` : `${esc(fmtMoney(fee, c))} (${pct}%)`}${efeito ? ': ' + esc(efeito) : ''}${sats > 0 ? ` · ${sale ? 'valor líquido por BTC' : 'custo por BTC, com a taxa'} ${esc(fmtMoney(Math.abs(fiat) / (sats / 1e8), c))}` : ''}`;
 }
 /* No modo sats (o da edição), os sats são os informados e a taxa muda a cotação (1.8.32). Na edição, um toque passa para
    o modo cotação, com a cotação do registro, para a taxa sair dos sats (ou somar aos vendidos). */
@@ -2940,7 +3334,7 @@ function updateApCalc() {
     if (fiatIn < 0) { el.innerHTML = 'Valor negativo é registrado como <b>venda</b> quando você salvar.'; return; }
     if (n.err) { el.innerHTML = `<span class="neg">${esc(n.err)}</span>`; return; }
     const efeito = cot && fee > 0 && !feeS && sats > 0 ? `${fmtSats(n.semTaxa - sats)} sats a menos` : '';
-    el.innerHTML = (!(sats > 0) ? (cot ? 'Preencha valor e cotação.' : 'Preencha valor e sats recebidos.') : cot ? `= <b>${esc(fmtSats(sats))}</b> sats · ${esc(fmtBTC(sats))} BTC` : `Cotação ${fee > 0 ? 'sem a taxa' : 'efetiva'}: <b>${esc(fmtMoney(price, c, 0))}</b>`) + apFeeLine(V, fee, sats, false, c, feeS, efeito) + apTaxaFica(false, fee);
+    el.innerHTML = (!(sats > 0) ? (cot ? 'Preencha valor e cotação.' : 'Preencha valor e sats recebidos.') : cot ? `= <b>${esc(fmtSats(sats))}</b> sats · ${esc(fmtBTC(sats))} BTC` : `Cotação ${fee > 0 ? 'sem a taxa' : 'efetiva'}: <b>${esc(fmtMoney(price, c))}</b>`) + apFeeLine(V, fee, sats, false, c, feeS, efeito) + apTaxaFica(false, fee);
     return;
   }
   if (n.err) { el.innerHTML = `<span class="neg">${esc(n.err)}</span>`; updateSaleTx(); return; }
@@ -2955,7 +3349,7 @@ function updateApCalc() {
   // com o par: da moeda do formulário para a dos aportes (qB) e para a dos valores (qD), pelos dois valores ou pelo dólar
   const x = f.fx, O = parseNum(fv('falt')), bv = !!x && apBaseV(), qO = x ? (V > 0 && O > 0 ? O / V : fxFO(1, x.d)) : 1, qB = x && !bv ? qO : 1, qD = x && bv ? qO : 1;
   const efeito = cot && fee > 0 && !feeS ? `${fmtSats(sats - n.semTaxa)} sats a mais vendidos` : '';
-  el.innerHTML = `${cot ? `= <b>${esc(fmtSats(sats))}</b> sats vendidos` : `Cotação efetiva: <b>${esc(fmtMoney(price, c, 0))}</b>`}${exAviso}${vendaConta(sats, V * qB, fee * qB, date, f.id, daCarteira, { feeS, efeito, form: { v: V, fee, c }, disp: x ? { v: V * qD, fee: fee * qD } : null })}${apTaxaFica(true, fee)}`;
+  el.innerHTML = `${cot ? `= <b>${esc(fmtSats(sats))}</b> sats vendidos` : `Cotação efetiva: <b>${esc(fmtMoney(price, c))}</b>`}${exAviso}${vendaConta(sats, V * qB, fee * qB, date, f.id, daCarteira, { feeS, efeito, form: { v: V, fee, c }, disp: x ? { v: V * qD, fee: fee * qD } : null })}${apTaxaFica(true, fee)}`;
   updateSaleTx();
 }
 /* Conta da venda, a mesma no formulário de venda e na venda feita pela transação: custo pelo custo médio da data, lucro
@@ -3017,6 +3411,11 @@ function saveAporte() {
   if (f.mode === 'price' && !(n.price > 0)) return formErr(`Informe a cotação do bitcoin na ${sale ? 'venda' : 'compra'}.`);
   if (f.mode !== 'price' && !(parseAmt(fv('sats')) > 0)) return formErr(sale ? 'Informe os sats vendidos.' : 'Informe os sats recebidos.');
   if (n.err) return formErr(n.err);
+  // CNPJ da corretora (0.9.5): opcional e fora da venda da carteira (P2P); incompleto não grava, dígito verificador errado
+  // só avisa no campo. A razão social vem da busca, da barra de seleção, da memória ou da lista do app.
+  const cnpj = exSugCampo(f) ? cnpjLimpo(fv('cnpj')) : '';
+  if (cnpj && !CNPJ_RE.test(cnpj)) return formErr('O CNPJ tem 14 caracteres: complete o número ou deixe o campo em branco.');
+  const razao = cnpj ? String((f.cz && f.cz.cnpj === cnpj && f.cz.razao) || cnpjRazao(cnpj)).slice(0, 150) : '';
   // na moeda dos aportes; com o par (1.8.31), pelo valor em R$ e o dólar, que o registro guarda quando é preciso
   let fiat = round2(n.V), q = 1, dolar = prev ? prev.dolar : undefined, moeda = prev ? prev.moeda : undefined;
   if (f.fx) { const r = apFxFinal(n.V, sale); if (r.err) return formErr(r.err); fiat = r.B; q = r.q; dolar = r.dolar; moeda = r.moeda; }
@@ -3026,7 +3425,12 @@ function saveAporte() {
   if (!(sats >= 1)) return formErr('O valor resulta em menos de 1 sat. Confira os números.');
   const est = histPrice(date.slice(0, 7));
   if (est && !f.warned && (price > est * 2.5 || price < est / 2.5)) { f.warned = true; const b = $('[data-act="save-aporte"]'); if (b) b.textContent = 'Salvar mesmo assim'; return formErr(`A cotação ficou bem diferente da média do mês (${fmtMoney(histPrice(date.slice(0, 7), apFc()), apFc(), 0)}). Confira se não faltou ou sobrou um zero.`); }
-  const base = { id: prev ? prev.id : uid(), date, fiat, price: round2(price), sats, ex: (fv('ex').trim() || DEF_EX(sale ? 'venda' : 'compra')).slice(0, 60), note: fv('note').trim().slice(0, 140), fee: feeV > 0 ? round2(feeV) : 0, feeSats: n.feeS > 0 ? n.feeS : undefined, dolar, moeda };
+  // cotação (0.9.6): a digitada fica com todas as casas; a calculada (modo sats, compra de terceiros), com 2. Na edição pelo
+  // modo sats, a do registro fica enquanto ainda dá os mesmos sats: abrir e salvar não troca a cotação digitada pela conta
+  const fica = f.mode !== 'price' && !!prev && !prev.entrada && cotFica(prev.price, fiat, feeV, n.feeS, sats, sale);
+  const pG = fica ? prev.price : f.mode === 'price' && !(prev && prev.entrada) ? price : round2(price);
+  const feeG = fica && n.feeS > 0 ? round2(n.feeS * prev.price / 1e8) : feeV > 0 ? round2(feeV) : 0;
+  const base = { id: prev ? prev.id : uid(), date, fiat, price: pG, sats, ex: (fv('ex').trim() || DEF_EX(sale ? 'venda' : 'compra')).slice(0, 60), note: fv('note').trim().slice(0, 140), fee: feeG, feeSats: n.feeS > 0 ? n.feeS : undefined, dolar, moeda, cnpj: cnpj || undefined, razao: razao || undefined };
   if (sale) {
     const ap = { ...base, type: 'venda', src: set.utxo ? (f.src || 'ex') : (prev ? prev.src || 'ex' : 'ex') };
     // venda já ligada a uma transação: quantidade e data vêm da transação; a cotação sai do recebido e da taxa
@@ -3067,15 +3471,19 @@ function saveAporte() {
       // o nome de uma venda da carteira (P2P, comprador) não vira a corretora lembrada
       save(); closeSheet(); render(); if (prev) toast('Venda atualizada'); else toastRegistro('Venda e transação registradas'); fxSync(); return;
     }
+    if (cnpjPergunta(ap)) return false;   // registros da mesma corretora sem CNPJ ou com outro: pergunta antes (0.9.5)
     if (prev) Object.assign(prev, ap); else state.aportes.push(ap);
     if (ap.ex && !isDefEx(ap.ex) && ap.src !== 'self') set.exchange = ap.ex;
+    const cz = cnpjDepois(ap);
     save(); closeSheet(); render();
-    if (prev) toast('Venda atualizada'); else toastRegistro('Venda registrada'); fxSync(); return;
+    if (cz) toastDesfazer(`${prev ? 'Venda atualizada' : 'Venda registrada'} · ${cz.msg}`, cz.snap, CNPJ_DESFEITO); else if (prev) toast('Venda atualizada'); else toastRegistro('Venda registrada');
+    fxSync(); return;
   }
   const ap = { ...base, type: 'compra', dest: set.utxo ? f.dest : (prev ? prev.dest || 'ex' : 'ex'), utxoId: prev ? prev.utxoId : undefined };
   const antes = calc().hold, exAntes = calc().ex;   // meta batida (1.8.40) e hora de sacar (0.9.1): pilha e corretora antes deste registro
   if (prev && prev.entrada && ap.dest !== 'self') return formErr('Os sats desta entrada já estão na carteira: o destino continua Direto na carteira.');   // 1.8.19
   const eL = ledgerErrNovo(ledger(state.aportes.filter(x => x.id !== ap.id).concat([ap]))); if (eL) return formErr(ledgerErrText(eL));
+  if (cnpjPergunta(ap)) return false;   // registros da mesma corretora sem CNPJ ou com outro: pergunta antes (0.9.5)
   if (set.utxo) {
     const old = ap.utxoId ? byId(state.utxos, ap.utxoId) : null;
     if (ap.dest === 'self') {
@@ -3096,10 +3504,12 @@ function saveAporte() {
   const cur0 = prev ? byId(state.aportes, prev.id) : null;
   if (cur0) Object.assign(cur0, ap); else state.aportes.push(ap);
   if (ap.ex && !isDefEx(ap.ex)) set.exchange = ap.ex;
+  const cz = cnpjDepois(ap);
   const sacar = !prev && ap.dest !== 'self' && sacarBateu(exAntes);   // hora de sacar: só no aporte novo que leva a corretora ao limite
   save(); if (metaBateu(antes)) { render(); metaFesta(sacar); } else if (sacar) { render(); sacarAlerta(); } else { closeSheet(); render(); }   // a folha do aporte vira o aviso
   if (sacar) sacarNotifica();
-  if (prev) toast('Aporte atualizado'); else toastRegistro('Aporte registrado'); fxSync();
+  if (cz) toastDesfazer(`${prev ? 'Aporte atualizado' : 'Aporte registrado'} · ${cz.msg}`, cz.snap, CNPJ_DESFEITO); else if (prev) toast('Aporte atualizado'); else toastRegistro('Aporte registrado');
+  fxSync();
 }
 function delAporte(id) {
   const a = byId(state.aportes, id); if (!a) return;
@@ -3127,7 +3537,7 @@ function sheetMonth(k) {
   const [y, m] = k.split('-').map(Number);
   const pre = k === nowYM() ? todayISO() : `${k}-${pad2(Math.min(S().day, lastDay(k)))}`;
   openSheet('month', () => `<h2>${Cap(MONTHS_FULL[m - 1])} de ${y}</h2><p class="sub">${aps.length ? `${aps.length} ${aps.length === 1 ? 'aporte' : 'aportes'} · ${MV(aps.reduce((t, a) => t + toVa(a, a.fiat), 0))} · ${AMT(aps.reduce((t, a) => t + a.sats, 0))}` : 'Nenhum aporte registrado neste mês.'}${sales ? ` · ${sales} ${sales === 1 ? 'venda' : 'vendas'}` : ''}</p>
-    ${all.map(a0 => [apV(a0), a0]).map(([a, a0]) => `<button class="row-btn ${isSale(a) ? 'sale' : ''}" data-act="edit-aporte" data-id="${a.id}"><span class="a">${isSale(a) ? '<span class="tag s">venda</span> ' : ''}${fmtDate(a.date)} · ${valReg(a0)}</span><span class="r"><b>${AMT(isSale(a) ? -a.sats : a.sats)}</b></span><span class="b">${esc(fmtV(a.price, 0))}${a.ex ? ' · ' + esc(a.ex) : ''}${a.fx ? ' · ' + esc(fxShort(a.fx)) : ''}</span><span></span></button>`).join('')}
+    ${all.map(a0 => [apV(a0), a0]).map(([a, a0]) => `<button class="row-btn ${isSale(a) ? 'sale' : ''}" data-act="edit-aporte" data-id="${a.id}"><span class="a">${isSale(a) ? '<span class="tag s">venda</span> ' : ''}${fmtDate(a.date)} · ${valReg(a0)}</span><span class="r"><b>${AMT(isSale(a) ? -a.sats : a.sats)}</b></span><span class="b">${esc(fmtV(a.price))}${a.ex ? ' · ' + esc(a.ex) : ''}${a.fx ? ' · ' + esc(fxShort(a.fx)) : ''}</span><span></span></button>`).join('')}
     <button class="btn ${aps.length ? 'btn-q' : 'btn-p'} block" style="margin-top:14px" data-act="new-aporte" data-date="${pre}">Registrar aporte em ${fmtYM(k)}</button>`, { label: 'Mês' });
 }
 /* ---------------- preço ---------------- */
@@ -3195,12 +3605,77 @@ function setCorpo(k, s, seg) {
       <button class="set-row" data-act="import">Importar (planilha, CSV ou backup)</button>
       <div class="switch"><span><span class="t">Lembrar de fazer backup</span><br><span class="d">${s.bkAt ? `Último backup em ${fmtDate(isoDeTs(s.bkAt))}.` : 'Nenhum backup registrado neste aparelho.'} O Início avisa quando o backup tem 30 dias e os registros mudaram.</span></span><button class="tog ${s.bkLembrar !== false ? 'on' : ''}" data-act="bk-lembrar" aria-pressed="${s.bkLembrar !== false}" aria-label="Lembrar de fazer backup"></button></div>
       <button class="set-row" data-act="price-sheet">Cotação<span class="v">${esc(fmtV(priceNow(vcur()), 0))}</span></button>
+      <button class="set-row" data-act="poeira">Verificar poeira<span class="v">frações e sobras</span></button>
       ${deferredInstall ? `<button class="set-row" data-act="install">Instalar o app neste aparelho</button>` : ''}
       <button class="set-row" data-act="wipe" style="color:var(--neg)">Apagar todos os dados</button>`;
   return `<p class="small muted">App do Projeto Hold BTC 100: R$ 100 em bitcoin todo mês, registrado e guardado no longo prazo. Funciona offline e sem cadastro. Preços históricos: CoinLore (BTC/USD) e Banco Central (PTAX). Cotação ao vivo: CoinGecko, Binance e mempool.space. Dólar do dia, só com os valores na outra moeda: Banco Central (PTAX), com o BCE de reserva. No modo 100% offline, o app não faz nenhuma conexão. Não é recomendação de investimento.</p>
       ${extLink('https://t.me/nicolasmaia42', 'Contato<span class="v">Telegram @nicolasmaia42</span>', 'set-row')}
       ${extLink('https://t.me/HoldBTC100', 'Grupo do projeto<span class="v">Telegram @HoldBTC100</span>', 'set-row')}
       ${extLink(PRIV_URL, `Política de privacidade<span class="v">${I.ext}</span>`, 'set-row')}`;
+}
+/* ---------------- Verificar poeira (0.9.7, pedido do Nicolas de 27/11/2026) ----------------
+   O que está na memória e não aparece igual na tela: frações de sat e de centavo nos aportes, vendas e saques (as telas
+   mostram sats inteiros e 2 casas) e a sobra ínfima de cada corretora depois da última saída dela (abaixo da maior poeira
+   da rede, 546 sats, DIRETRIZES §6). Sobra depois de uma entrada não é poeira: é aporte. A limpeza arredonda as frações e
+   leva a sobra para a taxa do último saque da corretora (a negativa, só se a taxa cobrir) ou para os sats da última venda
+   nela; UTXOs da carteira, transações e cotações ficam como estão. Com Desfazer. */
+const EX_POEIRA = 546;
+const fraSat = v => typeof v === 'number' && Math.abs(v - Math.round(v)) > 1e-6;
+const fraCent = v => typeof v === 'number' && Math.abs(v * 100 - Math.round(v * 100)) > 1e-6;
+const poeiraNum = (v, max = 8) => Number(v).toLocaleString('pt-BR', { maximumFractionDigits: max });
+const poeiraCasas = v => Math.min(8, Math.max(2, (cotTxt(Math.abs(v)).split('.')[1] || '').length));   // as casas do valor guardado (de 2 a 8)
+function poeiraItens() {
+  const fr = [], ex = [], neg = [];
+  const rot = a => `${isSale(a) ? 'Venda' : 'Aporte'} de ${fmtDate(a.date)}${a.ex && !isDefEx(a.ex) && !exP2P(a) ? ' · ' + a.ex : ''}`;
+  for (const a of state.aportes) {
+    if (fraSat(a.sats)) fr.push({ x: a, k: 'sats', tipo: 'sats', rot: rot(a) });
+    if (fraSat(a.feeSats)) fr.push({ x: a, k: 'feeSats', tipo: 'sats', rot: rot(a) + ' · taxa' });
+    if (fraCent(a.fiat)) fr.push({ x: a, k: 'fiat', tipo: 'din', rot: rot(a) });
+    if (fraCent(a.fee)) fr.push({ x: a, k: 'fee', tipo: 'din', rot: rot(a) + ' · taxa' });
+  }
+  for (const w of state.saques) {
+    const r = `Saque de ${fmtDate(w.date)}${w.ex ? ' · ' + w.ex : ''}`;
+    if (fraSat(w.sats)) fr.push({ x: w, k: 'sats', tipo: 'sats', rot: r });
+    if (fraSat(w.fee)) fr.push({ x: w, k: 'fee', tipo: 'sats', rot: r + ' · taxa' });
+  }
+  const L = exLivro();
+  for (const [k, s] of L.saldo) {
+    const m = L.ult.get(k), it = { k, nome: L.nome(k), cnpj: L.cnpj(k), sats: s, m };
+    if (Math.abs(s) >= 1e-6 && Math.abs(s) < EX_POEIRA && m && m.s < 0 && (m.t === 'saque' ? (m.x.fee || 0) + s >= 0 : m.x.sats + s > 0)) ex.push(it);
+    else if (s < -1e-6) neg.push(it);
+  }
+  return { fr, ex, neg };
+}
+function poeiraHTML() {
+  const { fr, ex, neg } = poeiraItens(), c = cur(), P = priceNow(vcur()), n = fr.length + ex.length;
+  const sinal = v => v > 0 ? '+' : v < 0 ? '−' : '';
+  const item = (rot, mem, tela, dif, nota) => `<div class="po-it"><p class="po-r">${esc(rot)}</p><dl class="po-v"><div><dt>Na memória</dt><dd>${priv(mem)}</dd></div><div><dt>Na tela</dt><dd>${priv(tela)}</dd></div><div><dt>Diferença</dt><dd>${priv(dif)}</dd></div></dl>${nota ? `<p class="po-d">${nota}</p>` : ''}</div>`;
+  let h = `<h2>Verificar poeira</h2><p class="sub">O que está guardado no aparelho e não aparece igual na tela: frações de sat ou de centavo nos registros e a sobra ínfima de cada corretora depois da última saída dela.</p>`;
+  if (!n && !neg.length) h += `<p class="note po-ok" id="po-ok">Nenhuma poeira: os registros batem com o que aparece na tela, e nenhuma corretora tem sobra.</p>`;
+  if (fr.length) h += `<h3 class="po-h">Frações nos registros (${fr.length})</h3>` + fr.map(x => {
+    const v = x.x[x.k];
+    if (x.tipo === 'sats') { const r = Math.round(v), d = v - r; return item(x.rot, `${poeiraNum(v)} sats`, `${fmtSats(r)} sats`, `${sinal(d)}${poeiraNum(Math.abs(d))} sat`); }
+    const r = round2(v), d = v - r, k = poeiraCasas(v); return item(x.rot, fmtMoney(v, c, k), fmtMoney(r, c), `${sinal(d)}${fmtMoney(Math.abs(d), c, k)}`);
+  }).join('');
+  if (ex.length) h += `<h3 class="po-h">Sobra nas corretoras (${ex.length})</h3>` + ex.map(x => {
+    const onde = x.m.t === 'saque' ? `do saque de ${fmtDate(x.m.d)}` : `da venda de ${fmtDate(x.m.d)}`, para = x.m.t === 'saque' ? 'Na limpeza, vai para a taxa desse saque.' : 'Na limpeza, entra nos sats dessa venda.';
+    return item(x.nome + (x.cnpj ? ` · CNPJ ${cnpjFmt(x.cnpj)}` : ''), `${sinal(x.sats).replace('+', '')}${poeiraNum(Math.abs(x.sats))} sats`, `${fmtV(Math.abs(x.sats) / 1e8 * P)}, parece zerada`, `${sinal(x.sats)}${poeiraNum(Math.abs(x.sats))} sats`, `Sobrou depois ${onde}. ${para}`);
+  }).join('');
+  if (neg.length) h += `<h3 class="po-h">Para conferir</h3>` + neg.map(x => `<p class="small po-neg">${esc(x.nome)} ficou com ${priv(amtTxt(x.sats))}: saiu mais do que entrou. Registre os aportes que faltam ou confira o nome da corretora nos saques e nas vendas. A limpeza não mexe nisso.</p>`).join('');
+  if (n) h += `<button class="btn btn-p block" style="margin-top:14px" data-act="poeira-limpa">Limpar poeira</button><p class="small muted" style="margin-top:8px">Arredonda as frações (sats inteiros e centavos) e leva a sobra de cada corretora para a taxa do último saque dela ou para a última venda nela. UTXOs da carteira, transações e cotações ficam como estão. Dá para desfazer.</p>`;
+  return h;
+}
+function sheetPoeira() { ui.form = { kind: 'poeira' }; openSheet('poeira', poeiraHTML, { label: 'Verificar poeira' }); }
+function poeiraLimpa() {
+  const antes = fotoDados(); let n = 0;
+  for (const a of state.aportes) { for (const k of ['sats', 'feeSats']) if (fraSat(a[k])) { a[k] = Math.round(a[k]); n++; } for (const k of ['fiat', 'fee']) if (fraCent(a[k])) { a[k] = round2(a[k]); n++; } }
+  for (const w of state.saques) for (const k of ['sats', 'fee']) if (fraSat(w[k])) { w[k] = Math.round(w[k]); n++; }
+  // a sobra de cada corretora, já com os registros arredondados
+  for (const x of poeiraItens().ex) { const m = x.m; if (m.t === 'saque') m.x.fee = (m.x.fee || 0) + x.sats; else m.x.sats += x.sats; n++; }
+  if (!n) { toast('Nenhuma poeira para limpar'); return; }
+  save(); render();
+  const b = $('#sheet-body'); if (b && ui.sheet && ui.sheet.kind === 'poeira') b.innerHTML = poeiraHTML();
+  toastDesfazer(`Poeira limpa: ${n} ${n === 1 ? 'item' : 'itens'}`, antes, 'A poeira voltou como estava');
 }
 function sheetSettings() {
   openSheet('settings', () => {
@@ -3261,17 +3736,38 @@ function onSettingChange(k, el) {
 /* ---------------- lembrete ---------------- */
 function nextReminder() { const n = new Date(), d = S().day; let dt = new Date(n.getFullYear(), n.getMonth(), d, 9, 0); if (dt < n) dt = new Date(n.getFullYear(), n.getMonth() + 1, d, 9, 0); return dt; }
 const icsDT = dt => `${dt.getFullYear()}${pad2(dt.getMonth() + 1)}${pad2(dt.getDate())}T${pad2(dt.getHours())}${pad2(dt.getMinutes())}00`;
+/* Imagem do lembrete (0.9.6, pedido do Nicolas): lembrete.png, no próprio site do app (pwa/, gerada por
+   build/fazer_lembrete.py), pelo endereço de onde o app abriu, para continuar certa quando o site mudar de endereço.
+   O Google Agenda não mostra imagem em evento criado por link nem por .ics (os anexos dele são do Google Drive): ela vai
+   como link na descrição e, no .ics, também como anexo (ATTACH) e imagem do evento (IMAGE, RFC 7986), que outros apps de
+   agenda podem mostrar. Na prévia, sem endereço público, fica de fora. */
+const LEMBRETE_IMG = 'lembrete.png';
+function lembreteImg() { if (IN_CLAUDE || !/^https?:$/.test(location.protocol)) return ''; try { return new URL(LEMBRETE_IMG, location.href).href; } catch (e) { return ''; } }
+function lembreteTexto() {
+  const img = lembreteImg();
+  return `Hora do aporte mensal de ${fmtMoney(S().monthly)} em bitcoin. Depois da compra, registre no app Hold BTC 100.` + (img ? `\n\nImagem do Hold BTC 100: ${img}` : '');
+}
 function calendarURL() {
   const s = S(), a = nextReminder(), b = new Date(a.getTime() + 30 * 60000);
-  const details = `Hora do aporte mensal de ${fmtMoney(s.monthly)} em bitcoin. Depois da compra, registre no app Hold BTC 100.`;
-  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent('Aporte Hold BTC 100') + '&details=' + encodeURIComponent(details) + '&dates=' + icsDT(a) + '/' + icsDT(b) + '&recur=' + encodeURIComponent('RRULE:FREQ=MONTHLY;BYMONTHDAY=' + s.day);
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent('Aporte Hold BTC 100') + '&details=' + encodeURIComponent(lembreteTexto()) + '&dates=' + icsDT(a) + '/' + icsDT(b) + '&recur=' + encodeURIComponent('RRULE:FREQ=MONTHLY;BYMONTHDAY=' + s.day);
 }
 function openCalendar() { const w = window.open(calendarURL(), '_blank', 'noopener'); if (!w) toast('Permita abrir links externos para criar o lembrete.'); }
-function downloadICS() {
-  const s = S(), a = nextReminder();
-  const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Hold BTC 100//PT-BR', 'BEGIN:VEVENT', 'UID:' + uid() + '@holdbtc100', 'DTSTAMP:' + new Date().toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z', 'DTSTART:' + icsDT(a), 'DURATION:PT30M', 'RRULE:FREQ=MONTHLY;BYMONTHDAY=' + s.day, 'SUMMARY:Aporte Hold BTC 100', 'DESCRIPTION:Hora do aporte mensal de ' + fmtMoney(s.monthly) + ' em bitcoin.', 'BEGIN:VALARM', 'TRIGGER:PT0M', 'ACTION:DISPLAY', 'DESCRIPTION:Aporte Hold BTC 100', 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
-  saveFile('lembrete-aporte-holdbtc100.ics', ics, 'text/calendar');
+/* .ics (RFC 5545): no texto, barra invertida, vírgula, ponto e vírgula e quebra de linha escapadas (antes, a vírgula
+   de "R$ 100,00" ia solta); linha com mais de 75 bytes dobrada (CRLF e espaço), sem partir letra acentuada (0.9.6) */
+const icsEsc = t => String(t).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+function icsDobra(l) {
+  const enc = new TextEncoder(); if (enc.encode(l).length <= 75) return l;
+  const out = []; let cur = '', n = 0, lim = 75;
+  for (const ch of l) { const k = enc.encode(ch).length; if (n + k > lim) { out.push(cur); cur = ''; n = 0; lim = 74; } cur += ch; n += k; }
+  out.push(cur); return out.join('\r\n ');
 }
+function lembreteICS() {
+  const s = S(), a = nextReminder(), img = lembreteImg();
+  return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Hold BTC 100//PT-BR', 'BEGIN:VEVENT', 'UID:' + uid() + '@holdbtc100', 'DTSTAMP:' + new Date().toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z', 'DTSTART:' + icsDT(a), 'DURATION:PT30M', 'RRULE:FREQ=MONTHLY;BYMONTHDAY=' + s.day, 'SUMMARY:Aporte Hold BTC 100', 'DESCRIPTION:' + icsEsc(lembreteTexto()),
+    ...(img ? ['ATTACH;FMTTYPE=image/png:' + img, 'IMAGE;VALUE=URI;DISPLAY=GRAPHIC;FMTTYPE=image/png:' + img] : []),
+    'BEGIN:VALARM', 'TRIGGER:PT0M', 'ACTION:DISPLAY', 'DESCRIPTION:Aporte Hold BTC 100', 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].map(icsDobra).join('\r\n') + '\r\n';
+}
+function downloadICS() { saveFile('lembrete-aporte-holdbtc100.ics', lembreteICS(), 'text/calendar'); }
 
 /* ---------------- UTXO: saque, UTXO manual, consolidação, envio ---------------- */
 function sheetUtxoSettings() {
@@ -3318,7 +3814,7 @@ const csvCell = v => { const s = String(v ?? ''); return /[;"\r\n]/.test(s) ? '"
 // formato antigo para o test12 e o test18, que conferem as 11 primeiras colunas da planilha nova (DIRETRIZES §6b).
 function aportesCSV() {
   const n2 = v => v.toFixed(2).replace('.', ',');
-  const rows = [...state.aportes].sort((a, b) => a.date.localeCompare(b.date) || (isSale(a) - isSale(b))).map(a => { const g = isSale(a) ? -1 : 1; return [fmtDate(a.date), isSale(a) ? 'venda' : 'compra', n2(g * a.fiat), cur(), n2(a.price), g * a.sats, (g * a.sats / 1e8).toFixed(8).replace('.', ','), a.ex || '', (isSale(a) ? a.src : a.dest) === 'self' ? 'carteira' : 'corretora', a.note || '', n2(a.fee || 0)].map(csvCell).join(';'); });
+  const rows = [...state.aportes].sort((a, b) => a.date.localeCompare(b.date) || (isSale(a) - isSale(b))).map(a => { const g = isSale(a) ? -1 : 1; return [fmtDate(a.date), isSale(a) ? 'venda' : 'compra', n2(g * a.fiat), cur(), cotCSV(a.price), g * a.sats, (g * a.sats / 1e8).toFixed(8).replace('.', ','), a.ex || '', (isSale(a) ? a.src : a.dest) === 'self' ? 'carteira' : 'corretora', a.note || '', n2(a.fee || 0)].map(csvCell).join(';'); });
   return '\uFEFF' + ['data', 'tipo', 'valor', 'moeda', 'cotacao', 'sats', 'btc', 'corretora', 'local', 'observacao', 'taxa'].join(';') + '\r\n' + rows.join('\r\n') + '\r\n';
 }
 /* Planilha de todas as movimentações (1.8.12): uma linha por movimento, com a coluna tipo para filtrar. Tipos: aporte e
@@ -3367,7 +3863,7 @@ function movimentos() {
 }
 function movimentosCSV() {
   const n2 = v => v.toFixed(2).replace('.', ','), btc = s => (s / 1e8).toFixed(8).replace('.', ',');
-  const rows = movimentos().map(m => { const a = m.a, g = m.tipo === 'venda' ? -1 : 1; return [fmtDate(m.date), m.tipo, a ? n2(g * a.fiat) : '', a ? cur() : '', a ? n2(a.price) : '', m.sats, btc(m.sats), m.ex, m.local, m.note, a ? n2(a.fee || 0) : '', m.fee == null ? '' : m.fee, m.wallet, m.txid].map(csvCell).join(';'); });
+  const rows = movimentos().map(m => { const a = m.a, g = m.tipo === 'venda' ? -1 : 1; return [fmtDate(m.date), m.tipo, a ? n2(g * a.fiat) : '', a ? cur() : '', a ? cotCSV(a.price) : '', m.sats, btc(m.sats), m.ex, m.local, m.note, a ? n2(a.fee || 0) : '', m.fee == null ? '' : m.fee, m.wallet, m.txid].map(csvCell).join(';'); });
   return String.fromCharCode(0xFEFF) + ['data', 'tipo', 'valor', 'moeda', 'cotacao', 'sats', 'btc', 'corretora', 'local', 'observacao', 'taxa', 'taxa_sats', 'carteira', 'txid'].join(';') + '\r\n' + rows.join('\r\n') + '\r\n';
 }
 /* Backup assinado, com PIN opcional (1.8.18). Formato 2: o envelope leva assinatura = SHA-256 (hexadecimal) da forma
@@ -3634,8 +4130,9 @@ function parseCSVAportes(text, forcar) {
     if (!date || !(fiat > 0)) { skipped++; continue; }
     const fee = iF >= 0 ? Math.abs(parseNum(r[iF])) || 0 : 0, base = sale ? fiat + fee : fiat - fee;
     if (!(base > 0)) { skipped++; continue; }
-    if (price > 0) { if (!(sats > 0)) sats = Math.round(base / price * 1e8); } else if (sats > 0) price = base / (sats / 1e8); else { skipped++; continue; }
-    list.push({ date, fiat: round2(fiat), price: round2(price), sats, fee: round2(fee), type: sale ? 'venda' : 'compra', ex: iE >= 0 ? String(r[iE] || '').trim().slice(0, 60) : '', note: iN >= 0 ? String(r[iN] || '').trim().slice(0, 140) : '', wal: iL >= 0 && norm(r[iL]) === 'carteira' });
+    const dada = price > 0;   // cotação da planilha: com todas as casas (0.9.6); a calculada pelos sats, com 2
+    if (dada) { if (!(sats > 0)) sats = Math.round(base / price * 1e8); } else if (sats > 0) price = round2(base / (sats / 1e8)); else { skipped++; continue; }
+    list.push({ date, fiat: round2(fiat), price, sats, fee: round2(fee), type: sale ? 'venda' : 'compra', ex: iE >= 0 ? String(r[iE] || '').trim().slice(0, 60) : '', note: iN >= 0 ? String(r[iN] || '').trim().slice(0, 140) : '', wal: iL >= 0 && norm(r[iL]) === 'carteira' });
   }
   return { list, skipped, wallet, datas: od.ordem, ambigua: od.ambigua, forcado: !!forcar };
 }
@@ -3716,7 +4213,7 @@ function aportesFromSheet(sheet) {
     if (!date && !fiat) continue;
     const f2 = Math.abs(fiat), p2 = Math.abs(price);
     if (!date || !(f2 > 0) || !(p2 > 0)) { skipped++; continue; }
-    list.push({ date, fiat: round2(f2), price: round2(p2), sats: Math.round(f2 / p2 * 1e8), type: fiat < 0 ? 'venda' : 'compra' });
+    list.push({ date, fiat: round2(f2), price: p2, sats: Math.round(f2 / p2 * 1e8), type: fiat < 0 ? 'venda' : 'compra' });   // cotação com todas as casas da planilha (0.9.6)
   }
   return { list, skipped };
 }
@@ -4097,6 +4594,17 @@ const ACT = {
   'del-aporte': el => delAporte(el.dataset.id),
   'ap-mode': el => { const m = el.dataset.mode; ui.form.mode = m; $$('[data-act="ap-mode"]').forEach(b => { b.classList.toggle('on', b === el); b.setAttribute('aria-pressed', b === el); }); $('#fld-price').hidden = m !== 'price'; $('#fld-sats').hidden = m !== 'sats'; updateApCalc(); },
   'ap-dest': el => { ui.form.dest = el.dataset.dest; $$('[data-act="ap-dest"]').forEach(b => b.classList.toggle('on', b === el)); $('#dest-self').hidden = ui.form.dest !== 'self'; },
+  // CNPJ da corretora (0.9.5): barra de seleção, Buscar e a pergunta sobre os registros antigos
+  'ex-pick': el => exEscolhe(+el.dataset.i),
+  'ap-cnpj-busca': () => { cnpjBusca(); },
+  'ap-cnpj-todos': () => { if (ui.form && ui.form.kind === 'aporte') { ui.form.cnpjDecisao = 'todos'; saveAporte(); } },
+  'ap-cnpj-manter': () => { if (ui.form && ui.form.kind === 'aporte') { ui.form.cnpjDecisao = 'manter'; saveAporte(); } },
+  'ir-cnpj-todos': el => {   // relatório do IR: o mesmo CNPJ em todos os registros da corretora (com Desfazer)
+    const d = (ui.irDiv || [])[+el.dataset.i]; if (!d) return;
+    const snap = fotoDados(), n = cnpjAplicaTodos(d.nome, d.cnpj, d.razao, null); if (!n) return render();
+    corGrava(d.nome, d.cnpj, d.razao); save(); render();
+    toastDesfazer(`${n} ${n === 1 ? 'registro' : 'registros'} de “${d.nome}” com o CNPJ ${cnpjFmt(d.cnpj)}`, snap, CNPJ_DESFEITO);
+  },
   'ap-kyc': el => { ui.form.kyc = !ui.form.kyc; el.classList.toggle('on', ui.form.kyc); el.setAttribute('aria-pressed', ui.form.kyc); },
   'form-kyc': el => { ui.form.kyc = !ui.form.kyc; el.classList.toggle('on', ui.form.kyc); el.setAttribute('aria-pressed', ui.form.kyc); },
   'form-frozen': el => { ui.form.frozen = !ui.form.frozen; el.classList.toggle('on', ui.form.frozen); el.setAttribute('aria-pressed', ui.form.frozen); },
@@ -4125,8 +4633,9 @@ const ACT = {
   'set': el => setValue(el.dataset.k, el.dataset.v),
   'desfazer': () => {
     const antes = desfazer.antes; if (!antes) return;
-    desfazer.antes = null; if (fotoDados() !== desfazer.depois) return toast('Não dá mais para desfazer: os registros mudaram depois da exclusão.');
-    Object.assign(state, JSON.parse(antes)); save(); render(); toast('Exclusão desfeita');
+    const feito = desfazer.feito || 'Exclusão desfeita'; desfazer.antes = null;
+    if (fotoDados() !== desfazer.depois) return toast(`Não dá mais para desfazer: os registros mudaram depois ${feito === CNPJ_DESFEITO ? 'da atualização' : 'da exclusão'}.`);
+    Object.assign(state, JSON.parse(antes)); save(); render(); toast(feito);
   },
   'csv-mdy': () => { const f = ui.form; if (f && f.csv) previewList(parseCSVAportes(f.csv.text, 'mdy'), cur(), f.csv.from); },
   'csv-dmy': () => { const f = ui.form; if (f && f.csv) previewList(parseCSVAportes(f.csv.text), cur(), f.csv.from); },
@@ -4171,10 +4680,12 @@ const ACT = {
   'wd-pct': el => { ui.form.wdPct = +el.dataset.v; $$('[data-act="wd-pct"]').forEach(b => b.classList.toggle('on', b === el)); },
   'save-utxo-set': () => { const v = parseIntSafe(fv('wdFee')); if (fv('wdFee').trim() && !(v >= 0)) return formErr('Informe a taxa em sats.'); S().wdFee = v || 0; if (ui.form.wdPct) S().wdPct = ui.form.wdPct; save(); closeSheet(); render(); toast('Ajustes salvos'); },
   'new-saque': () => sheetSaque(null),
+  'poeira': () => sheetPoeira(),
+  'poeira-limpa': () => poeiraLimpa(),
   'edit-saque': el => { closeSheet(true); sheetSaque(el.dataset.id); },
   'save-saque': saveSaque,
   'del-saque': el => delSaque(el.dataset.id),
-  'wd-all': () => { const c = calc(), fee = parseIntSafe(fv('fee')) || 0; $('#sheet-body [name="sats"]').value = amtIn(Math.max(0, c.ex - fee)); updateWdCalc(); },
+  'wd-all': () => { const b = wdBase(fv('ex')), fee = parseIntSafe(fv('fee')) || 0; $('#sheet-body [name="sats"]').value = amtIn(Math.max(0, b.sats - fee)); updateWdCalc(); },
   'new-utxo': () => sheetNewUtxo(),
   'un-origin': el => { ui.form.origin = el.dataset.o; $$('[data-act="un-origin"]').forEach(b => { b.classList.toggle('on', b === el); b.setAttribute('aria-pressed', b === el); }); $('#un-hint').textContent = UN_DICA[ui.form.origin === 'externo' ? 'externo' : 'aportes']; $('#fld-fee').hidden = ui.form.origin === 'externo'; const fc = $('#fld-cost'); if (fc) fc.hidden = ui.form.origin !== 'externo'; const t = $('#sheet-body [data-act="form-kyc"]'); ui.form.kyc = ui.form.origin !== 'externo'; t.classList.toggle('on', ui.form.kyc); },
   'save-new-utxo': saveNewUtxo,
@@ -4230,8 +4741,15 @@ document.addEventListener('input', e => {
   const k = e.target.dataset && e.target.dataset.inp; if (!k) return;
   if (k === 'ap-calc') updateApCalc();
   else if (k === 'ap-price') { ui.form.touched = true; updateApCalc(); }
+  else if (k === 'ap-ex') { exSugere(e.target); cnpjSegueNome(e.target.value); cnpjDecideLimpa(); cnpjInfo(); }   // 0.9.5
+  else if (k === 'ap-cnpj') {
+    cnpjDigita(e.target, e); const f = ui.form, c = cnpjLimpo(e.target.value);
+    if (f) { f.cnpjMao = true; f.cnpjApagado = ''; f.exNota = ''; if (f.cz && f.cz.cnpj !== c) f.cz = null; }
+    cnpjDecideLimpa(); cnpjInfo();
+  }
   else if (k === 'ap-date') { const d = e.target.value; if (/^\d{4}-\d{2}-\d{2}$/.test(d) && !ui.form.touched) { const p = histPrice(d.slice(0, 7), apFc()); if (p) $('#f-price').value = fmtInput(p, 0); const h = $('#price-hint'); if (h) h.innerHTML = priceHint(d); } apFxData(); updateApCalc(); }
   else if (k === 'wd-calc') updateWdCalc();
+  else if (k === 'wd-ex') { const t = $('#wd-all'); if (t) t.innerHTML = wdTudoTxt(wdBase(e.target.value)); }
   else if (k === 'fee-rate') { const v = +e.target.value; S().feeRate = v; $('#fr-val').textContent = v; $('#utxo-list').innerHTML = utxoRows(v); $('#utxo-sum').innerHTML = utxoSummary(v); $$('[data-act="fee-preset"]').forEach(b => b.classList.toggle('on', +b.dataset.v === v)); }
   else if (k === 'sim') { const amt = parseNum($('#sim-amt').value); ui.sim.amount = amt; ui.sim.start = `${$('#sim-y').value}-${pad2(+$('#sim-m').value)}`; $('#sim-out').innerHTML = simOut(); }
   else if (k === 'gl') { ui.gl = e.target.value; $('#gl-list').innerHTML = glList(); }
@@ -4248,7 +4766,17 @@ document.addEventListener('change', e => {
   if (t.dataset && t.dataset.chg) onSettingChange(t.dataset.chg, t);
   if (t.dataset && t.dataset.file && t.files && t.files[0]) handleFile(t.files[0]);
 });
+// barra de seleção das corretoras (0.9.5): o toque numa opção não tira o foco do campo (o clique chega à opção), e a barra
+// fecha logo depois que o campo perde o foco; setas, Enter (só com uma opção marcada pelas setas) e Esc
+document.addEventListener('mousedown', e => { if (e.target && e.target.closest && e.target.closest('#ex-sug')) e.preventDefault(); });
+document.addEventListener('focusout', e => { if (e.target && e.target.id === 'f-ex') setTimeout(() => { const a = document.activeElement; if (!a || a.id !== 'f-ex') exFecha(); }, 200); });
 document.addEventListener('keydown', e => {
+  if (e.target && e.target.id === 'f-ex' && ui.form && (ui.form.exOps || []).length) {
+    const s = ui.form.exSel == null ? -1 : ui.form.exSel;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); exMarca(e.key === 'ArrowDown' ? s + 1 : s < 0 ? -1 : s - 1); return; }
+    if (e.key === 'Escape') { e.preventDefault(); exFecha(); return; }
+    if (e.key === 'Enter' && s >= 0) { e.preventDefault(); exEscolhe(s); return; }
+  }
   if (e.key === 'Escape' && ui.sheet && !ui.sheet.opts.noClose) closeSheet();
   if (e.key === 'Enter' && e.target.matches && e.target.matches('input.inp[data-chg]')) { e.preventDefault(); e.target.blur(); return; }
   if (e.key === 'Enter' && ui.sheet && e.target.matches && e.target.matches('input.inp:not([type="search"])')) { const b = $('#sheet-body .btn-p[data-act^="save"], #sheet-body .btn-p[data-enter]'); if (b) { e.preventDefault(); b.click(); } }
@@ -4475,18 +5003,24 @@ function resolvePicker(p, defLabel, role = 'recebimento', ov = {}) {
 function pickerBad(p) { return fv(p + 'address') === '__new' && !validAddr(fv(p + 'newAddr')); }
 
 /* ---------- saque, UTXO manual e edição de UTXO ---------- */
+/* "Sacar todo o saldo" (0.9.7): com mais de uma corretora, o saldo da que está no campo, para o saque não levar o de outra */
+function wdBase(nome) {
+  const L = exLivro(), k = exChaves()(nome, '');
+  return L.saldo.size > 1 && L.saldo.has(k) ? { sats: L.saldo.get(k), nome: L.nome(k) } : { sats: calc().ex, nome: '' };
+}
+const wdTudoTxt = b => `Sacar todo o saldo da ${b.nome ? esc(b.nome) : 'corretora'} (${AMT(Math.max(0, b.sats))})`;
 function sheetSaque(id) {
   const s = S(), w = id ? byId(state.saques, id) : null, c = calc(), u = w ? byId(state.utxos, w.utxoId) : null;
-  const exList = exNames(), fee = w ? (w.fee || 0) : (s.wdFee || 0);
+  const exList = exNames(), fee = w ? (w.fee || 0) : (s.wdFee || 0), ex0 = w ? w.ex : (s.exchange || exList[exList.length - 1] || ''), b0 = wdBase(ex0);
   ui.form = { kind: 'saque', id, kyc: u ? !!u.kyc : true };
   openSheet('saque', () => `<h2>${w ? 'Editar saque' : 'Registrar saque'}</h2><p class="sub">Da corretora para a sua carteira. O saque cria um UTXO no endereço de destino.</p>
     ${u && u.spent ? `<p class="note" style="margin-bottom:14px">O UTXO deste saque foi gasto em ${fmtDate(u.spentAt)}. Se você mudar o valor, as transações seguintes são recalculadas.</p>` : ''}
     <div class="two"><div class="field"><label for="w-d">Data</label><input class="inp" id="w-d" name="date" type="date" value="${w ? w.date : todayISO()}" max="${todayISO()}"></div>
-    <div class="field"><label for="w-e">Corretora</label><input class="inp" id="w-e" name="ex" list="wex" autocomplete="off" value="${esc(w ? w.ex : (s.exchange || exList[exList.length - 1] || ''))}"><datalist id="wex">${exList.map(e => `<option value="${esc(e)}">`).join('')}</datalist></div></div>
+    <div class="field"><label for="w-e">Corretora</label><input class="inp" id="w-e" name="ex" list="wex" autocomplete="off" value="${esc(ex0)}" data-inp="wd-ex"><datalist id="wex">${exList.map(e => `<option value="${esc(e)}">`).join('')}</datalist></div></div>
     ${addrPicker('w_', u ? u.wallet : (state.wallets[0] || {}).id, u ? u.address : '__new', { exclude: u ? u.id : '' })}
-    <div class="two"><div class="field"><label for="w-s">Valor recebido (${unitName()})</label><input class="inp" id="w-s" name="sats" ${amtAttrs()} autocomplete="off" value="${(w ? w.sats : Math.max(0, c.ex - fee)) ? amtIn(w ? w.sats : Math.max(0, c.ex - fee)) : ''}" data-inp="wd-calc"></div>
+    <div class="two"><div class="field"><label for="w-s">Valor recebido (${unitName()})</label><input class="inp" id="w-s" name="sats" ${amtAttrs()} autocomplete="off" value="${(w ? w.sats : Math.max(0, b0.sats - fee)) ? amtIn(w ? w.sats : Math.max(0, b0.sats - fee)) : ''}" data-inp="wd-calc"></div>
     <div class="field"><label for="w-f">Taxa de saque (sats)</label><input class="inp" id="w-f" name="fee" inputmode="numeric" autocomplete="off" data-num="int" value="${fmtSats(fee)}" data-inp="wd-calc"></div></div>
-    ${w ? '' : `<p style="margin:-6px 0 12px"><button class="link-btn small" data-act="wd-all">Sacar todo o saldo da corretora (${AMT(Math.max(0, c.ex))})</button></p>`}
+    ${w ? '' : `<p style="margin:-6px 0 12px"><button class="link-btn small" id="wd-all" data-act="wd-all">${wdTudoTxt(b0)}</button></p>`}
     <div class="calc-line" id="wd-calc"></div>
     <div class="field"><label for="w-l">Etiqueta do UTXO</label><input class="inp" id="w-l" name="label" autocomplete="off" value="${esc(u ? u.label : '')}" placeholder="Ex.: Saque ${esc(s.exchange || 'corretora')} ${fmtYM(nowYM())}"></div>
     <div class="two"><div class="field"><label for="w-t">TXID (opcional)</label><input class="inp mono" id="w-t" name="txid" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(u ? u.txid : '')}"></div><div class="field"><label for="w-v">vout (opcional)</label><input class="inp" id="w-v" name="vout" inputmode="numeric" autocomplete="off" value="${esc(u ? u.vout : '')}"></div></div>
@@ -4569,7 +5103,7 @@ function entradaPaga(u, fiat, note) {
 }
 function utxoSource(u) {
   if (u.origin === 'saque') { const w = byId(state.saques, u.saqueId); return { t: `Saque${w && w.ex ? ' da ' + w.ex : ''}`, d: w ? `taxa de saque ${esc(fmtSats(w.fee || 0))} sats` : '', act: 'edit-saque', id: u.saqueId || '' }; }
-  if (u.origin === 'aporte') { const ap = byId(state.aportes, u.aporteId), av = ap && apV(ap); return { t: ap && ap.entrada ? 'Compra de terceiros (valor pago)' : 'Aporte direto na carteira', d: av ? `${MV(av.fiat)} a ${esc(fmtV(av.price, 0))}` : '', act: 'edit-aporte', id: u.aporteId || '' }; }
+  if (u.origin === 'aporte') { const ap = byId(state.aportes, u.aporteId), av = ap && apV(ap); return { t: ap && ap.entrada ? 'Compra de terceiros (valor pago)' : 'Aporte direto na carteira', d: av ? `${MV(av.fiat)} a ${esc(fmtV(av.price))}` : '', act: 'edit-aporte', id: u.aporteId || '' }; }
   if (u.origin === 'tx') {
     const sp = byId(state.spends, u.txId); if (!sp) return { t: 'Transação', d: '', act: 'edit-utxo', id: u.id };
     const ins = sp.inputs.map(i => byId(state.utxos, i)).filter(Boolean), from = [...new Set(ins.map(x => (addrById(x.address) || {}).label || 'endereço'))];
@@ -4881,7 +5415,7 @@ function txSaleRefresh() {
   if (!(n.sats > 0)) { el.innerHTML = `Informe o valor vendido, em ${esc(unitName())}.`; return; }
   if (!(n.fiat > 0)) { el.innerHTML = 'Informe o valor recebido: o app calcula o lucro pelo custo médio.'; return; }
   const t = ui.form.tx, sp = t.mode === 'edit' ? byId(state.spends, t.id) : null;
-  el.innerHTML = `Cotação efetiva: <b>${esc(fmtMoney(n.price, cur(), 0))}</b>${vendaConta(n.sats, n.fiat, n.fee, n.date, sp ? sp.saleId : null, !txOutrasDeCripto(t))}`;
+  el.innerHTML = `Cotação efetiva: <b>${esc(fmtMoney(n.price, cur()))}</b>${vendaConta(n.sats, n.fiat, n.fee, n.date, sp ? sp.saleId : null, !txOutrasDeCripto(t))}`;
 }
 function txChangeBlock(t) {
   const w = txSrcWallet(), c = t.change;
@@ -5188,8 +5722,8 @@ function pageWallet() {
 }
 
 /* ======================= MAPA DOS SATS (fluxo contínuo, 1.8.38; pedido do Nicolas de 23/11/2026) =======================
-   Os sats no tempo, num fluxo como o do mempool.space: da primeira compra (esquerda) até hoje (direita). A corretora é um
-   rio só, em índigo (todas somadas, com KYC; a espessura em cada data é o saldo do holdAt). Cada carteira tem as suas
+   Os sats no tempo, num fluxo como o do mempool.space: da primeira compra (esquerda) até hoje (direita). Cada corretora é
+   um rio em índigo (0.9.7: uma por CNPJ ou nome, pelo exLivro, com o saldo dela; somadas, o holdAt), com KYC. Cada carteira tem as suas
    trilhas em laranja: um UTXO por trilha, da bolha em que nasce até a transação que o gasta. O que sai vai para as margens:
    vendas na corretora em cima; envios, vendas pela carteira e gastos sem transação embaixo; taxas num ramo fino.
    Espessura proporcional aos sats, numa escala única. Sem campo novo: tudo sai de aportes, saques, utxos e spends; o KYC de
@@ -5226,15 +5760,10 @@ function mapaEventos() {
   ev.sort((x, y) => x.d.localeCompare(y.d) || x.o - y.o || (x.i || 0) - (y.i || 0));
   return ev;
 }
-// uma coluna por movimento; aportes seguidos na corretora, no mesmo mês e sem outro movimento entre eles, ficam numa só
+// uma coluna por movimento, e cada aporte é um degrau (0.9.7, pedido do Nicolas: antes, os aportes seguidos do mesmo mês
+// ficavam numa coluna só); o tipo continua 'aportes', com o aporte em aps
 function mapaColunas() {
-  const cols = [];
-  for (const e of mapaEventos()) {
-    const ult = cols[cols.length - 1];
-    if (e.t === 'compra' && ult && ult.t === 'aportes' && ult.d.slice(0, 7) === e.d.slice(0, 7)) { ult.aps.push(e.a); ult.d = e.d; continue; }
-    cols.push(e.t === 'compra' ? { t: 'aportes', d0: e.d, d: e.d, aps: [e.a] } : { t: e.t, d: e.d, a: e.a, w: e.w, u: e.u, sp: e.sp });
-  }
-  return cols;
+  return mapaEventos().map(e => e.t === 'compra' ? { t: 'aportes', d0: e.d, d: e.d, aps: [e.a] } : { t: e.t, d: e.d, a: e.a, w: e.w, u: e.u, sp: e.sp });
 }
 const mapaN = v => (Math.round(v * 10) / 10).toString();
 // faixa curva de (x0, y0) a (x1, y1) com altura h: as bordas são curvas de Bézier de tangente horizontal (a forma do Sankey)
@@ -5252,14 +5781,18 @@ function mapaCauda(x, y, h, L = 12) { const a = Math.max(h, 8), t = y + h / 2 - 
 function mapaGrafo() {
   const U = new Map(state.utxos.map(u => [u.id, u])), cols = mapaColunas(), N = cols.length, vida = new Map();
   const nasce = (u, i, como) => { if (!u || vida.has(u.id)) return null; const v = { u, b: i, d: null, como, fim: null, y: null, h: 0, cx: null, cy: 0 }; vida.set(u.id, v); return v; };
-  // 1. o saldo da corretora e a vida de cada UTXO (nasce numa coluna, morre na transação que o gasta). Uma entrada que só
-  // aparece depois do gasto (datas trocadas à mão) entra direto na transação que a gasta ('tardia').
-  let ex = 0;
+  // 1. o saldo de cada corretora e a vida de cada UTXO (nasce numa coluna, morre na transação que o gasta). Uma entrada que só
+  // aparece depois do gasto (datas trocadas à mão) entra direto na transação que a gasta ('tardia'). 0.9.7: um rio por
+  // corretora (c.k, a chave do exLivro; c.R, o rio), com exIn e exOut dele; exTot é a soma das corretoras (o holdAt)
+  const LV = exLivro(), bal = new Map(), gb = k => bal.get(k) || 0, rios = new Map();
+  const rioDe = (k, i) => { let r = rios.get(k); if (!r) { r = { k, nome: LV.nome(k), cnpj: LV.cnpj(k), i0: i, cols: [], nSaq: 0, maxNo: 0, maxV: 0 }; rios.set(k, r); } if (r.cols[r.cols.length - 1] !== i) r.cols.push(i); return r; };
   cols.forEach((c, i) => {
-    c.exIn = ex; c.A = 0; c.V = 0; c.S = 0; c.F = 0;
-    if (c.t === 'aportes') { c.A = c.aps.reduce((t, a) => t + a.sats, 0); ex += c.A; }
-    else if (c.t === 'venda') { c.V = c.a.sats; ex -= c.V; }
-    else if (c.t === 'saque') { c.S = c.w.sats; c.F = c.w.fee || 0; ex -= c.S + c.F; c.uv = nasce(U.get(c.w.utxoId), i, 'saque'); }
+    c.exIn = 0; c.exOut = 0; c.A = 0; c.V = 0; c.S = 0; c.F = 0; c.D = 0;
+    const reg = c.t === 'aportes' ? c.aps[0] : c.t === 'venda' ? c.a : c.t === 'saque' ? c.w : null;
+    if (reg && LV.de.has(reg)) { c.k = LV.de.get(reg); c.R = rioDe(c.k, i); c.exIn = gb(c.k); }
+    if (c.t === 'aportes') { c.A = c.aps.reduce((t, a) => t + a.sats, 0); if (c.R) bal.set(c.k, c.exIn + c.A); }
+    else if (c.t === 'venda') { c.V = c.a.sats; if (c.R) { bal.set(c.k, c.exIn - c.V); c.chute = LV.chute.has(c.a); } }
+    else if (c.t === 'saque') { c.S = c.w.sats; c.F = c.w.fee || 0; if (c.R) { bal.set(c.k, c.exIn - c.S - c.F); c.R.nSaq++; c.chute = LV.chute.has(c.w); } c.uv = nasce(U.get(c.w.utxoId), i, 'saque'); }
     else if (c.t === 'entrada') c.uv = nasce(c.u, i, 'entrada');
     else if (c.t === 'tx') {
       const sv = saidaVenda(c.sp); c.ins = []; c.outs = []; c.fee = c.sp.fee || 0;
@@ -5269,9 +5802,13 @@ function mapaGrafo() {
         else c.outs.push({ k: o.kind === 'ex' ? 'dep' : o === sv ? 'venda' : 'env', o });
       }
       c.mix = c.ins.some(v => v.u.kyc) && c.ins.some(v => !v.u.kyc);
-      c.D = c.outs.reduce((t, s) => t + (s.k === 'dep' ? s.o.sats : 0), 0); ex += c.D;   // 1.8.39: para a corretora, volta ao rio
+      // 1.8.39: para a corretora, volta ao rio; 0.9.7: ao rio da corretora de cada saída
+      c.depIn = new Map(); c.depOut = new Map(); c.segD = new Map();
+      for (const s of c.outs) if (s.k === 'dep') { s.rk = LV.de.get(s.o) || EX_NI; s.R = rioDe(s.rk, i); if (!c.depIn.has(s.rk)) c.depIn.set(s.rk, gb(s.rk)); bal.set(s.rk, gb(s.rk) + s.o.sats); c.D += s.o.sats; }
+      for (const k of c.depIn.keys()) c.depOut.set(k, gb(k));
     } else if (c.t === 'sumiu') { const v = vida.get(c.u.id) || nasce(c.u, i, 'tardia'); if (v.d == null) { v.d = i; v.fim = 'sumiu'; } c.uv = v; }
-    c.exOut = ex;
+    if (c.R) c.exOut = gb(c.k);
+    let t = 0; for (const v of bal.values()) t += v; c.exTot = t;
   });
   // 2. a escala: o rio no ponto mais cheio, o pico de cada carteira e as maiores saídas cabem em MAPA.HF px.
   // Com mais de 40 UTXOs vivos numa carteira, faixas e folgas mais finas.
@@ -5288,10 +5825,11 @@ function mapaGrafo() {
   const denso = picoQtd > 40, MIN = denso ? 1 : 1.6, GAP = denso ? 1.5 : 5, CAP = denso ? 6 : 10;
   let maxNo = 0, maxV = 0, maxSai = 0, picos = 0;
   for (const c of cols) {
-    maxNo = Math.max(maxNo, c.exIn + c.A, c.exOut); maxV = Math.max(maxV, c.V);
-    if (c.t === 'tx') maxSai = Math.max(maxSai, c.outs.reduce((t, s) => t + (s.k === 'own' || s.k === 'dep' ? 0 : s.o.sats), 0));
+    if (c.R) { c.R.maxNo = Math.max(c.R.maxNo, c.exIn + c.A, c.exOut); c.R.maxV = Math.max(c.R.maxV, c.V); }
+    if (c.t === 'tx') { for (const [k, v] of c.depOut) { const R = rios.get(k); R.maxNo = Math.max(R.maxNo, v); } maxSai = Math.max(maxSai, c.outs.reduce((t, s) => t + (s.k === 'own' || s.k === 'dep' ? 0 : s.o.sats), 0)); }
     if (c.t === 'sumiu') maxSai = Math.max(maxSai, c.u.sats);
   }
+  for (const R of rios.values()) { maxNo += R.maxNo; maxV += R.maxV; }   // os rios ficam um sobre o outro: a escala conta todos
   for (const p of pico.values()) picos += p;
   const k = MAPA.HF / Math.max(1, maxNo + picos + maxV + maxSai), th = s => s > 0 ? Math.max(MIN, s * k) : 0;
   // 3. as trilhas: em cada carteira, a altura livre mais perto do alvo, num tempo em fatias (três por coluna: a chegada das
@@ -5337,13 +5875,23 @@ function mapaGrafo() {
     for (const s of c.outs) if (s.k !== 'own' && s.k !== 'dep') { s.vaga = topo - s.h; topo -= s.h; }
     c.feeVaga = topo - c.feeH;
   });
-  // 4. as alturas na tela: margem de cima (vendas na corretora), rio, uma faixa por carteira, margem de baixo e o eixo
-  const temEx = cols.some(c => c.t === 'aportes' || c.t === 'venda' || c.t === 'saque' || c.D > 0);
-  let y = maxV > 0 ? Math.max(28, th(maxV) + 18) : 10, rio = null;
-  if (temEx) {
-    let alt = MIN; for (const c of cols) alt = Math.max(alt, th(c.exIn) + th(c.A), th(c.V) + th(c.exOut) + th(c.S) + th(c.F));
-    rio = { top: y, yB: y + MAPA.LBL + alt }; y = rio.yB + 16;
-  }
+  // 4. as alturas na tela: os rios das corretoras (cada um com a margem das vendas dele em cima), uma faixa por carteira,
+  // a margem de baixo e o eixo. O rio que mais manda para as carteiras fica embaixo, perto delas; no empate, o mais antigo
+  // fica em cima
+  const rioL = [...rios.values()].sort((p, q) => p.nSaq - q.nSaq || p.i0 - q.i0);
+  let y = rioL.length ? 0 : 10;
+  rioL.forEach((R, j) => {
+    R.j = j; R.topo = y;
+    if (R.maxV > 0) { R.vy = y + 6; y += Math.max(28, th(R.maxV) + 18); } else if (!j) y = 10;
+    let alt = MIN;
+    for (const i of R.cols) {
+      const c = cols[i];
+      if (c.R === R) alt = Math.max(alt, th(c.exIn) + th(c.A), th(c.V) + th(c.exOut) + th(c.S) + th(c.F));
+      else if (c.t === 'tx' && c.depOut.has(R.k)) alt = Math.max(alt, th(c.depOut.get(R.k)));
+    }
+    R.top = y; R.yB = y + MAPA.LBL + alt; y = R.yB + 16;
+  });
+  const rio = rioL[0] || null;   // o de cima (com uma corretora só, o rio de antes)
   const faixas = carteiras.map(w => { const f = { w, top: y, y0: y + MAPA.LBL }; f.yb = f.y0 + pista.get(w).reduce((m, r) => Math.max(m, r.y1), MIN); y = f.yb + 16; return f; });
   let baixo = 0;
   for (const c of cols) {
@@ -5359,13 +5907,13 @@ function mapaGrafo() {
     c.esq = 6; c.dir = 6;
     if (c.t === 'aportes') c.esq = 46;
     else if (c.t === 'entrada') { c.esq = MAPA.CW / 2 + 22; c.dir = MAPA.CW / 2 + 6; }
-    else if (c.t === 'saque' && rio) { const ys = rio.yB - th(c.F) - th(c.S); c.Ls = lim(0.45 * Math.abs((c.uv ? gy(c.uv) : ys + 34) - ys), 28, 72); c.dir = c.Ls + MAPA.CW + 6; }
-    else if (c.t === 'venda' && rio) { c.Lv = lim(0.5 * (rio.yB - th(c.exOut) - th(c.V) - 6), 22, 56); c.dir = c.Lv + 14; }
+    else if (c.t === 'saque' && c.R) { const ys = c.R.yB - th(c.F) - th(c.S); c.Ls = lim(0.45 * Math.abs((c.uv ? gy(c.uv) : ys + 34) - ys), 28, 72); c.dir = c.Ls + MAPA.CW + 6; }
+    else if (c.t === 'venda' && c.R) { c.Lv = lim(0.5 * (c.R.yB - th(c.exOut) - th(c.V) - c.R.vy), 22, 56); c.dir = c.Lv + 14; }
     else if (c.t === 'tx' && c.lane) {
       const yb = fx.get(c.lane).yb; c.gy = yb - c.ny - c.nh;
       let off = c.gy, din = 0, tarde = false, dout = 0, sai = false, ddep = -1;
       for (const v of c.ins) { v.vaga = off; off += v.h; if (v.y != null) din = Math.max(din, Math.abs(gy(v) - v.vaga)); else tarde = true; }
-      for (const s of c.outs) { s.gv = yb - s.vaga - s.h; if (s.k === 'own') dout = Math.max(dout, Math.abs(gy(s.v) - s.gv)); else if (s.k === 'dep') ddep = Math.max(ddep, Math.abs(s.gv - (rio ? rio.yB : 0))); else sai = true; }
+      for (const s of c.outs) { s.gv = yb - s.vaga - s.h; if (s.k === 'own') dout = Math.max(dout, Math.abs(gy(s.v) - s.gv)); else if (s.k === 'dep') ddep = Math.max(ddep, Math.abs(s.gv - s.R.yB)); else sai = true; }
       c.gfee = yb - c.feeVaga - c.feeH;
       c.Lin = lim(0.5 * din, 18, 56); c.Lout = lim(0.5 * dout, 18, 60); c.Lx = lim(0.45 * Math.abs(ySai - c.gfee), 24, 64); c.Ld = ddep < 0 ? 0 : lim(0.45 * ddep, 28, 72);
       c.esq = MAPA.NW / 2 + c.Lin + (tarde ? 20 : 0);
@@ -5403,49 +5951,52 @@ function mapaGrafo() {
   };
   const taxa = (x0, y0, kk) => camada.topo.push(`<path class="el tf" d="M${mapaN(x0)} ${mapaN(y0)}C${mapaN(x0 + 9)} ${mapaN(y0)} ${mapaN(x0 + 12)} ${mapaN(y0 + 6)} ${mapaN(x0 + 13)} ${mapaN(y0 + 16)}" data-a="${kk}" data-b="${kk}"/><ellipse class="el tp" cx="${mapaN(x0 + 13)}" cy="${mapaN(y0 + 18.5)}" rx="2.3" ry="2.3" data-a="${kk}" data-b="${kk}"/>`);
   const rotU = u => `UTXO de ${fmtDate(u.date)}, ${walletName(u.wallet)}${qt(u.sats)}, ${u.kyc ? 'com' : 'sem'} KYC`;
-  // o rio: um trecho por movimento da corretora, deitado no leito (yB); depois de um saque, desce até o leito
-  const segs = []; let atual = null;
-  if (rio) cols.forEach((c, i) => {
-    const dep = c.t === 'tx' && c.D > 0;
-    if (c.t !== 'aportes' && c.t !== 'venda' && c.t !== 'saque' && !dep) return;
-    const x0 = dep && c.lane ? c.x + MAPA.NW / 2 : c.x, de = atual; if (de) { de.x1 = x0; de.d1 = c.d; }
-    const novo = c.exOut > 0 ? { s: segs.length, c: i, x0, x1: 0, d0: c.d, d1: null, sats: c.exOut } : null;
-    if (novo) segs.push(novo);
-    if (c.t === 'aportes' && novo) liga('a:' + i, 'r:' + novo.s, 'in');
-    if (dep && novo && c.lane) liga('t:' + c.sp.id, 'r:' + novo.s, 'in');   // 1.8.39: o envio para a corretora entra no rio
-    if (c.t === 'venda' && de) liga('r:' + de.s, 'v:' + c.a.id, 'out');
-    if (c.t === 'saque' && de) liga('r:' + de.s, 'w:' + c.w.id, 'out');
-    if (de && novo) liga('r:' + de.s, 'r:' + novo.s, 'rr');
-    c.seg = novo; atual = novo;
+  // cada rio: um trecho por movimento da corretora dele, deitado no leito (yB); depois de um saque, desce até o leito
+  const segs = [], atual = new Map();
+  cols.forEach((c, i) => {
+    const dep = c.t === 'tx' && c.D > 0, ks = dep ? [...c.depOut.keys()] : c.R ? [c.k] : [];
+    for (const k of ks) {
+      const x0 = dep && c.lane ? c.x + MAPA.NW / 2 : c.x, de = atual.get(k); if (de) { de.x1 = x0; de.d1 = c.d; }
+      const sats = dep ? c.depOut.get(k) : c.exOut;
+      const novo = sats > 0 ? { s: segs.length, c: i, k, x0, x1: 0, d0: c.d, d1: null, sats } : null;
+      if (novo) segs.push(novo);
+      if (c.t === 'aportes' && novo) liga('a:' + i, 'r:' + novo.s, 'in');
+      if (dep && novo && c.lane) liga('t:' + c.sp.id, 'r:' + novo.s, 'in');   // 1.8.39: o envio para a corretora entra no rio
+      if (c.t === 'venda' && de) liga('r:' + de.s, 'v:' + c.a.id, 'out');
+      if (c.t === 'saque' && de) liga('r:' + de.s, 'w:' + c.w.id, 'out');
+      if (de && novo) liga('r:' + de.s, 'r:' + novo.s, 'rr');
+      if (dep) { c.segD.set(k, novo); c.seg = novo; } else c.seg = novo;
+      atual.set(k, novo);
+    }
   });
-  if (atual) atual.x1 = xFim;
+  for (const g of atual.values()) if (g) g.x1 = xFim;
   for (const g of segs) {
-    const c = cols[g.c], h = th(g.sats), yb = rio.yB - h, kk = 'r:' + g.s;
+    const c = cols[g.c], R = rios.get(g.k), h = th(g.sats), yb = R.yB - h, kk = 'r:' + g.s;
     let L, d;
     if (c.t === 'tx') {   // 1.8.39: depois de um envio para a corretora, o rio sobe e o envio entra por baixo dele
-      const h0 = th(c.exIn); L = Math.min(c.Ld || 0, g.x1 - g.x0);
-      d = (L && h0 ? mapaFita(g.x0 - 0.3, rio.yB - h0, g.x0 + L, yb, h0) : '') + mapaReta(g.x0 + L - 0.3, g.x1 + 0.3, yb, h);
+      const h0 = th(c.depIn.get(g.k)); L = Math.min(c.Ld || 0, g.x1 - g.x0);
+      d = (L && h0 ? mapaFita(g.x0 - 0.3, R.yB - h0, g.x0 + L, yb, h0) : '') + mapaReta(g.x0 + L - 0.3, g.x1 + 0.3, yb, h);
     } else {
       const yo = yb - th(c.F) - th(c.S); L = yo < yb - 0.05 ? Math.min(c.Ls || 30, g.x1 - g.x0) : 0;
       d = (L ? mapaFita(g.x0 - 0.3, yo, g.x0 + L, yb, h) : '') + mapaReta(g.x0 + L - 0.3, g.x1 + 0.3, yb, h);
     }
-    poe('rio', 'rio', d, kk, kk, kk, `Corretora de ${fmtDate(g.d0)} ${g.d1 ? 'a ' + fmtDate(g.d1) : 'até hoje'}${qt(g.sats)}`);
-    nos.set(kk, { tp: 'r', g, x: g.x0 + Math.min(L + 30, (g.x1 - g.x0) / 2), y: yb + h / 2 });
+    poe('rio', 'rio' + (R.j % 2 ? ' r2' : ''), d, kk, kk, kk, `${R.nome} de ${fmtDate(g.d0)} ${g.d1 ? 'a ' + fmtDate(g.d1) : 'até hoje'}${qt(g.sats)}`);
+    nos.set(kk, { tp: 'r', g, R, x: g.x0 + Math.min(L + 30, (g.x1 - g.x0) / 2), y: yb + h / 2 });
   }
   cols.forEach((c, i) => {
-    if (c.t === 'aportes' && rio) {
-      const kk = 'a:' + i, h = th(c.A), ys = rio.yB - th(c.exIn) - h, cx = c.x - 26;
-      poe('rio', 'ap', mapaCauda(cx - MAPA.CW / 2 - 15, ys, h), kk, kk, kk);
-      poe('rio', 'ap', mapaReta(cx, c.x + 0.3, ys, h), kk, c.seg ? 'r:' + c.seg.s : kk, kk);
-      bolha(cx, ys + h / 2, h, MAPA.CW, 'ap', kk, c.aps.length === 1 ? `Aporte na corretora em ${fmtDate(c.d)}${qt(c.A)}` : `${c.aps.length} aportes na corretora, de ${fmtDate(c.d0)} a ${fmtDate(c.d)}${qt(c.A)}`);
+    if (c.t === 'aportes' && c.R) {
+      const kk = 'a:' + i, h = th(c.A), ys = c.R.yB - th(c.exIn) - h, cx = c.x - 26;
+      poe('rio', 'ap' + (c.R.j % 2 ? ' r2' : ''), mapaCauda(cx - MAPA.CW / 2 - 15, ys, h), kk, kk, kk);
+      poe('rio', 'ap' + (c.R.j % 2 ? ' r2' : ''), mapaReta(cx, c.x + 0.3, ys, h), kk, c.seg ? 'r:' + c.seg.s : kk, kk);
+      bolha(cx, ys + h / 2, h, MAPA.CW, 'ap' + (c.R.j % 2 ? ' r2' : ''), kk, `Aporte em ${fmtDate(c.d)} na ${c.R.nome}${qt(c.A)}`);
       nos.set(kk, { tp: 'a', c, x: cx, y: ys + h / 2 });
-    } else if (c.t === 'venda' && rio) {
-      const kk = 'v:' + c.a.id, h = th(c.V), yv = rio.yB - th(c.exOut) - h, x1 = c.x + c.Lv;
-      poe('rio', 'vx', mapaFita(c.x - 0.3, yv, x1, 6, h), kk, kk, kk);
-      poe('topo', 'pv', mapaPonta(x1 - 0.3, 6, h), kk, kk, kk, `Venda na corretora em ${fmtDate(c.d)}${qt(c.V)}`);
-      nos.set(kk, { tp: 'v', c, x: x1, y: 6 + h / 2 });
-    } else if (c.t === 'saque' && rio) {
-      const kk = 'w:' + c.w.id, h = th(c.S), ys = rio.yB - th(c.F) - h, v = c.uv, rot = `Saque de ${fmtDate(c.d)}${qt(c.S)}`, yf = v ? gy(v) : ys + 34;
+    } else if (c.t === 'venda' && c.R) {
+      const kk = 'v:' + c.a.id, h = th(c.V), yv = c.R.yB - th(c.exOut) - h, x1 = c.x + c.Lv;
+      poe('rio', 'vx', mapaFita(c.x - 0.3, yv, x1, c.R.vy, h), kk, kk, kk);
+      poe('topo', 'pv', mapaPonta(x1 - 0.3, c.R.vy, h), kk, kk, kk, `Venda em ${fmtDate(c.d)} na ${c.R.nome}${qt(c.V)}`);
+      nos.set(kk, { tp: 'v', c, x: x1, y: c.R.vy + h / 2 });
+    } else if (c.t === 'saque' && c.R) {
+      const kk = 'w:' + c.w.id, h = th(c.S), ys = c.R.yB - th(c.F) - h, v = c.uv, rot = `Saque de ${fmtDate(c.d)} da ${c.R.nome}${qt(c.S)}`, yf = v ? gy(v) : ys + 34;
       if (v) {
         v.cx = c.x + c.Ls + MAPA.CW / 2; v.cy = gy(v) + v.h / 2;
         poe('fita', 'saq', mapaFita(c.x - 0.3, ys, v.cx, gy(v), h), kk, kk, kk, rot); liga(kk, 'u:' + v.u.id, 'n');
@@ -5454,7 +6005,7 @@ function mapaGrafo() {
         poe('fita', 'saq', mapaFita(c.x - 0.3, ys, x1, y1, h), kk, kk, kk, rot); poe('topo', 'pe tr', mapaPonta(x1 - 0.3, y1, h), kk, kk, kk);
         if (u) liga(kk, 'u:' + u.id, 'n');
       }
-      if (c.F) taxa(c.x, rio.yB - th(c.F) / 2, kk);
+      if (c.F) taxa(c.x, c.R.yB - th(c.F) / 2, kk);
       nos.set(kk, { tp: 'w', c, x: c.x + c.Ls / 2, y: (ys + yf + h) / 2 });
     } else if (c.t === 'entrada' && c.uv) {
       const v = c.uv; v.cx = c.x; v.cy = gy(v) + v.h / 2;
@@ -5467,10 +6018,11 @@ function mapaGrafo() {
         else { v.cx = xl - 22; v.cy = v.vaga + v.h / 2; poe('fita', cl, mapaCauda(v.cx - 6, v.vaga, v.h, 10) + mapaReta(v.cx + 4, xl + 0.3, v.vaga, v.h), ku, kk, ku, rotU(v.u)); nos.set(ku, { tp: 'u', v, x: v.cx, y: v.cy }); }
         liga(ku, kk, 'n');
       }
-      // os envios para a corretora entram por baixo do rio, na ordem em que saem do tronco (sem se cruzar)
-      let yx = ySai, yd = (rio ? rio.yB : 0) - c.outs.reduce((t, s) => t + (s.k === 'dep' ? s.h : 0), 0);
+      // os envios para a corretora entram por baixo do rio dela, na ordem em que saem do tronco (sem se cruzar)
+      let yx = ySai; const yd = new Map();
+      for (const s of c.outs) if (s.k === 'dep') yd.set(s.rk, (yd.has(s.rk) ? yd.get(s.rk) : s.R.yB) - s.h);
       for (const s of c.outs) {   // e o tronco se abre nas saídas
-        if (s.k === 'dep') { poe('fita', 'dx', mapaFita(xr - 0.3, s.gv, xr + c.Ld + 0.3, yd, s.h), kk, c.seg ? 'r:' + c.seg.s : kk, kk); yd += s.h; }
+        if (s.k === 'dep') { const g = c.segD.get(s.rk); poe('fita', 'dx', mapaFita(xr - 0.3, s.gv, xr + c.Ld + 0.3, yd.get(s.rk), s.h), kk, g ? 'r:' + g.s : kk, kk); yd.set(s.rk, yd.get(s.rk) + s.h); }
         else if (s.k === 'own') {
           const v = s.v, ku = 'u:' + v.u.id; v.cx = xr + c.Lout + MAPA.CW / 2; v.cy = gy(v) + v.h / 2;
           poe('fita', 'ut' + (v.u.kyc ? ' k' : ''), mapaFita(xr - 0.3, s.gv, v.cx, gy(v), v.h), kk, ku, ku); liga(kk, ku, 'n');
@@ -5499,6 +6051,7 @@ function mapaGrafo() {
   }
   // fundo: separação das faixas e a linha de hoje; o eixo com os meses (posição proporcional à data entre duas colunas)
   const fundo = [];
+  for (const R of rioL) if (R.j) fundo.push(`<line class="sep" x1="0" x2="${W}" y1="${mapaN(R.topo - 8)}" y2="${mapaN(R.topo - 8)}"/>`);   // entre os rios
   for (const f of faixas) if (f.top > 14) fundo.push(`<line class="sep" x1="0" x2="${W}" y1="${mapaN(f.top - 8)}" y2="${mapaN(f.top - 8)}"/>`);
   if (N) fundo.push(`<line class="sep" x1="0" x2="${W}" y1="${mapaN(base - 8)}" y2="${mapaN(base - 8)}"/>`);
   fundo.push(`<line class="hoje" x1="${mapaN(xFim)}" x2="${mapaN(xFim)}" y1="${mapaN(rio ? rio.top : faixas.length ? faixas[0].top : 0)}" y2="${mapaN(H0)}"/>`);
@@ -5516,13 +6069,13 @@ function mapaGrafo() {
   const pausas = []; cols.forEach((c, i) => { if (c.pausa) pausas.push((cols[i - 1].x + c.x) / 2); });
   if (N && dFim > MAPA.TETO) pausas.push((ult.x + xFim) / 2);
   const eixo = { marcas, pausas, x0: MAPA.PADL - 12, xFim };
-  const defs = `<defs>${['x', 'u'].map(t => `<pattern id="mp-h${t}" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect class="pb-${t}" width="6" height="6"/><rect class="ps" width="2.2" height="6"/></pattern>`).join('')}${[['gxu', 'x', 'u'], ['gxv', 'x', 'v'], ['gue', 'u', 'e'], ['guv', 'u', 'v'], ['gux', 'u', 'x']].map(([id, a, b]) => `<linearGradient id="mp-${id}"><stop offset="0" class="s-${a}"/><stop offset="1" class="s-${b}"/></linearGradient>`).join('')}</defs>`;
+  const defs = `<defs>${['x', 'y', 'u'].map(t => `<pattern id="mp-h${t}" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect class="pb-${t}" width="6" height="6"/><rect class="ps" width="2.2" height="6"/></pattern>`).join('')}${[['gxu', 'x', 'u'], ['gxv', 'x', 'v'], ['gue', 'u', 'e'], ['guv', 'u', 'v'], ['gux', 'u', 'x']].map(([id, a, b]) => `<linearGradient id="mp-${id}"><stop offset="0" class="s-${a}"/><stop offset="1" class="s-${b}"/></linearGradient>`).join('')}</defs>`;
   const resumo = N ? `Mapa dos sats de ${fmtDate(cols[0].d)} até hoje, com ${N} ${N === 1 ? 'movimento' : 'movimentos'}. Toque numa bolha para destacar o caminho dela e toque de novo para ver os detalhes.` : '';
   const Hs = Math.ceil(H0 + 2);   // o SVG vai até a linha de hoje; o eixo dos meses fica embaixo, em HTML (MAPA.AX px)
   const svg = `<svg id="mapa-svg" width="${W}" height="${Hs}" viewBox="0 0 ${W} ${Hs}" preserveAspectRatio="none" role="group" aria-label="${esc(resumo)}">${defs}${fundo.join('')}${camada.rio.join('')}${camada.fita.join('')}${camada.banda.join('')}${camada.bolha.join('')}${camada.topo.join('')}</svg>`;
-  const rots = [...(rio ? [{ y: rio.top + 3, t: 'Corretora' }] : []), ...faixas.map(f => ({ y: f.top + 3, t: walletName(f.w) })), ...(N ? [{ y: base - 2, t: 'Saiu' }] : [])];
+  const rots = [...rioL.map(R => ({ y: R.top + 3, t: R.nome })), ...faixas.map(f => ({ y: f.top + 3, t: walletName(f.w) })), ...(N ? [{ y: base - 2, t: 'Saiu' }] : [])];
   const ordem = [...nos.entries()].sort((p, q) => p[1].x - q[1].x).map(e => e[0]);
-  return { cols, vida, segs, nos, dn, up, ordem, W, H: Hs + MAPA.AX, Hs, k, MIN, rio, faixas, base, xFim, svg, rots, eixo, bolhas, els: null, lv: null };
+  return { cols, vida, segs, nos, dn, up, ordem, W, H: Hs + MAPA.AX, Hs, k, MIN, rio, rios: rioL, faixas, base, xFim, svg, rots, eixo, bolhas, els: null, lv: null };
 }
 
 /* O caminho de um nó: tudo o que veio antes (subindo) e tudo o que veio depois (descendo). Nível 2: caminho exato (UTXOs e
@@ -5626,21 +6179,23 @@ function mapaPopHTML(k) {
       ${dep.length && c.ins.some(v => !v.u.kyc) ? '<p class="mp-av">Moedas sem KYC foram para a corretora: lá ficam ligadas ao seu cadastro, e o troco passa a ter KYC.</p>' : ''}
       <div class="mp-bt">${bt('open-tx', sp.id, 'Ver transação')}</div>`;
   }
+  // 0.9.7: o nome da corretora de cada rio (e o CNPJ, quando tem) e o saldo dela
+  const cor = R => R ? lin(`${esc(R.nome)}${R.cnpj ? ` · CNPJ ${esc(cnpjFmt(R.cnpj))}` : ''}`) : '';
   if (n.tp === 'a') {
-    const c = n.c, um = c.aps.length === 1;
-    return `<p class="mp-t"><b>${AMT(c.A)}</b> ${tag(true)}</p>${lin(um ? `Aporte na corretora em ${fmtDate(c.d)}` : `${c.aps.length} aportes na corretora, de ${fmtDate(c.d0)} a ${fmtDate(c.d)}`)}${lin('A corretora tem o seu cadastro: o saldo dela tem KYC.')}${um ? `<div class="mp-bt">${bt('edit-aporte', c.aps[0].id, 'Abrir aporte')}</div>` : ''}`;
+    const c = n.c, a = c.aps[0];
+    return `<p class="mp-t"><b>${AMT(c.A)}</b> ${tag(true)}</p>${lin(`Aporte em ${fmtDate(c.d)}${a && a.price > 0 ? ` a ${esc(fmtMoney(a.price, cur()))}` : ''}`)}${cor(c.R)}${lin(`Saldo da corretora depois dele: ${AMT(c.exOut)}`)}${lin('A corretora tem o seu cadastro: o saldo dela tem KYC.')}${a ? `<div class="mp-bt">${bt('edit-aporte', a.id, 'Abrir aporte')}</div>` : ''}`;
   }
   if (n.tp === 'r') {
     const g = n.g;
-    return `<p class="mp-t"><b>${AMT(g.sats)}</b> ${tag(true)}</p>${lin(`Na corretora de ${fmtDate(g.d0)} ${g.d1 ? 'a ' + fmtDate(g.d1) : 'até hoje'}`)}${lin('A corretora mistura os saldos: o caminho em meia-luz mostra de onde eles podem ter vindo e para onde podem ter ido.')}`;
+    return `<p class="mp-t"><b>${AMT(g.sats)}</b> ${tag(true)}</p>${cor(n.R)}${lin(`Saldo de ${fmtDate(g.d0)} ${g.d1 ? 'a ' + fmtDate(g.d1) : 'até hoje'}`)}${lin('A corretora mistura os saldos: o caminho em meia-luz mostra de onde eles podem ter vindo e para onde podem ter ido. Cada corretora tem o seu rio.')}`;
   }
   if (n.tp === 'w') {
-    const w = n.c.w, u = w.utxoId ? byId(state.utxos, w.utxoId) : null;
-    return `<p class="mp-t"><b>${AMT(w.sats)}</b></p>${lin(`Saque${w.ex ? ' da ' + esc(w.ex) : ''} em ${fmtDate(w.date)}`)}${lin(`Taxa de saque: ${emSats(w.fee || 0)}`)}${n.c.uv ? '' : lin(u ? 'O UTXO deste saque aparece antes da data dele: confira as datas.' : 'Saque sem UTXO registrado.')}<div class="mp-bt">${bt('edit-saque', w.id, 'Abrir saque')}${u ? bt('edit-utxo', u.id, 'Abrir UTXO') : ''}</div>`;
+    const c = n.c, w = c.w, u = w.utxoId ? byId(state.utxos, w.utxoId) : null;
+    return `<p class="mp-t"><b>${AMT(w.sats)}</b></p>${lin(`Saque em ${fmtDate(w.date)}`)}${cor(c.R)}${c.chute ? `<p class="mp-av">${w.ex && !isDefEx(w.ex) ? `"${esc(w.ex)}" não tem aporte registrado` : 'O saque não diz a corretora'}: ele saiu da ${esc(c.R.nome)}, a de mais saldo nessa data. Para mudar, abra o saque e escreva o nome da corretora.</p>` : ''}${lin(`Taxa de saque: ${emSats(w.fee || 0)}`)}${c.uv ? '' : lin(u ? 'O UTXO deste saque aparece antes da data dele: confira as datas.' : 'Saque sem UTXO registrado.')}<div class="mp-bt">${bt('edit-saque', w.id, 'Abrir saque')}${u ? bt('edit-utxo', u.id, 'Abrir UTXO') : ''}</div>`;
   }
   if (n.tp === 'v') {
-    const a = n.c.a;
-    return `<p class="mp-t"><b>${AMT(a.sats)}</b></p>${lin(`Venda na corretora em ${fmtDate(a.date)}${a.ex && !isDefEx(a.ex) ? ' · ' + esc(a.ex) : ''}`)}<div class="mp-bt">${bt('edit-aporte', a.id, 'Abrir venda')}</div>`;
+    const c = n.c, a = c.a;
+    return `<p class="mp-t"><b>${AMT(a.sats)}</b></p>${lin(`Venda em ${fmtDate(a.date)}${a.price > 0 ? ` a ${esc(fmtMoney(a.price, cur()))}` : ''}`)}${cor(c.R)}${c.chute ? `<p class="mp-av">A venda não diz a corretora: ela saiu da ${esc(c.R.nome)}, a de mais saldo nessa data.</p>` : ''}<div class="mp-bt">${bt('edit-aporte', a.id, 'Abrir venda')}</div>`;
   }
   return '';
 }
@@ -5927,6 +6482,8 @@ function viewCarteira() {
   if (moves.length) h += `<section class="sec"><h2 class="sec-t">Movimentos</h2>${moves.slice(0, 30).map(moveRow).join('')}</section>`;
   if (state.utxos.length || state.addresses.some(a => a.addr)) h += `<section class="sec"><h2 class="sec-t">Etiquetas BIP-329</h2><p class="small muted">Leve as etiquetas para a Sparrow ou outra carteira compatível. Entram os endereços informados, os UTXOs com TXID e vout e as transações com TXID.</p><div class="btn-row"><button class="btn btn-q btn-s" data-act="bip329-save">Baixar arquivo</button><button class="btn btn-q btn-s" data-act="bip329-copy">Copiar</button></div></section>`;
   h += xiSection();
+  // 0.9.7: discreto, no fim da aba (também em Configurações › Dados)
+  if (state.aportes.length || state.saques.length) h += `<p class="po-pe"><button class="link-btn small" data-act="poeira">Verificar poeira nos registros</button></p>`;
   h += `<section class="sec" style="padding-top:0">${ksCard('steel')}</section>`;
   return h;
 }
@@ -6158,6 +6715,7 @@ Object.assign(ACT, {
   'ap-src': el => {
     const f = ui.form; f.src = el.dataset.s; f.dustOk = false; $$('[data-act="ap-src"]').forEach(b => { b.classList.toggle('on', b === el); b.setAttribute('aria-pressed', b === el); });
     const hEl = $('#src-hint'); if (hEl) hEl.textContent = srcHint(f.src); const box = $('#sale-self'); if (box) box.hidden = f.src !== 'self';
+    const cnpjF = $('#fld-cnpj'); if (cnpjF) cnpjF.hidden = !exSugCampo(f); exFecha(); cnpjDecideLimpa();   // venda da carteira (P2P): sem CNPJ (0.9.5)
     const exEl = $('#f-ex'), lembrada = exLembrada();
     if (exEl) { exEl.placeholder = exPlaceholder(f.src); if (f.src === 'self' && lembrada && exEl.value === lembrada) { exEl.value = ''; f.exLimpo = true; } else if (f.src !== 'self' && f.exLimpo && !exEl.value.trim()) { exEl.value = lembrada; f.exLimpo = false; } }
     updateApCalc(); updateSaleTx();
@@ -6877,7 +7435,7 @@ function xiPreview() {
   // o que sai do saldo da corretora (só o marcado como da corretora) e o que entra novo na pilha (de terceiros)
   const quebra = `<b>Da corretora</b>: ${saques.length ? `${q(saques.length, ...nome)} · ${AMT(sq)} saem do saldo da corretora (${AMT(Math.max(0, c.ex))} → ${AMT(Math.max(0, ex))}).` : 'nenhum, e a corretora não muda.'}<br><b>De terceiros</b>: ${terc.length ? `${q(terc.length, ...nome)} · ${AMT(ts)} entram novos na pilha, sem mexer na corretora.` : 'nenhum.'}<br>`;
   const F = parseNum(fv('xfiat')), ext = F > 0 ? xiExtList() : [], es = ext.reduce((t, u) => t + u.sats, 0);   // valor pago (1.8.19)
-  const cl = !(F > 0) ? '' : ext.length ? `<br>Total aportado: <b>+${priv(fmtMoney(F, cur()))}</b> em ${ext.length} ${ext.length === 1 ? 'entrada de terceiros' : 'entradas de terceiros'} (${AMT(es)}), a ${priv(fmtMoney(F / (es / 1e8), cur(), 0))} por bitcoin` : '<br><span class="neg">Nenhuma entrada de terceiros para receber o valor pago: marque como de terceiros o que você comprou fora do app.</span>';
+  const cl = !(F > 0) ? '' : ext.length ? `<br>Total aportado: <b>+${priv(fmtMoney(F, cur()))}</b> em ${ext.length} ${ext.length === 1 ? 'entrada de terceiros' : 'entradas de terceiros'} (${AMT(es)}), a ${priv(fmtMoney(F / (es / 1e8), cur()))} por bitcoin` : '<br><span class="neg">Nenhuma entrada de terceiros para receber o valor pago: marque como de terceiros o que você comprou fora do app.</span>';
   el.innerHTML = `${quebra}Depois de importar: corretora <b>${AMT(Math.max(0, ex))}</b> · autocustódia <b>${AMT(c.self + inn)}</b>${ex < 0 ? `<br><span class="neg">A corretora ficaria ${AMT(ex)} negativa: marque ${H ? 'algumas' : 'alguns'} como de terceiros.</span>` : ''}${neg ? `<br><span class="warn">Em ${esc(fmtDate(neg))} a corretora ficaria negativa: nessa data, os seus aportes na corretora não cobriam o que está marcado como da corretora. Confira as datas dos aportes ou marque como de terceiros.</span>` : ''}${cl}`;
 }
 /* guarda o que já foi digitado e escolhido na revisão antes de redesenhá-la (1.8.16; entradas do histórico na 1.8.17) */
@@ -7395,7 +7953,7 @@ function apFxTroca(fc0, fc1) {
   // de volta à moeda anterior sem nada mudado, voltam a cotação e a taxa digitadas nela (sem o arredondamento da ida)
   if (m && m.para === fc0 && m.prod.price === d.price && m.prod.afee === d.afee) Object.assign(d, m.antes);
   else {
-    const p = conv(d.price); if (isFinite(p)) d.price = fmtInput(Math.round(p), 0);
+    const p = conv(d.price); if (isFinite(p)) d.price = fmtInput(round2(p));   // com os centavos (0.9.6; antes, inteira)
     if (f.feeU === 'fiat') { const t = conv(d.afee); if (isFinite(t)) d.afee = fmtInput(round2(t)); }
   }
   f.fxMemo = { para: fc1, antes, prod: { price: d.price, afee: d.afee } };

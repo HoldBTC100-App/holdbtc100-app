@@ -8,11 +8,11 @@
    A política fica guardada também, para abrir sem internet (1.8.12).
    Toque na notificação "Hora de sacar" (0.9.1): traz o app para a frente, ou abre, se estiver fechado.
    Troque CACHE a cada versão publicada para os aparelhos baixarem a nova. */
-const CACHE = 'holdbtc100-v0.9.4';
+const CACHE = 'holdbtc100-v0.9.7';
 const FLAGS = 'holdbtc100-flags';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 const EXTRA = ['./privacidade.html'];   // se faltar no site, a instalação segue sem ela
-const isAPI = h => /coingecko|binance|mempool\.space|blockstream\.info|bcb\.gov\.br|frankfurter/.test(h);   // blockstream.info: outro servidor da importação (1.8.14)
+const isAPI = h => /coingecko|binance|mempool\.space|blockstream\.info|bcb\.gov\.br|frankfurter|brasilapi\.com\.br/.test(h);   // blockstream.info: outro servidor da importação (1.8.14); brasilapi: o Buscar do CNPJ (0.9.5)
 const isApp = u => /\/(index\.html)?$/.test(u.pathname);
 
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL).then(() => c.addAll(EXTRA).catch(() => { }))).then(() => self.skipWaiting())); });
